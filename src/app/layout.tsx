@@ -25,6 +25,19 @@ export const metadata: Metadata = {
   description: '',
 }
 
+async function Navbar() {
+  return (
+  <nav className='flex justify-between p-4 w-full text-s border-b-2'>
+    <SignedOut>
+      <SignInButton />
+    </SignedOut>
+    <SignedIn>
+      <UserButton />
+    </SignedIn>
+  </nav>
+  )
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,15 +47,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <header className="flex justify-end items-center p-4 gap-4 h-16">
-            <SignedOut>
-              <SignInButton />
-              <SignUpButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
+            <Navbar />
           {children}
         </body>
       </html>
