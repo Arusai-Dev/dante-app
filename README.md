@@ -1,4 +1,5 @@
 # TO DO
+<<<<<<< HEAD
 
 - [ ] - Set up authentication (Clerk)
 - [ ] - Figure out where to host database and set it up
@@ -15,3 +16,7 @@
 - [ ] - Design the flashcard
 - [ ] - Home Page
 - [ ] - Sign-up page
+=======
+- [x] - Set up authentication (Clerk)
+- [x] - Figure out where to host database and set it up
+>>>>>>> 17f6dab9f9bc83c0121b9dbbfcc45727617e4109
