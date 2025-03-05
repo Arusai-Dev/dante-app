@@ -1,14 +1,10 @@
 import { type Metadata } from 'next'
 import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
+  ClerkProvider
 } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
+import Navbar from '@/components/Navbar'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -25,18 +21,6 @@ export const metadata: Metadata = {
   description: '',
 }
 
-async function Navbar() {
-  return (
-  <nav className='flex justify-between p-4 w-full text-s border-b-2'>
-    <SignedOut>
-      <SignInButton />
-    </SignedOut>
-    <SignedIn>
-      <UserButton />
-    </SignedIn>
-  </nav>
-  )
-}
 
 export default function RootLayout({
   children,
@@ -47,7 +31,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-            <Navbar />
+            <Navbar/>
           {children}
         </body>
       </html>
