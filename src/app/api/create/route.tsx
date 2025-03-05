@@ -4,12 +4,12 @@ import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
   
-  const requestData:object = await req.json();
-  
-  let cards:card = {}
+  const reqData:object = await req.json();
+  const user = await currentUser();
+  let cards: object[];
   
   interface card {
-    "card_id": string,
+    "cardId": string,
     "front": {
       "title": string,
       "description": string
@@ -21,14 +21,14 @@ export async function POST(req: NextRequest) {
   }
   
   interface flashcardObject {
-    "user_id": string,
+    "userId": string,
     "categories": [{
-      "category_name": string,
+      "categoryName": string,
       "sets": [{
-          "set_name": string,
+          "setName": string,
           "description": string, 
-          "date_created": Date,
-          "privacy_setting": boolean,
+          "dateCreated": Date,
+          "privacySetting": boolean,
           "cards": [{
             "card":card[],
           }]
@@ -37,9 +37,50 @@ export async function POST(req: NextRequest) {
   }
   
   
+  reqData.cardsArray.forEach((element, index, array) => {
+    createIndvCardObject({
+      "cardId": element.cardId,
+      "front": {
+        "title": element.frontTitle,
+        "description": element.frontDescription,
+      },
+      "back": {
+        "title": element.backTitle, 
+        "description": element.backDescription,
+      },
+    })
+  })
+  
+  function createIndvCardObject(indvCard: card) {
+    cards.push(indvCard)
+  }
   
   
-  const sql = neon(process.env.DATABASE_URL);
+  uploadFlashcardObject({ 
+      "userId": user?.id,  
+      "categories": [{
+        "categoryName": reqData.categoryName, 
+        "sets": [{
+          "setName": reqData.setName, 
+          "description": reqData.description, 
+          "dateCreated": reqData.dateCreate, 
+          "privacySetting": reqData.privacySetting, 
+          "cards":[{
+            cards
+          }]
+        }]
+      }]
+    
+    })
+  
+  function uploadFlashcardObject(cardObject: flashcardObject) {
+    const sql = neon(process.env.DATABASE_URL);
+    
+  }
+  
+  
+  
+  
   
   
   
