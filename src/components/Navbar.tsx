@@ -23,7 +23,7 @@ export default function Navbar() {
                 <ul className="flex list-none gap-7 text-[15px] font-normal items-center">
                     <li><Link href="/sets">My Sets</Link></li>
                     <li><Link href="/flashcards/create">Create Set</Link></li>
-                    <li><Link href="/pricing">Pricing</Link></li>
+                    {/* <li><Link href="/pricing">Pricing</Link></li> */}
                 </ul>
             </div>
 
