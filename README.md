@@ -2,8 +2,8 @@
 
 # Flashcards Creation
 
-- [ ] - Option for local flashcard (This will need to be tested since erasing browser data can cause sets to disappear)
-- [ ] - Create infinite flashcards (desktop: horizontal scrolling, mobile: vertical)
+- [ ] - Locally save flashcard creation progress
+- [ ] - Create infinite cards (desktop: horizontal scrolling, mobile: vertical)
 - [ ] - Option to paste in flashcard data to auto create cards
 - [ ] - When using manual creation mode implement auto complete for answers
 - [ ] - Create simple UI for /create where you can create a card, flip it to input an answer, create a new a card and finally submit

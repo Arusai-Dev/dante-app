@@ -18,20 +18,21 @@ export default function Navbar() {
                 </Link>
             </div>
 
+            
             <div>
                 <ul className="flex list-none gap-7 text-[15px] font-normal items-center">
                     <li><Link href="/sets">My Sets</Link></li>
-                    <li><Link href="/create">Create Set</Link></li>
+                    <li><Link href="/flashcards/create">Create Set</Link></li>
                     <li><Link href="/pricing">Pricing</Link></li>
                 </ul>
             </div>
 
 
-
-            <div className="w-[65px] flex justify-center">
+            <div className="w-[65px] flex justify-center z-1">
                 <SignedIn><UserButton /></SignedIn>
                 <SignedOut><SignUpButton/></SignedOut>
             </div>
+            <div className="fixed w-[75px] h-[50px] top-[5px] right-0 bg-[#D9D9D9] z-0 rounded-tl-3xl rounded-bl-3xl"></div>
         </nav>
     )
 }
