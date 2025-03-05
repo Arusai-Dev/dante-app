@@ -3,9 +3,10 @@ import { NextRequest } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
-  const formData = await req.formData();
   
-  let cards:object = {}
+  const requestData:object = await req.json();
+  
+  let cards:card = {}
   
   interface card {
     "card_id": string,
@@ -29,16 +30,17 @@ export async function POST(req: NextRequest) {
           "date_created": Date,
           "privacy_setting": boolean,
           "cards": [{
-            cards
+            "card":card[],
           }]
         }]
-      
     }] 
   }
   
-  const text = formData.get("text");
+  
+  
   
   const sql = neon(process.env.DATABASE_URL);
-  await sql("INSERT INTO flashcards (text) VALUES ($1)", [text]);
+  
+  
   
 }
