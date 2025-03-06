@@ -1,12 +1,11 @@
-import { neon } from "@neondatabase/serverless";
 import { NextRequest } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
+import { neon } from "@neondatabase/serverless";
 
 export async function POST(req: NextRequest) {
   
   const reqData:object = await req.json();
   const user = await currentUser();
-  let cards: object[];
   
   interface card {
     "cardId": string,
@@ -30,14 +29,15 @@ export async function POST(req: NextRequest) {
           "dateCreated": Date,
           "privacySetting": boolean,
           "cards": [{
-            "card":card[],
+            "card": object[],
           }]
         }]
     }] 
   }
   
-  
-  reqData.cardsArray.forEach((element, index, array) => {
+
+  const cards: object[] = []
+  reqData.cardsArray.forEach((element:object) => {
     createIndvCardObject({
       "cardId": element.cardId,
       "front": {
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   
   
   uploadFlashcardObject({ 
-      "userId": user?.id,  
+      "userId": user.id,  
       "categories": [{
         "categoryName": reqData.categoryName, 
         "sets": [{
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
           "dateCreated": reqData.dateCreate, 
           "privacySetting": reqData.privacySetting, 
           "cards":[{
-            cards
+            "card": cards
           }]
         }]
       }]
