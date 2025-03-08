@@ -1,10 +1,11 @@
-import { neon } from '@neondatabase/serverless';
+import { neon } from "@neondatabase/serverless";
 
 export default async function MyFlashcards() {
-  const sql = neon(process.env.DATABASE_URL);
-  await sql`CREATE TABLE IF NOT EXISTS flashcards (testvalue TEXT)`;
-  
-  return (
-    <input type="text" />
-  );
+    const responseCards = fetch("http://localhost:3000/api/my-sets", {
+        method: "GET",
+    });
+
+    console.log(responseCards);
+
+    return <input type="text" />;
 }
