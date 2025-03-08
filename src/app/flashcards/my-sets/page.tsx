@@ -5,6 +5,8 @@ export default async function MyFlashcards() {
         method: "GET",
     });
 
+    // TO DO 
+    // Use .map to display all flashcard sets
     console.log(responseCards);
 
     return <input type="text" />;

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
           "setName": string,
           "description": string, 
           "dateCreated": Date,
-          "privacySetting": boolean,
+          "isPrivate": boolean,
           "cards": [{
             "card": object[],
           }]
