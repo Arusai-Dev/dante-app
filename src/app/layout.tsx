@@ -2,19 +2,14 @@ import { type Metadata } from 'next'
 import {
   ClerkProvider
 } from '@clerk/nextjs'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const interSans = Inter({
   subsets: ['latin'],
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-})
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Dante',
@@ -29,8 +24,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <html lang="en" className={interSans.className}>
+        <body className="antialiased">
             <Navbar/>
           {children}
         </body>
