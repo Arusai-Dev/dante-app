@@ -131,3 +131,16 @@ body {
   background-color: #141414;
   color: #e9e9e9;
 }
+
+
+/* Hides scroll bar but keeps functionality */
+@layer utilities {
+  .hidden-scrollbar::-webkit-scrollbar {
+    display: none; 
+  }
+
+  .hidden-scrollbar {
+    overflow-y: scroll; 
+    scrollbar-width: none;
+  }
+}
