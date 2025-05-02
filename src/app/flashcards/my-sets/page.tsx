@@ -10,13 +10,11 @@ export default async function MyFlashcards() {
                 <p className=" text-[22px] pt-2">add, remove, edit or organize your cards.</p>   
             </div>        
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2 p-6">
 
                 <div>
-
                     <h1 className="relative font-bold text-2xl">Title</h1>
-
-                    <div className="absolute flex content-center items-center text-center h-64 w-lg bg-neutral-900 rounded-2xl">
+                    <div className="absolute flex content-center items-center text-center h-1/4 w-lg bg-neutral-900 rounded-2xl">
 
                         <div className="absolute top-0 right-0 m-2">
                             <Pencil className="inline-block m-1"/> 
@@ -33,11 +31,9 @@ export default async function MyFlashcards() {
                         <h1 className="text-center m-auto">Description</h1>
 
                     </div>
-
-
                 </div>
-                
-        </div>
+
+            </div>
 
 
         </section>
