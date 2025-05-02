@@ -34,13 +34,11 @@ export default async function MyFlashcards() {
 
                     </div>
 
-
                 </div>
-                
-        </div>
 
+            </div>
 
         </section>
-
+        
     )
 }
