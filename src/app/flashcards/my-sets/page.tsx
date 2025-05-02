@@ -1,23 +1,44 @@
-
+import { Trash, Pencil, Layers2 } from "lucide-react"
 
 export default async function MyFlashcards() {
     return (
 
-        <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)">
+        <section className="items-center pt-[65px] font-(family-name:inter)">
 
-            <div className="flex flex-col items-center pt-[30px] pb-9">
+            <div className="items-center pt-[30px] pb-9">
                 <h1 className=" text-4xl font-bold ">My Sets.</h1>
                 <p className=" text-[22px] pt-2">add, remove, edit or organize your cards.</p>   
             </div>        
 
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-6">
-                
-                <h1>Title</h1>
-                <div className="relative w-full h-64 bg-neutral-900">
-                    <h1>Description</h1>
+            {/* <div className="grid grid-cols-6"> */}
+            <div className="grid grid-cols-3 gap-2">
+
+                <div>
+
+                    <h1 className="relative font-bold text-2xl">Title</h1>
+
+                    <div className="absolute h-64 w-lg bg-neutral-900 rounded-2xl">
+
+                        <div className="float-right m-2">
+                            <Pencil className="inline-block m-1"/> 
+                            <Trash className="inline-block m-1" />
+                        </div>
+
+                        <div className="absolute bottom-0 right-0 m-2">
+                            <p className="inline-block m-1">25</p>
+                            <Layers2 className="inline-block m-1"/>
+
+                        </div>
+
+                        <h1 className="text-center m-auto">Description</h1>
+
+                    </div>
+
+
                 </div>
-            </div>
+        </div>
+
 
         </section>
 
