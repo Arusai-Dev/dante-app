@@ -86,10 +86,8 @@ export default async function MyFlashcards() {
                 </div>
 
                 <div>
-
                     <h1 className="relative font-bold text-2xl">Title</h1>
-
-                    <div className="absolute flex content-center items-center text-center h-64 w-lg bg-neutral-900 rounded-2xl">
+                    <div className="absolute flex content-center items-center text-center h-1/4 w-lg bg-neutral-900 rounded-2xl">
 
                         <div className="absolute top-0 right-0 m-2">
                             <Pencil className="inline-block m-1"/> 
