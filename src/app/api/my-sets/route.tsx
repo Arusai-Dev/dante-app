@@ -15,12 +15,10 @@ export async function GET() {
 
     if (row.length > 0) {
     
-        // @ts-expect-error - Typescript expects next line to be an iterator but there is no need  
         const response = "hello";
         return NextResponse.json({ "Cards": response })
         
     } else {
-
         return NextResponse.json({ "Cards": "No flashcard sets to display." })
     }
 
