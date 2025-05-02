@@ -31,12 +31,12 @@ export default async function MyFlashcards() {
                         <h1 className="text-center m-auto">Description</h1>
 
                     </div>
+
                 </div>
 
             </div>
 
-
         </section>
-
+        
     )
 }

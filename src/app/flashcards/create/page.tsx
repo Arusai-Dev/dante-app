@@ -4,21 +4,20 @@ import Image from "next/image"
 import { useEffect, useState } from "react"
 
 export default function Create() {
-    const [isOpen, setIsOpen] = useState(false);
 
+    // Drop Down 
+    const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
     const toggleDropDown = () => {
-        setIsOpen(!isOpen);
+        setDropDownIsOpen(!dropDownIsOpen);
     }
-
     const closeDropDown = (e: MouseEvent) => {
 
         const target = e.target as HTMLElement; 
 
         if (!target.closest(".select-set-dd")) {
-            setIsOpen(false);
+            setDropDownIsOpen(false);
         }
     }
-
     useEffect(() => {
         document.addEventListener('click', closeDropDown);
 
@@ -27,8 +26,12 @@ export default function Create() {
         };
     }, []);
 
-    const [selectedKey, setSelectedKey] = useState("");
-    const [selectedDict, setSelectedDict] = useState("");
+    // Info
+    const [selectedSetName, setSelectedSetName] = useState("");
+    const [selectedSetInfo, setSelectedSetInfo] = useState("");
+
+    // New Set
+    const [newSetIsOpen, setNewSetIsOpen] = useState(false);
 
     const userSets = {
         "Chinese Chapter 1": {
@@ -64,12 +67,12 @@ export default function Create() {
             <div className="flex justify-between h-[150px] w-[1150px] bg-[#D9D9D9]/3 py-3 px-4 rounded-[10px]">
                 <div className="flex flex-col justify-between h-full">
                     <div>
-                        <h2 className="font-bold text-2xl">{selectedKey == "" ? 'No Set Selected' : selectedKey}</h2>
-                        <p>{selectedKey == "" ? '' : selectedDict.Description}</p>
+                        <h2 className="font-bold text-2xl">{selectedSetName == "" ? 'No Set Selected' : selectedSetName}</h2>
+                        <p>{selectedSetName == "" ? '' : selectedSetInfo.Description}</p>
                     </div>
-                    {selectedDict && selectedDict.Cards && (
+                    {selectedSetInfo && selectedSetInfo.Cards && (
                         <div>
-                            <p>{selectedDict.Cards.length} Cards</p>
+                            <p>{selectedSetInfo.Cards.length} Cards</p>
                         </div>
                     )}
                 </div>
@@ -89,22 +92,21 @@ export default function Create() {
                                 width={24}
                                 height={24}  
                             />
-
                         </button>
 
                         {/* Drop Drown Content */}
-                        {isOpen && (
+                        {dropDownIsOpen && (
                             <div className="absolute mt-1 flex flex-col gap-2 overflow-y-auto w-[200px] max-h-[300px] py-2 bg-[#202020] rounded-[5px] border-1 border-[#828282] hidden-scrollbar">
                                 {Object.entries(userSets).map(([key, value], index) => (
                                     <div 
                                         key={index} 
                                         className="bg-[#202020] flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation overflow-x-scroll whitespace-nowrap hide-scrollbar"
                                         onClick={() => {
-                                            setSelectedKey(key)
-                                            setSelectedDict(value)
+                                            setSelectedSetName(key)
+                                            setSelectedSetInfo(value)
                                         }}
                                     >
-                                        {selectedKey == key && (
+                                        {selectedSetName == key && (
                                             <Image src="/icons/checkmark.svg" alt="checkmark icon" width={24} height={24}/>
                                         )}
                                         <div className="overflow-x-auto max-w-[200px] hide-scrollbar">{key}</div>
@@ -118,7 +120,9 @@ export default function Create() {
                     <div className="new-set-btn">
                         <button 
                             className="flex justify-between items-center w-[125px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
-                            onClick={}
+                            onClick={() => {
+                                setNewSetIsOpen(true)
+                            }}
                         >
                             <Image
                                 src="/icons/add.svg"
@@ -128,6 +132,12 @@ export default function Create() {
                             />
                             New Set
                         </button>
+
+                        {newSetIsOpen && (
+                            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                {/* Your content here */}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
