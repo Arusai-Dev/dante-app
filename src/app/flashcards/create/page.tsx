@@ -5,33 +5,21 @@ import { useEffect, useState } from "react"
 
 export default function Create() {
 
+    // Info
+    const [selectedSetName, setSelectedSetName] = useState("");
+    const [selectedSetInfo, setSelectedSetInfo] = useState("");
+
     // Drop Down 
     const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
     const toggleDropDown = () => {
         setDropDownIsOpen(!dropDownIsOpen);
     }
-    const closeDropDown = (e: MouseEvent) => {
-
-        const target = e.target as HTMLElement; 
-
-        if (!target.closest(".select-set-dd")) {
-            setDropDownIsOpen(false);
-        }
-    }
-    useEffect(() => {
-        document.addEventListener('click', closeDropDown);
-
-        return () => {
-            document.removeEventListener('click', closeDropDown);
-        };
-    }, []);
-
-    // Info
-    const [selectedSetName, setSelectedSetName] = useState("");
-    const [selectedSetInfo, setSelectedSetInfo] = useState("");
 
     // New Set
     const [newSetIsOpen, setNewSetIsOpen] = useState(false);
+    const toggleNewSetUI = () => {
+        setNewSetIsOpen(!newSetIsOpen);
+    }
 
     const userSets = {
         "Chinese Chapter 1": {
@@ -51,6 +39,21 @@ export default function Create() {
             ]
         }
     }
+
+
+    // Closes any open UI
+    const closeAnyUi = (e: MouseEvent) => {
+
+        const target = e.target as HTMLElement; 
+        if (!target.closest(".select-set-dd")) {setDropDownIsOpen(false)}
+    }
+    useEffect(() => {
+        document.addEventListener('click', closeAnyUi);
+
+        return () => {
+            document.removeEventListener('click', closeAnyUi);
+        };
+    }, []);
 
     return (
 
@@ -77,8 +80,11 @@ export default function Create() {
                     )}
                 </div>
 
-                {/* Select Set Drop Down */}
+                {/* Select Set Drop Down / New Set Button */}
                 <div className="flex gap-[11px]">
+
+
+                    {/* Select Set Drop Down */}
                     <div className="select-set-dd">
                         <button 
                             className="flex justify-between items-center w-[250px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
@@ -116,13 +122,13 @@ export default function Create() {
                         )}        
                     </div>
                     
+
+                    
                     {/* New Set Button */}
                     <div className="new-set-btn">
                         <button 
                             className="flex justify-between items-center w-[125px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
-                            onClick={() => {
-                                setNewSetIsOpen(true)
-                            }}
+                            onClick={toggleNewSetUI}
                         >
                             <Image
                                 src="/icons/add.svg"
@@ -134,9 +140,34 @@ export default function Create() {
                         </button>
 
                         {newSetIsOpen && (
-                            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[200px] bg-[#1e1e1e]">
-                                {/* Your content here */}
+                            <>
+                            <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={toggleNewSetUI}></div>
+
+                            <div className="new-set-btn-pop-up z-50 px-7 py-6 flex flex-col gap-8 rounded-md fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] bg-[#1e1e1e] transition-all duration-[0.2s]">
+                                
+                                <div>
+                                    <h1 className="text-2xl font-bold">Create New Set</h1>
+                                    <p className="text-[#8c8c8c]">Create a new set to organize your flashcards.</p>
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <h2>Set Name</h2>
+                                    <input className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"></input>
+                                </div>
+
+                                <div>
+                                    <h2 className="pb-2">Set Description (optional)</h2>
+                                    <textarea className="px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"></textarea>
+                                </div>
+
+                                <div>
+                                    <button></button>
+
+                                    <button></button>
+                                </div>
+
                             </div>
+                            </>
                         )}
                     </div>
                 </div>
@@ -150,7 +181,7 @@ export default function Create() {
 
 
             {/* Create Flashcard / Preview Section */}
-
+                        
 
 
 
