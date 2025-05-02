@@ -143,4 +143,21 @@ body {
     overflow-y: scroll; 
     scrollbar-width: none;
   }
+  
+  .hover-animation {
+    transition: 0.2s;
+  }
+  
+  .hover-animation:hover {
+    background-color: #323232
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;  
+    scrollbar-width: none;  
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; 
+  }
 }
