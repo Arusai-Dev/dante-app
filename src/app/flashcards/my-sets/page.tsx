@@ -10,17 +10,15 @@ export default async function MyFlashcards() {
                 <p className=" text-[22px] pt-2">add, remove, edit or organize your cards.</p>   
             </div>        
 
-
-            {/* <div className="grid grid-cols-6"> */}
             <div className="grid grid-cols-3 gap-2">
 
                 <div>
 
                     <h1 className="relative font-bold text-2xl">Title</h1>
 
-                    <div className="absolute h-64 w-lg bg-neutral-900 rounded-2xl">
+                    <div className="absolute flex content-center items-center text-center h-64 w-lg bg-neutral-900 rounded-2xl">
 
-                        <div className="float-right m-2">
+                        <div className="absolute top-0 right-0 m-2">
                             <Pencil className="inline-block m-1"/> 
                             <Trash className="inline-block m-1" />
                         </div>
@@ -31,12 +29,14 @@ export default async function MyFlashcards() {
 
                         </div>
 
+                        {/* TODO put a 50 word limit on description */}
                         <h1 className="text-center m-auto">Description</h1>
 
                     </div>
 
 
                 </div>
+                
         </div>
 
 
