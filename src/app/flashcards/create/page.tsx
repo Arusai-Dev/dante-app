@@ -134,7 +134,7 @@ export default function Create() {
                         </button>
 
                         {newSetIsOpen && (
-                            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[200px] bg-[#1e1e1e]">
                                 {/* Your content here */}
                             </div>
                         )}
