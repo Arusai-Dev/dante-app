@@ -10,3 +10,13 @@ export async function deleteSet(id: number) {
         console.log(error)
     }
 }
+
+export async function getSet(id :number) {
+    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
+
+    try {
+        return await sql('SELECT * FROM flashcards WHERE "id"= $1', [id]);
+    } catch (error) {
+        console.log(error)
+    }
+}

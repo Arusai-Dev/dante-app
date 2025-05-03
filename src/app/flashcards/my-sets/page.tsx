@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import DeleteButton from "@/components/DeleteButton";
-import { Pencil, Layers2, Globe, LockKeyhole } from "lucide-react"
+import EditButton from "@/components/EditButton";
+import { Pencil, Layers2, Globe, LockKeyhole, Link } from "lucide-react"
 
 export default async function MyFlashcards() {
 
@@ -33,7 +34,7 @@ export default async function MyFlashcards() {
                         <div className="flex relative content-center items-center text-center h-64 w-full bg-neutral-900 rounded-2xl">
 
                             <div className="absolute top-0 right-0 m-2">
-                                <Pencil className="inline-block m-1 hover:text-orange-300"/> 
+                                <EditButton id={set.id}/>
                                 <DeleteButton id={set.id}/>
                                 {set.is_private ? ( <LockKeyhole className="inline-block m-1"/> ) : (<Globe className="inline-block m-1"/>) }
                             </div>
