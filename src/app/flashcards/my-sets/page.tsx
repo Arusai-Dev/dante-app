@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { Trash, Pencil, Layers2 } from "lucide-react"
+import { Trash, Pencil, Layers2, Globe, LockKeyhole } from "lucide-react"
 
 export default async function MyFlashcards() {
 
@@ -34,6 +34,7 @@ export default async function MyFlashcards() {
                             <div className="absolute top-0 right-0 m-2">
                                 <Pencil className="inline-block m-1"/> 
                                 <Trash className="inline-block m-1" />
+                                {set.is_private ? ( <LockKeyhole className="inline-block m-1"/> ) : (<Globe className="inline-block m-1"/>) }
                             </div>
 
                             <div className="absolute bottom-0 right-0 m-2">
