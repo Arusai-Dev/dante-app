@@ -20,7 +20,7 @@ export default async function MyFlashcards() {
                 <p className=" text-[22px] pt-2">Add, remove, edit or organize your sets.</p>   
             </div>        
 
-            <div className="grid grid-cols-2 gap-8 h-full 2xl:grid-cols-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-8 h-full 2xl:grid-cols-3">
 
                 {setData != "No Flashcards" ? (
                     //@ts-ignore
