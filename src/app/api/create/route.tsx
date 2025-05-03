@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
   
   const reqData = await req.json();
   const user = await currentUser();
+  const userId = user?.id;
   
   const isPrivate = reqData.get("isPrivate");
   const description = reqData.get("description");
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
   const cards = reqData.get("cards");
 
 
-  await sql("INSERT INTO flashcards (cards, user, is_private, description, date_created) VALUES ($1, $2, $3, $4, $5)", [cards, user, isPrivate, description, dateCreated])
+  await sql("INSERT INTO flashcards (cards, user, is_private, description, date_created) VALUES ($1, $2, $3, $4, $5)", [cards, userId, isPrivate, description, dateCreated])
 
   
   

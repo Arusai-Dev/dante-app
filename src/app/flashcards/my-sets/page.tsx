@@ -1,6 +1,16 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Trash, Pencil, Layers2 } from "lucide-react"
 
 export default async function MyFlashcards() {
+
+    const res = await fetch("http://localhost:3000/api/my-sets", {
+        method: "GET", 
+    });
+
+
+    const data = await res.json();
+    const setData = data.Cards;
+
     return (
 
         <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)">
@@ -12,30 +22,39 @@ export default async function MyFlashcards() {
 
             <div className="grid grid-cols-2 gap-8 h-full 2xl:grid-cols-3">
 
-                <div className="w-[512px]">
+                {setData != "No Flashcards" ? (
+                    //@ts-ignore
+                    setData.map(async (set, index:number) => (
 
-                    <h1 className="relative font-bold text-2xl">Title</h1>
+                    <div key={index} className="w-[512px]">
+                        <h1 className="relative font-bold text-2xl">{set.title}</h1>
 
-                    <div className="flex relative content-center items-center text-center h-64 w-full bg-neutral-900 rounded-2xl">
+                        <div className="flex relative content-center items-center text-center h-64 w-full bg-neutral-900 rounded-2xl">
 
-                        <div className="absolute top-0 right-0 m-2">
-                            <Pencil className="inline-block m-1"/> 
-                            <Trash className="inline-block m-1" />
+                            <div className="absolute top-0 right-0 m-2">
+                                <Pencil className="inline-block m-1"/> 
+                                <Trash className="inline-block m-1" />
+                            </div>
+
+                            <div className="absolute bottom-0 right-0 m-2">
+                                <p className="inline-block m-1">{set.number_cards}</p>
+                                <Layers2 className="inline-block m-1"/>
+
+                            </div>
+
+                            {/* TODO put a 50 word limit on description */}
+                            <h1 className="text-center m-auto">{set.description}</h1>
+
                         </div>
-
-                        <div className="absolute bottom-0 right-0 m-2">
-                            <p className="inline-block m-1">25</p>
-                            <Layers2 className="inline-block m-1"/>
-
-                        </div>
-
-                        {/* TODO put a 50 word limit on description */}
-                        <h1 className="text-center m-auto">Description</h1>
 
                     </div>
 
-                </div>
-
+                        ))
+                    ) : (
+                        <div>
+                            No cards to display.
+                        </div>
+                    )}
 
             </div>
 
