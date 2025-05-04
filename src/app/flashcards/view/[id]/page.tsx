@@ -2,7 +2,7 @@
 import { getSet } from "@/lib/dbFunctions"
 
 
-export default async function EditSet({ params }) {  
+export default async function ViewSet({ params }) {  
     const { id } = await params;
     
     //@ts-ignore
