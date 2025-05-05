@@ -8,6 +8,7 @@ export async function GET() {
     //@ts-ignore
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
     
+    // TODO 
     // using this for testing, for production use [user?.id] && uncomment next line
     // const user = await currentUser();
     const userId = 'userid';

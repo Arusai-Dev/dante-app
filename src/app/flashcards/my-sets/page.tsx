@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import DeleteButton from "@/components/DeleteButton";
 import EditButton from "@/components/EditButton";
-import { Pencil, Layers2, Globe, LockKeyhole } from "lucide-react"
+import { Layers2, Globe, LockKeyhole } from "lucide-react"
 import Link from "next/link";
 
 export default async function MyFlashcards() {

@@ -11,7 +11,7 @@ export async function deleteSet(id: number) {
     }
 }
 
-export async function getSet(id :number) {
+export async function getSet(id: number) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
     try {
