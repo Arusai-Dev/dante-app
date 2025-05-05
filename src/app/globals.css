@@ -152,6 +152,14 @@ body {
     background-color: #323232
   }
 
+  .hover-animation-secondary {
+    transition: 0.2s;
+  }
+
+  .hover-animation-secondary:hover {
+    background-color: #ffffff
+  }
+
   .hide-scrollbar {
     -ms-overflow-style: none;  
     scrollbar-width: none;  

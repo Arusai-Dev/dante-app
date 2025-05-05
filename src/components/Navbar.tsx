@@ -9,7 +9,7 @@ import {
 
 export default function Navbar() {
     return (
-        <nav className='fixed flex items-center justify-between p-4 w-full text-s border-b-2 border-[#4a4a4a]'>
+        <nav className='fixed flex items-center bg-[#141414] justify-between p-4 w-full text-s border-b-2 border-[#4a4a4a]'>
 
 
             <div className="Logo">

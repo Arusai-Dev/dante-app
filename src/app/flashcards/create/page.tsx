@@ -21,6 +21,15 @@ export default function Create() {
         setNewSetIsOpen(!newSetIsOpen);
     }
 
+    // New Set Text Area 
+    const [newSetTextArea, setNewSetTextArea] = useState("");
+
+    // Create / Manage Nav
+    const [active, setActive] = useState("create");
+
+    // Current Card Data
+    const [currentCard, setCurrentCard] = useState([]);
+
     const userSets = {
         "Chinese Chapter 1": {
             "Description": "Chinese flashcards for lesson 1",
@@ -38,8 +47,7 @@ export default function Create() {
                 {"category": "grammar", "front": "what?", "back": "was?"}
             ]
         }
-    }
-
+    }   
 
     // Closes any open UI
     const closeAnyUi = (e: MouseEvent) => {
@@ -57,13 +65,14 @@ export default function Create() {
 
     return (
 
-        <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)">
+        <section className="flex flex-col items-center pt-[65px] pb-[65px] font-(family-name:inter)">
 
             {/* Title */}
             <div className="flex flex-col items-center pt-[30px] pb-9">
                 <h1 className=" text-4xl font-bold ">Set Creator</h1>
                 <p className=" text-[22px] pt-2">Create, organize, and manage your sets!</p>   
             </div>        
+
 
 
             {/* Set Selection / Description */}
@@ -138,7 +147,7 @@ export default function Create() {
                             />
                             New Set
                         </button>
-
+                        
                         {newSetIsOpen && (
                             <>
                             <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={toggleNewSetUI}></div>
@@ -157,15 +166,29 @@ export default function Create() {
 
                                 <div>
                                     <h2 className="pb-2">Set Description (optional)</h2>
-                                    <textarea className="px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"></textarea>
+                                    <textarea 
+                                        className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                                        onChange={(e) => setNewSetTextArea(e.target.value)}
+                                    ></textarea>
                                 </div>
 
-                                <div>
-                                    <button></button>
+                                <div className="flex gap-3 justify-end">
+                                    <button 
+                                        className="flex justify-center items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
+                                        onClick={() => {
+                                            toggleNewSetUI();
+                                            setNewSetTextArea("");
+                                        }}
+                                    
+                                    >Cancel</button>
 
-                                    <button></button>
+                                    <button 
+                                        className="flex justify-center items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                        
+                                    
+                                    >Save</button>
                                 </div>
-
+                                
                             </div>
                             </>
                         )}
@@ -176,16 +199,99 @@ export default function Create() {
 
 
             {/* Nav -> Create Card / Manage Cards */}
-
+            <div className="flex gap-2 items-center p-2 mt-4 w-[1150px] h-[65px] bg-[#D9D9D9]/3 rounded-[10px]">
+                {active == "create" && (
+                    <>
+                    <button 
+                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl bg-[#D9D9D9]/3 rounded-[5px] hover-animation"
+                        onClick={() => setActive("create")}
+                        >
+                        {`Create Card`} 
+                    </button>
+                    
+                    <button 
+                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl rounded-[5px] hover-animation"
+                        onClick={() => setActive("manage")}
+                        >
+    
+                        {`Manage Cards`} 
+                    </button>
+                    </>
+                )}
+                {active == "manage" && (
+                    <>
+                    <button 
+                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl rounded-[5px] hover-animation"
+                        onClick={() => setActive("create")}
+                        >
+                        {`Create Card`} 
+                    </button>
+                    
+                    <button 
+                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl bg-[#D9D9D9]/3 rounded-[5px] hover-animation"
+                        onClick={() => setActive("manage")}
+                        >
+    
+                        {`Manage Cards`} 
+                    </button>
+                    </>
+                )}
+            </div>            
 
 
 
             {/* Create Flashcard / Preview Section */}
+            {active == "create" && (
+                <div className="flex mt-4 w-[1150px]">
+                    <div className="w-[565px] bg-[#D9D9D9]/3 rounded-[10px] py-3 px-4
+                    ">
+                        <h1 className="font-bold text-2xl pb-4">Create New Card</h1>
+
+
+                        <h2 className="text-[16px] pb-2">Category (optional)</h2>
+                        <input className="px-2 py-1 mb-6 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"></input>
+
                         
+                        <h2 className="text-[16px] pb-2">Front Side</h2>
+                        <input className="px-2 py-1 mb-6 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"></input>
+
+                        
+                        <h2 className="text-[16px] pb-2">Back Side</h2>
+                        <textarea 
+                            className="set-desc-text-area mb-6 px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                        ></textarea>
+                        
+                        <div className="flex gap-2 w-full max-w-[600px]">
+                            <button 
+                                className="flex justify-center bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
+                                // onClick = {}
+                                >
+            
+                                {`Add Card`} 
+                            </button>
+
+                            <button 
+                                className="flex justify-center items-center grow-[165] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation border-1 border-[#8c8c8c]"
+                                // onClick = {}
+                                >
+            
+                                {`Clear`} 
+                            </button>
+                        </div>
+                        
+                    </div>
 
 
+                    <div className="w-[565px]">
 
-        </section>
-        
+                    </div>
+                </div>
+            )}
+            
+            
+            {/* Manage Cards Section */}
+
+
+        </section>  
     )  
 }
