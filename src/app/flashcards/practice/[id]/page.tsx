@@ -1,16 +1,20 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+
+import CardButton from "@/components/CardButton";
 import { getSet } from "@/lib/dbFunctions"
 
 export default async function PracticeSet({ params }) {  
+    
     const { id } = await params;
     
     //@ts-ignore
     const [set] = await getSet(id)
-
+    
     const jsonCards = JSON.parse(set.cards);
 
     return (
-        <h1></h1>
+        
+        <CardButton jsonCards={await jsonCards} number_cards={await set.number_cards} />
     )
 
 
