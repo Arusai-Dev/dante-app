@@ -12,14 +12,14 @@ export async function GET() {
     // using this for testing, for production use [user?.id] && uncomment next line
     // const user = await currentUser();
     const userId = 'userid';
-    const rows = await sql('SELECT * FROM flashcards WHERE "user" = $1', [userId]);
+    const set = await sql('SELECT * FROM flashcards WHERE "user" = $1', [userId]);
 
 
-    if (rows.length > 0) {
-        return NextResponse.json({ "Cards": rows })
+    if (set.length > 0) {
+        return NextResponse.json({ "Sets": set })
         
     } else {
-        return NextResponse.json({ "Cards": "No Flashcards" })
+        return NextResponse.json({ "Sets": "No Sets" })
     }
 
 
