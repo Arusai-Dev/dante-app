@@ -1,3 +1,4 @@
+import Flashcards from "@/app/flashcards/page";
 import { neon } from "@neondatabase/serverless";
 
 
@@ -41,5 +42,24 @@ export async function createNewSet(
     } catch (error) {
         console.log(error);
     }
+}
 
+export async function addOneCardToSet(
+    setId: number,
+    category: string,
+    front: string,
+    back: string
+) {
+    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
+
+    try {
+        return await sql(
+            `UPDATE flashcards
+             SET cards = cards || $1::jsonb
+             WHERE id = $2`,
+            [JSON.stringify([{ category, front, back }]), setId]
+        ); 
+    } catch (error) {
+        console.log(error);
+    }
 }

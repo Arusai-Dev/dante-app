@@ -5,10 +5,12 @@ import SetSelectionSection from "@/components/createPageComponents/SetSelectionS
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
 import { useSelectionStore } from "@/app/stores/createStores"
+import { addOneCardToSet } from "@/lib/dbFunctions"
 
 export default function Create() {
     const { sets, setSets, active, setActive } = useCreateStore();
     const { dropDownIsOpen, setDropDownIsOpen } = useSelectionStore();
+    const { selectedSet, setSelectedSet } = useSelectionStore();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,16 +31,13 @@ export default function Create() {
     };
 
 
-    const handleAddCard = (cardData) => {
-        if (selectedSetName && userSets[selectedSetName]) {
-            userSets[selectedSetName]['Cards'].push({
-                "category": cardData[0],
-                "front": cardData[1],
-                "back": cardData[2]
-            });
-        } else {
-            console.error("Set not found:", selectedSetName);
-        }
+    const handleAddCard = (data) => {
+        const setId = selectedSet;
+        const category = data[0];
+        const front = data[1];
+        const back = data[2];
+
+        addOneCardToSet(setId, category, front, back);
     }   
 
 

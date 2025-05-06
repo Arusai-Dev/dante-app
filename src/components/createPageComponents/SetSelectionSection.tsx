@@ -9,10 +9,9 @@ export default function SetSelectionSection({ sets }) {
     // Info
     const [selectedSetName, setSelectedSetName] = useState("");
     const [selectedSetDescription, setSelectedSetDescription] = useState("");
-    const [selectedSet, setSelectedSet] = useState(null);
 
     // Drop Down 
-    const { dropDownIsOpen, setDropDownIsOpen } = useSelectionStore();
+    const { dropDownIsOpen, setDropDownIsOpen, selectedSet, setSelectedSet } = useSelectionStore();
     const toggleDropDown = () => {
         setDropDownIsOpen(!dropDownIsOpen);
     }
@@ -75,7 +74,7 @@ export default function SetSelectionSection({ sets }) {
                                     onClick={() => {
                                         setSelectedSetName(set.title)
                                         setSelectedSetDescription(set.description)
-                                        setSelectedSet(set)
+                                        setSelectedSet(set.id)
                                     }}
                                 >
                                     {selectedSetName == set.title && (
@@ -89,7 +88,6 @@ export default function SetSelectionSection({ sets }) {
                 </div>
                 
 
-                
                 {/* New Set Button */}
                 <div className="new-set-btn">
                     <button 
