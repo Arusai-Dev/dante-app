@@ -8,7 +8,7 @@ r = Repetition count
 
 */
 
-export default function calculateInterval(q: number, eF: number, r: number) {
+export default function SM2calculateInterval(q: number, eF: number, r: number) {
     let I:number;
 
     if (q >= 3) {
