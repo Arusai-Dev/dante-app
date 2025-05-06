@@ -2,21 +2,30 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { Album, ArrowLeft, ArrowRight, BookCheck, Swords } from "lucide-react";
+import { Album, ArrowLeft, ArrowRight, BookCheck, Shuffle, Swords } from "lucide-react";
 import { toast, Toaster } from 'sonner'
 
 export default function CardButton({ jsonCards, number_cards }) {
     const [currentCard, setCurrentCard] = useState(0);
     const [showFront, setShowFront] = useState(true);
-
+    const [isShuffle, setIsShuffle] = useState(false);
 
     const flipCard = () => {
         setShowFront(!showFront);
     }
 
     const nextCard = () => {
-        if (currentCard == number_cards-1) {setCurrentCard(0)} 
-        else { setCurrentCard(i => i+1) } 
+        if (isShuffle == false) {
+
+            if (currentCard == number_cards-1) {setCurrentCard(0)} 
+            else { setCurrentCard(i => i+1) } 
+        } else {
+            let random_int = Math.floor(Math.random() * (number_cards))
+            while (random_int == currentCard) {
+                random_int = Math.floor(Math.random() * (number_cards))
+            }
+            setCurrentCard(random_int)
+        }
     }
 
     const prevCard = () => {
@@ -66,9 +75,12 @@ export default function CardButton({ jsonCards, number_cards }) {
 
     const checkChallenging = ():boolean => {
         return jsonCards[currentCard].markedChallenging == "true"
-
     }
 
+    const setShuffle = () => {
+        if (isShuffle == false) { setIsShuffle(true) }
+        else { setIsShuffle(false) }
+    }
 
 
     return (
@@ -130,12 +142,18 @@ export default function CardButton({ jsonCards, number_cards }) {
 
 
                 <div className="left-0 absolute lg:p-50 sm:p-10">
-
                     <Button className="rounded-4xl border border-white px-50 hover-animation" onClick={prevCard}>
                         <ArrowLeft />
                     </Button>
-
                 </div>
+
+
+                <div className="bottom-0 absolute lg:p-50 sm:p-10">
+                    <Button className={`rounded-4xl border border-white px-50 hover-animation ${isShuffle ? 'bg-neutral-600' : '' }`} onClick={setShuffle}>
+                        <Shuffle />
+                    </Button>
+                </div>
+
             </div>
 
         </>
