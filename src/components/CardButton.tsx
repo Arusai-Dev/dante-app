@@ -14,15 +14,72 @@ export default function CardButton({ jsonCards, number_cards }) {
         setShowFront(!showFront);
     }
 
+    const nextCard = () => {
+        if (currentCard == number_cards-1) {setCurrentCard(0)} 
+        else { setCurrentCard(i => i+1) } 
+    }
+
+    const prevCard = () => {
+        if (currentCard == 0) { setCurrentCard(number_cards-1) } 
+        else { setCurrentCard(i => i-1) }
+    }
+
+    const markChallenging = ():void => {
+        if (jsonCards[currentCard].markedEasy == "true") {
+            toast("Cannot mark question as both easy and challenging.")
+        } else {
+            if (jsonCards[currentCard].markedChallenging == "true") {
+
+                jsonCards[currentCard].markedChallenging = "false";
+                toast("No longer marked as challenging"); 
+                nextCard();
+
+            } else {
+                jsonCards[currentCard].markedChallenging = "true";
+                toast("Marked as challenging"); 
+                nextCard();
+            }
+        }
+    }
+
+    const markEasy = ():void => {
+        if (jsonCards[currentCard].markedChallenging == "true") {
+            toast("Cannot mark question as both easy and challenging.")
+        } else {
+            if (jsonCards[currentCard].markedEasy == "true") {
+
+                jsonCards[currentCard].markedEasy = "false";
+                toast("No longer marked as easy"); 
+                nextCard();
+
+            } else {
+                jsonCards[currentCard].markedEasy = "true";
+                toast("Marked as easy"); 
+                nextCard();
+            }
+        }
+    }
+
+    const checkEasy = ():boolean => {
+        return jsonCards[currentCard].markedEasy == "true"
+    }
+
+    const checkChallenging = ():boolean => {
+        return jsonCards[currentCard].markedChallenging == "true"
+
+    }
+
+
+
     return (
         <>
             <div className="h-screen w-screen flex items-center justify-center">
                     <Toaster 
                         toastOptions={{
-                            unstyled: true,
-                            className: 'bg-neutral-800 text-white text-sm rounded-md px-5 py-3 flex items-center gap-2 shadow-lg'
+
                         }}
                     />
+
                     <div className={`absolute w-1/2 h-1/2 transition-transform duration-500 flip-inner cursor-pointer ${!showFront ? 'flipped' : ''}`} onClick={flipCard}>
 
                         <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px] hover-animation">
@@ -38,19 +95,21 @@ export default function CardButton({ jsonCards, number_cards }) {
                             <div className="absolute top-0 right-0">
 
 
-                                <button onClick={() => toast("Marked as Challenging")} className="relative group inline-block">
-                                    <Swords className="inline-block m-2 hover:text-red-400" />
+                                <button onClick={() => markChallenging() } className="relative group inline-block">
+                                    <Swords className={`inline-block m-2 hover:text-red-500 ${checkChallenging() ? 'text-red-300' : ''}`} />
                                     <span className="absolute bottom-full mb-1 hidden group-hover:block bg-black text-white text-xs rounded px-2 py-1">
                                         Challenging
                                     </span>
 
                                 </button>
 
-                                <button onClick={() => toast("Marked as Easy")} className="relative group inline-block">
-                                    <BookCheck className="inline-block m-2 hover:text-green-300" />
+                                <button onClick={() => markEasy() } className="relative group inline-block">
+
+                                    <BookCheck className={`inline-block m-2 hover:text-green-400 ${checkEasy() ? 'text-green-300' : ''}`} />
                                     <span className="absolute bottom-full mb-1 hidden group-hover:block bg-black text-white text-xs rounded px-2 py-1">
                                         Easy 
                                    </span>
+                                   
                                 </button>
 
 
@@ -63,15 +122,7 @@ export default function CardButton({ jsonCards, number_cards }) {
                     </div>
 
                     <div className="right-0 absolute lg:p-50 sm:p-10">
-                        <Button className="rounded-4xl border border-white px-50 hover-animation"
-                        onClick={() => {
-                            if (currentCard == number_cards-1) {
-                                setCurrentCard(0);
-                            } else {
-                                    setCurrentCard(i => i+1);
-                                }
-                            }}>
-
+                        <Button className="rounded-4xl border border-white px-50 hover-animation" onClick={nextCard}>
                             <ArrowRight />
                         </Button>
 
@@ -80,16 +131,7 @@ export default function CardButton({ jsonCards, number_cards }) {
 
                 <div className="left-0 absolute lg:p-50 sm:p-10">
 
-                    <Button className="rounded-4xl border border-white px-50 hover-animation"
-                    onClick={() => {
-                        
-                        if (currentCard == 0) {
-                            setCurrentCard(number_cards-1);
-                        } else {
-                                setCurrentCard(i => i-1);
-                            }
-                        }}>
-
+                    <Button className="rounded-4xl border border-white px-50 hover-animation" onClick={prevCard}>
                         <ArrowLeft />
                     </Button>
 
