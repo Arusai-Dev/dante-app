@@ -30,6 +30,12 @@ export default function Create() {
     // Current Card Data
     const [currentCard, setCurrentCard] = useState([]);
 
+    // Preview Card
+    const [showFront, setShowFront] = useState(true);
+    const flipCard = () => {
+        setShowFront(!showFront);
+    }
+
     const userSets = {
         "Chinese Chapter 1": {
             "Description": "Chinese flashcards for lesson 1",
@@ -96,7 +102,7 @@ export default function Create() {
                     {/* Select Set Drop Down */}
                     <div className="select-set-dd">
                         <button 
-                            className="flex justify-between items-center w-[250px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
+                            className="flex justify-between cursor-pointer items-center w-[250px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
                             onClick={toggleDropDown}
                             >
 
@@ -115,7 +121,7 @@ export default function Create() {
                                 {Object.entries(userSets).map(([key, value], index) => (
                                     <div 
                                         key={index} 
-                                        className="bg-[#202020] flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation overflow-x-scroll whitespace-nowrap hide-scrollbar"
+                                        className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation overflow-x-scroll whitespace-nowrap hide-scrollbar"
                                         onClick={() => {
                                             setSelectedSetName(key)
                                             setSelectedSetInfo(value)
@@ -136,7 +142,7 @@ export default function Create() {
                     {/* New Set Button */}
                     <div className="new-set-btn">
                         <button 
-                            className="flex justify-between items-center w-[125px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                            className="flex cursor-pointer justify-between items-center w-[125px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
                             onClick={toggleNewSetUI}
                         >
                             <Image
@@ -174,7 +180,7 @@ export default function Create() {
 
                                 <div className="flex gap-3 justify-end">
                                     <button 
-                                        className="flex justify-center items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
+                                        className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
                                         onClick={() => {
                                             toggleNewSetUI();
                                             setNewSetTextArea("");
@@ -183,7 +189,7 @@ export default function Create() {
                                     >Cancel</button>
 
                                     <button 
-                                        className="flex justify-center items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                        className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
                                         
                                     
                                     >Save</button>
@@ -203,14 +209,14 @@ export default function Create() {
                 {active == "create" && (
                     <>
                     <button 
-                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl bg-[#D9D9D9]/3 rounded-[5px] hover-animation"
+                        className="flex justify-center cursor-pointer items-center w-full h-[50px] py-1 px-3 font-bold text-2xl bg-[#D9D9D9]/3 rounded-[5px] hover-animation"
                         onClick={() => setActive("create")}
                         >
                         {`Create Card`} 
                     </button>
                     
                     <button 
-                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl rounded-[5px] hover-animation"
+                        className="flex justify-center cursor-pointer items-center w-full h-[50px] py-1 px-3 font-bold text-2xl rounded-[5px] hover-animation"
                         onClick={() => setActive("manage")}
                         >
     
@@ -221,14 +227,14 @@ export default function Create() {
                 {active == "manage" && (
                     <>
                     <button 
-                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl rounded-[5px] hover-animation"
+                        className="flex justify-center items-center cursor-pointer w-full h-[50px] py-1 px-3 font-bold text-2xl rounded-[5px] hover-animation"
                         onClick={() => setActive("create")}
                         >
                         {`Create Card`} 
                     </button>
                     
                     <button 
-                        className="flex justify-center items-center w-full h-[50px] py-1 px-3 font-bold text-2xl bg-[#D9D9D9]/3 rounded-[5px] hover-animation"
+                        className="flex justify-center items-center cursor-pointer w-full h-[50px] py-1 px-3 font-bold text-2xl bg-[#D9D9D9]/3 rounded-[5px] hover-animation"
                         onClick={() => setActive("manage")}
                         >
     
@@ -263,7 +269,7 @@ export default function Create() {
                         
                         <div className="flex gap-2 w-full max-w-[600px]">
                             <button 
-                                className="flex justify-center bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
+                                className="flex justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
                                 // onClick = {}
                                 >
             
@@ -271,7 +277,7 @@ export default function Create() {
                             </button>
 
                             <button 
-                                className="flex justify-center items-center grow-[165] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation border-1 border-[#8c8c8c]"
+                                className="flex justify-center cursor-pointer items-center grow-[165] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation border-1 border-[#8c8c8c]"
                                 // onClick = {}
                                 >
             
@@ -282,8 +288,35 @@ export default function Create() {
                     </div>
 
 
-                    <div className="w-[565px]">
+                    <div className="w-[565px] h-[565px] pl-4">
+                        <h1 className="font-bold text-2xl pb-3">Preview</h1>
 
+                        <div className={`relative w-full h-[255px] transition-transform duration-500 flip-inner ${!showFront ? 'flipped' : ''}`} onClick={flipCard}>
+                            
+                            {/* front */}
+                            <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px]">
+                                <h2 className="pl-3 py-2">{`Category`}</h2>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{`front`}</div>
+                            </div>
+
+                            {/* back */}
+                            <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#A9A9A9]/3 rounded-[10px]">
+                                <h2 className="pl-3 py-2">{`Category`}</h2>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{`back`}</div>
+                            </div>
+                            
+                        </div>
+
+                        <div className="flex">
+                            <h2>Click to rotate</h2>
+                            <Image
+                                src="/icons/arrow.svg"
+                                alt="arrow icon"
+                                width={24}
+                                height={24}
+                                className=" rotate-180"  
+                            />
+                        </div>
                     </div>
                 </div>
             )}
