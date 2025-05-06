@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { Album, ArrowLeft, ArrowRight, BookCheck, Shuffle, Swords } from "lucide-react";
+import { Album, ArrowLeft, ArrowRight, BookCheck, Shuffle, Swords, Target } from "lucide-react";
 import { toast, Toaster } from 'sonner'
 
 export default function CardButton({ jsonCards, number_cards }) {
@@ -148,12 +148,10 @@ export default function CardButton({ jsonCards, number_cards }) {
                 </div>
 
 
-                <div className="bottom-0 absolute lg:p-50 sm:p-10">
-                    <Button className={`rounded-4xl border border-white px-50 hover-animation ${isShuffle ? 'bg-neutral-600' : '' }`} onClick={setShuffle}>
-                        <Shuffle />
-                    </Button>
+                <div className="top-0 absolute lg:p-50 sm:p-10 ">
+                    <Target className="inline-block mr-4 top-0" /><h1 className="top-0 inline-block">Practice Mode.</h1>
                 </div>
-
+                        
             </div>
 
         </>

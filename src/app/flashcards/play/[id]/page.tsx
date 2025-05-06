@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 
-import CardButton from "@/components/PracticeCardComponent";
+import CardButton from "@/components/PlayCardComponent";
 import { getSet } from "@/lib/dbFunctions"
 
-export default async function PracticeSet({ params }) {  
+export default async function PlaySet({ params }) {  
     
     const { id } = await params;
     
