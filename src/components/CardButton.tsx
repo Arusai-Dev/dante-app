@@ -33,7 +33,7 @@ export default function CardButton({ jsonCards, number_cards }) {
 
                     <div className="right-0 absolute lg:p-50 sm:p-10">
 
-                        <Button className="rounded-4xl border border-white px-50"
+                        <Button className="rounded-4xl border border-white px-50 hover-animation"
                         onClick={() => {
                             
                             if (currentCard == number_cards-1) {
@@ -51,7 +51,7 @@ export default function CardButton({ jsonCards, number_cards }) {
 
                 <div className="left-0 absolute lg:p-50 sm:p-10">
 
-                    <Button className="rounded-4xl border border-white px-50"
+                    <Button className="rounded-4xl border border-white px-50 hover-animation"
                     onClick={() => {
                         
                         if (currentCard == 0) {

@@ -8,9 +8,8 @@ export default async function ViewSet({ params }) {
     
     //@ts-ignore
     const [set] = await getSet(id)
-
-    const jsonCards = JSON.parse(set.cards);
-
+    const jsonCards = set.cards;
+    
     return (
 
         <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)">

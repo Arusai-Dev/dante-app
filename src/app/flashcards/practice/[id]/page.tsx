@@ -10,7 +10,7 @@ export default async function PracticeSet({ params }) {
     //@ts-ignore
     const [set] = await getSet(id)
     
-    const jsonCards = JSON.parse(set.cards);
+    const jsonCards = set.cards;
 
     return (
         

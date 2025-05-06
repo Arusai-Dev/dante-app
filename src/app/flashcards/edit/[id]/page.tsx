@@ -23,7 +23,7 @@ export default async function EditSet({ params }) {
         redirect("/flashcards/my-sets");
     }
 
-    const jsonCards = JSON.parse(set.cards);
+    const jsonCards = set.cards;
 
     
 }

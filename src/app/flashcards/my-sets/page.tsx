@@ -12,8 +12,7 @@ export default async function MyFlashcards() {
 
 
     const data = await res.json();
-    const setData = data.Cards;
-
+    const setData = data.Sets;
     return (
 
         <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)">
@@ -25,7 +24,7 @@ export default async function MyFlashcards() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-8 h-full 2xl:grid-cols-3">
 
-                {setData != "No Flashcards" ? (
+                {setData != "No Sets" ? (
                     //@ts-ignore
                     setData.map(async (set, index:number) => (
                     
