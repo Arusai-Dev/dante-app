@@ -1,15 +1,18 @@
 "use client"
 import { useState } from "react";
 import { ArrowDown, Check, PlusCircle } from "lucide-react";
+import { createNewSet } from "@/lib/dbFunctions";
+import { useSelectionStore } from "@/app/stores/createStores";
 
 export default function SetSelectionSection({ sets }) {
+
     // Info
     const [selectedSetName, setSelectedSetName] = useState("");
     const [selectedSetDescription, setSelectedSetDescription] = useState("");
     const [selectedSet, setSelectedSet] = useState(null);
 
     // Drop Down 
-    const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
+    const { dropDownIsOpen, setDropDownIsOpen } = useSelectionStore();
     const toggleDropDown = () => {
         setDropDownIsOpen(!dropDownIsOpen);
     }
@@ -20,15 +23,16 @@ export default function SetSelectionSection({ sets }) {
         setNewSetIsOpen(!newSetIsOpen);
     }
 
-    // New Set Text Area 
-    const [newSetTextArea, setNewSetTextArea] = useState("");
     
-    let newSetTitle = "";
-    let newSetDescription = "";
-    let newSetUserId = ""; // testing purposes only later will get current user
-    let privacyStatus = null;
-    const cards = [];
+    const [newSetTitle, setNewSetTitle] = useState("");
+    const [newSetDescription, setNewSetDescription] = useState("");
+    const [isPrivate, setIsPrivate] = useState(false);
+    const newSetUserId = "userid"; // testing purposes only later will get current user
+    const cards = null;
+    const date_created = new Date();
+    const number_cards = 0;
 
+    console.log(newSetTitle, newSetDescription)
 
     return (
         <>
@@ -111,7 +115,7 @@ export default function SetSelectionSection({ sets }) {
                                 <h2>Set Title</h2>
                                 <input 
                                     className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                                    onChange={(e) => {newSetTitle = e.target.value}}
+                                    onChange={(e) => setNewSetTitle(e.target.value)}
                                 ></input>
                             </div>
 
@@ -119,36 +123,41 @@ export default function SetSelectionSection({ sets }) {
                                 <h2 className="pb-2">Set Description (optional)</h2>
                                 <textarea 
                                     className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                                    value={newSetTextArea}
+                                    value={newSetDescription}
                                     onChange={(e) => {
-                                        setNewSetTextArea(e.target.value)
-                                        newSetDescription = e.target.value
+                                        setNewSetDescription(e.target.value)
                                     }}
                                 ></textarea>
                             </div>
 
                             <div className="flex gap-3 justify-end">
+                                Visibility
+                                <div>
+                                    <button 
+                                        className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                        onClick={() => setIsPrivate(false)}
+                                    >Public</button>
+                                    <button 
+                                        className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                        onClick={() => setIsPrivate(false)}
+                                    >Private</button>
+                                </div>
+
                                 <button 
                                     className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
                                     onClick={() => {
                                         toggleNewSetUI();
-                                        setNewSetTextArea("");
+                                        setNewSetDescription("");
                                     }}
                                 >Cancel</button>
 
                                 <button 
                                     className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                    // onClick={addSet}
-                                    >
-                                    Save
-                                </button>
-                                
-                                <button 
-                                    className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                    // onClick={addSet}
-                                    >
-                                    Set Privacy
-                                </button>
+                                    onClick={() => {
+                                        createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
+                                        toggleNewSetUI();
+                                    }}
+                                >Save</button>
                             </div>
                         </div>
                         </>

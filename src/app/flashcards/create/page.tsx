@@ -1,21 +1,25 @@
-
+'use client'
 
 import Image from "next/image"
 import SetSelectionSection from "@/components/createPageComponents/SetSelectionSection"
+import { useEffect, useState } from "react"
+import { useCreateStore } from "@/app/stores/createStores"
+import { useSelectionStore } from "@/app/stores/createStores"
 
-export default async function Create() {
+export default function Create() {
+    const { sets, setSets, active, setActive } = useCreateStore();
+    const { dropDownIsOpen, setDropDownIsOpen } = useSelectionStore();
 
-    const res = await fetch("http://localhost:3000/api/my-sets", {
-        method: "GET", 
-    });
-
-    const data = await res.json();
-    const setData = data.Sets;
-    console.log(setData);
-
-    // Create / Manage Nav
-    const [active, setActive] = useState("create");
-
+    useEffect(() => {
+        const fetchData = async () => {
+            const res = await fetch("http://localhost:3000/api/my-sets");
+            const data = await res.json();
+            setSets(data.Sets);
+        }
+    
+        fetchData();
+    }, []);
+    
     // Current Card Data
     const [currentCardData, setCurrentCardData] = useState(['Category', 'Front', 'Back']);
     const updateCard = (index: number, value: string) => {
@@ -73,7 +77,6 @@ export default async function Create() {
 
     // Closes any open UI
     const closeAnyUi = (e: MouseEvent) => {
-
         const target = e.target as HTMLElement; 
         if (!target.closest(".select-set-dd")) {setDropDownIsOpen(false)}
     }
@@ -96,9 +99,7 @@ export default async function Create() {
             </div>        
 
 
-            <SetSelectionSection sets={setData} />
-
-
+            <SetSelectionSection sets={sets} />
 
             {/* Nav -> Create Card / Manage Cards */}
             <div className="flex gap-2 items-center p-2 mt-4 w-[1150px] h-[65px] bg-[#D9D9D9]/3 rounded-[10px]">

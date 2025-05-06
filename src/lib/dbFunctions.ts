@@ -34,7 +34,7 @@ export async function createNewSet(
 
     try {
         return await sql(
-            `INSERT INTO flashcards (user, is_private, description, data_created, title, number_cards) 
+            `INSERT INTO flashcards ("user", is_private, description, date_created, title, number_cards, cards) 
             values ($1, $2, $3, $4, $5, $6, $7)`, 
             [user_id, is_private, description, date_created, title, number_cards, cards]
         );
