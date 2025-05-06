@@ -291,23 +291,23 @@ export default function Create() {
                     <div className="w-[565px] h-[565px] pl-4">
                         <h1 className="font-bold text-2xl pb-3">Preview</h1>
 
-                        <div className={`relative w-full h-[255px] transition-transform duration-500 flip-inner ${!showFront ? 'flipped' : ''}`} onClick={flipCard}>
+                        <div className={`relative w-full h-[255px] transition-transform duration-500 flip-inner cursor-pointer ${!showFront ? 'flipped' : ''}`} onClick={flipCard}>
                             
                             {/* front */}
-                            <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px]">
+                            <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px] hover-animation">
                                 <h2 className="pl-3 py-2">{`Category`}</h2>
                                 <div className="flex justify-center items-center h-[calc(100%-80px)]">{`front`}</div>
                             </div>
 
                             {/* back */}
-                            <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#A9A9A9]/3 rounded-[10px]">
+                            <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded-[10px] hover-animation">
                                 <h2 className="pl-3 py-2">{`Category`}</h2>
                                 <div className="flex justify-center items-center h-[calc(100%-80px)]">{`back`}</div>
                             </div>
                             
                         </div>
 
-                        <div className="flex">
+                        <div className="flex mt-1">
                             <h2>Click to rotate</h2>
                             <Image
                                 src="/icons/arrow.svg"
