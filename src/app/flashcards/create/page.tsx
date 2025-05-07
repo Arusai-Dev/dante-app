@@ -9,19 +9,11 @@ import { addOneCardToSet } from "@/lib/dbFunctions"
 export default function Create() {
     const { 
         active, 
-        sets, 
-        dropDownIsOpen, 
         selectedSet, 
-        selectedSetTitle, 
-        selectedSetDescription, 
-        selectedSetCardCnt, 
+        sets,
         setActive, 
         setSets, 
         setDropDownIsOpen, 
-        setSelectedSet, 
-        setSelectedSetTitle,
-        setSelectedSetDescription,
-        setSelectedSetCardCnt,
     } = useCreateStore()
 
     useEffect(() => {
@@ -32,7 +24,7 @@ export default function Create() {
         }
     
         fetchData();
-    }, []);
+    }, [sets]);
     
     // Current Card Data
     const [currentCardData, setCurrentCardData] = useState(['Category', 'Front', 'Back', 0, 2.5, 0]);
@@ -221,7 +213,11 @@ export default function Create() {
             
             
             {/* Manage Cards Section */}
-
+            {active == "manage" && (
+                <div>
+                    
+                </div>
+            )}
 
         </section>  
     )  

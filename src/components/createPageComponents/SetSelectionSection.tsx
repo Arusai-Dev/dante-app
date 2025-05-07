@@ -10,17 +10,15 @@ export default function SetSelectionSection() {
 
     // zustand
     const { 
-        active, 
-        sets, 
+        sets,
+        currentSet,
         dropDownIsOpen, 
-        selectedSet, 
         selectedSetTitle, 
         selectedSetDescription, 
         selectedSetCardCnt, 
-        setActive, 
-        setSets, 
-        setDropDownIsOpen, 
         setSelectedSet, 
+        setCurrentSet,
+        setDropDownIsOpen, 
         setSelectedSetTitle,
         setSelectedSetDescription,
         setSelectedSetCardCnt,
@@ -55,7 +53,7 @@ export default function SetSelectionSection() {
         const result = await getSetByTitle(newSetUserId, newSetTitle)
         const id = result?.[0]?.id;
         if (id) setSelectedSet(id);
-        console.log(result)
+        setCurrentSet(result?.[0])
         setSelectedSetTitle(result?.[0]?.title)
         setSelectedSetDescription(result?.[0]?.description)
         setSelectedSetCardCnt(result?.[0]?.number_cards)
@@ -63,7 +61,6 @@ export default function SetSelectionSection() {
         clearNewSetForm();
         // window.location.reload()
     }
-
 
     return (
         <>
