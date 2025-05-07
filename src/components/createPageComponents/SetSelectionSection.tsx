@@ -11,7 +11,6 @@ export default function SetSelectionSection() {
     // zustand
     const { 
         sets,
-        currentSet,
         dropDownIsOpen, 
         selectedSetTitle, 
         selectedSetDescription, 
@@ -50,6 +49,7 @@ export default function SetSelectionSection() {
 
     const onNewSetSubmit = async () => {
         createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
+        console.log(date_created)
         const result = await getSetByTitle(newSetUserId, newSetTitle)
         const id = result?.[0]?.id;
         if (id) setSelectedSet(id);
@@ -59,7 +59,7 @@ export default function SetSelectionSection() {
         setSelectedSetCardCnt(result?.[0]?.number_cards)
         toggleNewSetUI();
         clearNewSetForm();
-        // window.location.reload()
+        window.location.reload()
     }
 
     return (
@@ -96,7 +96,7 @@ export default function SetSelectionSection() {
 
                     {/* Drop Drown Content */}
                     {dropDownIsOpen && (
-                        <div className="absolute mt-1 flex flex-col gap-2 overflow-y-auto w-[200px] max-h-[300px] py-2 bg-[#202020] rounded-[5px] border-1 border-[#828282] hidden-scrollbar">
+                        <div className="absolute mt-1 flex flex-col gap-2 overflow-y-auto z-50 w-[200px] max-h-[300px] py-2 bg-[#202020] rounded-[5px] border-1 border-[#828282] hidden-scrollbar">
                             {sets.map((set, index:number) => (
                                 <div 
                                     key={index} 

@@ -6,8 +6,12 @@
 - [ ] - Create infinite cards (desktop: horizontal scrolling, mobile: vertical)
 - [ ] - Option to paste in flashcard data to auto create cards
 - [ ] - When using manual creation mode implement auto complete for answers
-- [ ] - Create simple UI for /create where you can create a card, flip it to input an answer, create a new a card and finally submit
-    it to be published/created. (Options for privacy (public, private), category, name of flashcard set)
+- [ ] - Create Page
+    - [ ] - Manage cards section
+    - [ ] - When making a new card after submission clear form
+    - [ ] - After selecting a set in the drop down, sets data should be displayed
+    - [ ] - Creating a new set causes selected set == new set
+    - [ ] - When you click edit on a card in the manage section it should open up the cards info on the form
 - [x] - Upload flashcard set to database with corresponding user.
 - [ ] - Allow images to be input as questions or answers. (Set up an s3 bucket and handle image processing)
 

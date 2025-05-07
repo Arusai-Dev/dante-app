@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 type createStoreState = {
     active: string
@@ -19,24 +20,31 @@ type createStoreState = {
     setSelectedSetCardCnt: (mode: number) => void
 }
 
-export const useCreateStore = create<createStoreState>((set) => ({
-    active: 'create',
-    sets: [],
-    currentSet: [],
-    dropDownIsOpen: false,
-    selectedSet: null,
-    selectedSetTitle: "",
-    selectedSetDescription: "",
-    selectedSetCardCnt: null,
-    setActive: (mode) => set({ active: mode }),
-    setSets: (data) => set({ sets: data }),
-    setCurrentSet: (data) => set({ currentSet: data }),
-    setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
-    setSelectedSet: (mode) => set({ selectedSet: mode }),
-    setSelectedSetTitle: (mode) => set({ selectedSetTitle: mode }),
-    setSelectedSetDescription: (mode) => set({ selectedSetDescription: mode }),
-    setSelectedSetCardCnt: (mode) => set({ selectedSetCardCnt: mode })
-}))
+export const useCreateStore = create(
+    persist<createStoreState>(
+        (set) => ({
+        active: 'create',
+        sets: [],
+        currentSet: [],
+        dropDownIsOpen: false,
+        selectedSet: null,
+        selectedSetTitle: "",
+        selectedSetDescription: "",
+        selectedSetCardCnt: null,
+        setActive: (mode) => set({ active: mode }),
+        setSets: (data) => set({ sets: data }),
+        setCurrentSet: (data) => set({ currentSet: data }),
+        setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
+        setSelectedSet: (mode) => set({ selectedSet: mode }),
+        setSelectedSetTitle: (mode) => set({ selectedSetTitle: mode }),
+        setSelectedSetDescription: (mode) => set({ selectedSetDescription: mode }),
+        setSelectedSetCardCnt: (mode) => set({ selectedSetCardCnt: mode })
+    }),
+    {
+        name: 'create-storage', 
+        storage: createJSONStorage(() => localStorage), 
+    },
+))
 
 // active or manage
 // current user

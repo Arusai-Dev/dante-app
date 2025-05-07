@@ -5,6 +5,7 @@ import SetSelectionSection from "@/components/createPageComponents/SetSelectionS
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
 import { addOneCardToSet } from "@/lib/dbFunctions"
+import { Save } from "lucide-react"
 
 export default function Create() {
     const { 
@@ -159,10 +160,10 @@ export default function Create() {
                         
                         <div className="flex gap-2 w-full max-w-[600px] mb-1">
                             <button 
-                                className="flex justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
+                                className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
                                 onClick={() => handleAddCard(currentCardData)}
                                 >
-            
+                                <Save/>
                                 {`Add Card`} 
                             </button>
 
