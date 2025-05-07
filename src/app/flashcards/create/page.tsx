@@ -30,17 +30,6 @@ export default function Create() {
         setCurrentCardData(updatedCard);
     };
 
-
-    const handleAddCard = (data) => {
-        const setId = selectedSet;
-        const category = data[0];
-        const front = data[1];
-        const back = data[2];
-
-        addOneCardToSet(setId, category, front, back);
-    }   
-
-
     const clearCurrentCardData = () => {
         const updatedCard = [...currentCardData]
         updatedCard[0] = 'Category';
@@ -55,30 +44,12 @@ export default function Create() {
         setShowFront(!showFront);
     }
 
-    const userSets = {
-        "Chinese Chapter 1": {
-            "Description": "Chinese flashcards for lesson 1",
-            "Cards": [
-                {"category": "vocab", "front": "Hello", "back": "Ni hao"}, 
-                {"category": "vocab", "front": "Why?", "back": "Wei shenme"},
-                {"category": "grammar", "front": "what?", "back": "shenme?"}
-            ] 
-        },
-        "German Chapter 34": {
-            "Description": "German flashcards for lesson 6",
-            "Cards": [
-                {"category": "vocab", "front": "Hello", "back": "Hallo"}, 
-                {"category": "vocab", "front": "Why?", "back": "warum?"},
-                {"category": "grammar", "front": "what?", "back": "was?"}
-            ]
-        }
-    }   
-
     // Closes any open UI
     const closeAnyUi = (e: MouseEvent) => {
         const target = e.target as HTMLElement; 
         if (!target.closest(".select-set-dd")) {setDropDownIsOpen(false)}
     }
+    
     useEffect(() => {
         document.addEventListener('click', closeAnyUi);
 
@@ -86,6 +57,18 @@ export default function Create() {
             document.removeEventListener('click', closeAnyUi);
         };
     }, []);
+
+    const handleAddCard = (data: [string, string, string]) => {
+        const [category, front, back] = data;
+
+        // FUTURE WORK: HANDLE ERROR WHEN NO SET IS SELECTED
+        if (!selectedSet) {
+            console.warn("No set selected.");
+            return;
+          }
+        
+          addOneCardToSet(selectedSet, category, front, back);
+        };   
 
     return (
 

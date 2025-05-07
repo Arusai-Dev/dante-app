@@ -29,7 +29,7 @@ export async function createNewSet(
     date_created: string, 
     number_cards: number, 
     user_id: string,
-    cards: Array<null>
+    cards: any[]
 ) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
@@ -37,7 +37,7 @@ export async function createNewSet(
         return await sql(
             `INSERT INTO flashcards ("user", is_private, description, date_created, title, number_cards, cards) 
             values ($1, $2, $3, $4, $5, $6, $7)`, 
-            [user_id, is_private, description, date_created, title, number_cards, cards]
+            [user_id, is_private, description, date_created, title, number_cards, JSON.stringify(cards)]
         );
     } catch (error) {
         console.log(error);
@@ -55,7 +55,7 @@ export async function addOneCardToSet(
     try {
         return await sql(
             `UPDATE flashcards
-             SET cards = cards || $1::jsonb
+             SET cards = cards::jsonb || $1::jsonb
              WHERE id = $2`,
             [JSON.stringify([{ category, front, back }]), setId]
         ); 
