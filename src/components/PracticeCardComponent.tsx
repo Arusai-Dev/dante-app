@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Album, ArrowLeft, ArrowRight, Target } from "lucide-react";
-import { toast, Toaster } from 'sonner'
+import { Toaster } from 'sonner'
+import Sm2PatchComponent from "./sm2PatchComponent";
 
 export default function CardButton({ jsonCards, number_cards }) {
     const [currentCard, setCurrentCard] = useState(0);
@@ -29,9 +30,8 @@ export default function CardButton({ jsonCards, number_cards }) {
 
     }
 
-    const handleQualityScoreSubmit = (e) => {
-        console.log(qualityScore);
-        console.log(jsonCards[currentCard].ease_factor)
+    const handleQualityScoreSubmit = () => {
+        <Sm2PatchComponent qualityScore={parseInt(qualityScore)} easeFactor={jsonCards[currentCard].ease_factor} repetition={jsonCards[currentCard].repetition} id={jsonCards[currentCard].id}   />
         setQualityScore('')
     }
 

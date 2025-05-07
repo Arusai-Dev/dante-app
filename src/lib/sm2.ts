@@ -24,5 +24,6 @@ export default function SM2calculateInterval(q: number, eF: number, r: number) {
     let efPrime = eF = 0.8 + (0.28 * q) - (0.02 * q**2)
     if (efPrime < 1.3) { efPrime = 1.3 }
 
-    return {I, efPrime}
+
+    return {I, efPrime, r}
 }
