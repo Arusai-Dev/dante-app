@@ -3,27 +3,58 @@ import { create } from 'zustand'
 type createStoreState = {
     active: string
     sets: any[]
+    dropDownIsOpen: boolean
+    selectedSet: number // id of set
+    selectedSetTitle: string
+    selectedSetDescription: string
+    selectedSetCardCnt: number
     setActive: (mode: string) => void
     setSets: (data: any[]) => void
+    setDropDownIsOpen: (mode: boolean) => void
+    setSelectedSet: (mode: number) => void
+    setSelectedSetTitle: (mode: string) => void
+    setSelectedSetDescription: (mode: string) => void
+    setSelectedSetCardCnt: (mode: number) => void
 }
 
 export const useCreateStore = create<createStoreState>((set) => ({
     active: 'create',
     sets: [],
-    setActive: (mode) => set({ active: mode }),
-    setSets: (data) => set({ sets: data }),
-}))
-
-type setSelectionStore = {
-    dropDownIsOpen: boolean
-    selectedSet: number // id of set
-    setDropDownIsOpen: (mode: boolean) => void
-    setSelectedSet: (mode: number) => void
-}
-
-export const useSelectionStore = create<setSelectionStore>((set) => ({
     dropDownIsOpen: false,
     selectedSet: null,
+    selectedSetTitle: "",
+    selectedSetDescription: "",
+    selectedSetCardCnt: null,
+    setActive: (mode) => set({ active: mode }),
+    setSets: (data) => set({ sets: data }),
     setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
-    setSelectedSet: (mode) => set({ selectedSet: mode })
+    setSelectedSet: (mode) => set({ selectedSet: mode }),
+    setSelectedSetTitle: (mode) => set({ selectedSetTitle: mode }),
+    setSelectedSetDescription: (mode) => set({ selectedSetDescription: mode }),
+    setSelectedSetCardCnt: (mode) => set({ selectedSetCardCnt: mode })
 }))
+
+// active or manage
+// current user
+// current set id
+// current title
+// current description
+// current cnt of cards
+// all user sets
+
+// const { 
+//     active, 
+//     sets, 
+//     dropDownIsOpen, 
+//     selectedSet, 
+//     selectedSetTitle, 
+//     selectedSetDescription, 
+//     selectedSetCardCnt, 
+//     setActive, 
+//     setSets, 
+//     setDropDownIsOpen, 
+//     setSelectedSet, 
+//     setSelectedSetTitle,
+//     setSelectedSetDescription,
+//     setSelectedSetCardCnt,
+// } = useCreateStore()

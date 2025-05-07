@@ -1,19 +1,31 @@
-"use client"
-import { useState } from "react";
+'use client'
+
+import { useEffect, useState } from "react";
 import { ArrowDown, Check, PlusCircle, Eye, EyeOff } from "lucide-react";
-import { createNewSet } from "@/lib/dbFunctions";
-import { useSelectionStore } from "@/app/stores/createStores";
+import { createNewSet, getSetById, getSetByTitle } from "@/lib/dbFunctions";
+import { useCreateStore } from "@/app/stores/createStores";
 import { toast, Toaster } from "sonner";
 
-export default function SetSelectionSection({ sets }) {
+export default function SetSelectionSection() {
 
-    // Info
-    const [selectedSetName, setSelectedSetName] = useState("");
-    const [selectedSetDescription, setSelectedSetDescription] = useState("");
-    const [selectedCardCnt, setSelectedCardCnt] = useState(0);
+    // zustand
+    const { 
+        active, 
+        sets, 
+        dropDownIsOpen, 
+        selectedSet, 
+        selectedSetTitle, 
+        selectedSetDescription, 
+        selectedSetCardCnt, 
+        setActive, 
+        setSets, 
+        setDropDownIsOpen, 
+        setSelectedSet, 
+        setSelectedSetTitle,
+        setSelectedSetDescription,
+        setSelectedSetCardCnt,
+    } = useCreateStore()
 
-    // Drop Down 
-    const { dropDownIsOpen, setDropDownIsOpen, setSelectedSet } = useSelectionStore();
     const toggleDropDown = () => {
         setDropDownIsOpen(!dropDownIsOpen);
     }
@@ -30,7 +42,6 @@ export default function SetSelectionSection({ sets }) {
         setIsPrivate(false);
     }
 
-
     const [newSetTitle, setNewSetTitle] = useState("");
     const [newSetDescription, setNewSetDescription] = useState("");
     const [isPrivate, setIsPrivate] = useState(false);
@@ -39,11 +50,18 @@ export default function SetSelectionSection({ sets }) {
     const date_created = new Date();
     const number_cards = 0;
 
-    const onNewSetSubmit = () => {
+    const onNewSetSubmit = async () => {
         createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
+        const result = await getSetByTitle(newSetUserId, newSetTitle)
+        const id = result?.[0]?.id;
+        if (id) setSelectedSet(id);
+        console.log(result)
+        setSelectedSetTitle(result?.[0]?.title)
+        setSelectedSetDescription(result?.[0]?.description)
+        setSelectedSetCardCnt(result?.[0]?.number_cards)
         toggleNewSetUI();
         clearNewSetForm();
-        setSelectedSet()
+        // window.location.reload()
     }
 
 
@@ -54,12 +72,12 @@ export default function SetSelectionSection({ sets }) {
         <div className="flex justify-between h-[150px] w-[1150px] bg-[#D9D9D9]/3 py-3 px-4 rounded-[10px]">
             <div className="flex flex-col justify-between h-full">
                 <div>
-                    <h2 className="font-bold text-2xl">{selectedSetName == "" ? 'No Set Selected' : selectedSetName}</h2>
-                    <p>{selectedSetName == "" ? '' : selectedSetDescription}</p>
+                    <h2 className="font-bold text-2xl">{selectedSetTitle == "" ? 'No Set Selected' : selectedSetTitle}</h2>
+                    <p>{selectedSetTitle == "" ? '' : selectedSetDescription}</p>
                 </div>
                 {selectedSetDescription && (
                     <div>
-                        <p>{selectedCardCnt} Cards</p>
+                        <p>{selectedSetCardCnt} Cards</p>
                     </div>
                 )}
             </div>
@@ -75,7 +93,7 @@ export default function SetSelectionSection({ sets }) {
                         onClick={toggleDropDown}
                         >
 
-                        {selectedSetName ? selectedSetName : "Select A Set"} 
+                        {selectedSetTitle ? selectedSetTitle : "Select A Set"} 
                         <ArrowDown/>
                     </button>
 
@@ -87,13 +105,13 @@ export default function SetSelectionSection({ sets }) {
                                     key={index} 
                                     className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation overflow-x-scroll whitespace-nowrap hide-scrollbar"
                                     onClick={() => {
-                                        setSelectedSetName(set.title)
+                                        setSelectedSetTitle(set.title)
                                         setSelectedSetDescription(set.description)
                                         setSelectedSet(set.id)
-                                        setSelectedCardCnt(set.cards.length)
+                                        setSelectedSetCardCnt(set.cards.length)
                                     }}
                                 >
-                                    {selectedSetName == set.title && (
+                                    {selectedSetTitle == set.title && (
                                         <Check/>
                                     )}
                                     <div className="overflow-x-auto max-w-[200px] hide-scrollbar">{set.title}</div>
@@ -176,5 +194,4 @@ export default function SetSelectionSection({ sets }) {
         </div>
         </>
     )
-
 }

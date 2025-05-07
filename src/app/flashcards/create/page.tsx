@@ -4,13 +4,25 @@ import Image from "next/image"
 import SetSelectionSection from "@/components/createPageComponents/SetSelectionSection"
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
-import { useSelectionStore } from "@/app/stores/createStores"
 import { addOneCardToSet } from "@/lib/dbFunctions"
 
 export default function Create() {
-    const { sets, setSets, active, setActive } = useCreateStore();
-    const { dropDownIsOpen, setDropDownIsOpen } = useSelectionStore();
-    const { selectedSet, setSelectedSet } = useSelectionStore();
+    const { 
+        active, 
+        sets, 
+        dropDownIsOpen, 
+        selectedSet, 
+        selectedSetTitle, 
+        selectedSetDescription, 
+        selectedSetCardCnt, 
+        setActive, 
+        setSets, 
+        setDropDownIsOpen, 
+        setSelectedSet, 
+        setSelectedSetTitle,
+        setSelectedSetDescription,
+        setSelectedSetCardCnt,
+    } = useCreateStore()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -81,7 +93,7 @@ export default function Create() {
             </div>        
 
 
-            <SetSelectionSection sets={sets} />
+            <SetSelectionSection/>
 
             {/* Nav -> Create Card / Manage Cards */}
             <div className="flex gap-2 items-center p-2 mt-4 w-[1150px] h-[65px] bg-[#D9D9D9]/3 rounded-[10px]">

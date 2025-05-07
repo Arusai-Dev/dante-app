@@ -22,11 +22,11 @@ export async function getSetById(id: number) {
     }
 }
 
-export async function getSetByTitle(id: number) {
+export async function getSetByTitle(user_id: string, title: string) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
     try {
-        return await sql('SELECT * FROM flashcards WHERE "id"= $1', [id]);
+        return await sql('SELECT * FROM flashcards WHERE "user"= $1 AND "title"=$2 LIMIT 1', [user_id, title]);
     } catch (error) {
         console.log(error)
     }
