@@ -48,7 +48,10 @@ export async function addOneCardToSet(
     setId: number,
     category: string,
     front: string,
-    back: string
+    back: string,
+    quality_score: number,
+    ease_factor: number,
+    repetition: number
 ) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
@@ -57,7 +60,7 @@ export async function addOneCardToSet(
             `UPDATE flashcards
              SET cards = cards::jsonb || $1::jsonb
              WHERE id = $2`,
-            [JSON.stringify([{ category, front, back }]), setId]
+            [JSON.stringify([{ category, front, back, quality_score, ease_factor, repetition }]), setId]
         ); 
     } catch (error) {
         console.log(error);

@@ -23,7 +23,7 @@ export default function Create() {
     }, []);
     
     // Current Card Data
-    const [currentCardData, setCurrentCardData] = useState(['Category', 'Front', 'Back']);
+    const [currentCardData, setCurrentCardData] = useState(['Category', 'Front', 'Back', 0, 2.5, 0]);
     const updateCard = (index: number, value: string) => {
         const updatedCard = [...currentCardData]
         updatedCard[index] = value;
@@ -58,8 +58,8 @@ export default function Create() {
         };
     }, []);
 
-    const handleAddCard = (data: [string, string, string]) => {
-        const [category, front, back] = data;
+    const handleAddCard = (data: [string, string, string, number, number, number]) => {
+        const [category, front, back, qualityScore, easeFactor, repetition] = data;
 
         // FUTURE WORK: HANDLE ERROR WHEN NO SET IS SELECTED
         if (!selectedSet) {
@@ -67,7 +67,7 @@ export default function Create() {
             return;
           }
         
-          addOneCardToSet(selectedSet, category, front, back);
+          addOneCardToSet(selectedSet, category, front, back, qualityScore, easeFactor, repetition);
         };   
 
     return (

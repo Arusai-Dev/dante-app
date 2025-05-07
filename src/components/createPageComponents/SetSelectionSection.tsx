@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowDown, Check, PlusCircle, Eye, EyeOff } from "lucide-react";
 import { createNewSet } from "@/lib/dbFunctions";
 import { useSelectionStore } from "@/app/stores/createStores";
+import { toast, Toaster } from "sonner";
 
 export default function SetSelectionSection({ sets }) {
 
@@ -23,6 +24,12 @@ export default function SetSelectionSection({ sets }) {
         setNewSetIsOpen(!newSetIsOpen);
     }
 
+    const clearNewSetForm = () => {
+        setNewSetTitle("");
+        setNewSetDescription("");
+        setIsPrivate(false);
+    }
+
     
     const [newSetTitle, setNewSetTitle] = useState("");
     const [newSetDescription, setNewSetDescription] = useState("");
@@ -34,9 +41,12 @@ export default function SetSelectionSection({ sets }) {
 
 
 
+
+
     return (
         <>
         {/* Set Selection / Description */}
+        <Toaster />
         <div className="flex justify-between h-[150px] w-[1150px] bg-[#D9D9D9]/3 py-3 px-4 rounded-[10px]">
             <div className="flex flex-col justify-between h-full">
                 <div>
@@ -131,11 +141,11 @@ export default function SetSelectionSection({ sets }) {
                             </div>
 
                             <div className="flex gap-3 justify-between items-center">
-                                <div className="flex">
-                                    Visibility
+                                <div className="flex items-center">
+                                    <h1 className="font-semibold pr-2">Visibility:</h1>
                                     <button 
                                         className="flex justify-center cursor-pointer items-center w-[50px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                        onClick={() => setIsPrivate(!isPrivate)}
+                                        onClick={() => {setIsPrivate(!isPrivate); toast(`Set is now ${isPrivate ? "private" : "public"}`)}}
                                     >{isPrivate ? <Eye/> : <EyeOff/>}</button>
                                 </div>
 
