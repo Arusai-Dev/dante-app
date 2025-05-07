@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { getSet } from "@/lib/dbFunctions"
+import { getSetById } from "@/lib/dbFunctions"
 import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -11,7 +11,7 @@ export default async function EditSet({ params }) {
     const { id } = await params;
     
     //@ts-ignore
-    const [set] = await getSet(id)
+    const [set] = await getSetById(id)
 
     const user = await currentUser();
 

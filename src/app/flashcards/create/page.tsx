@@ -65,10 +65,10 @@ export default function Create() {
         if (!selectedSet) {
             console.warn("No set selected.");
             return;
-          }
+        }
         
-          addOneCardToSet(selectedSet, category, front, back, qualityScore, easeFactor, repetition);
-        };   
+        addOneCardToSet(selectedSet, category, front, back, qualityScore, easeFactor, repetition);
+    };   
 
     return (
 

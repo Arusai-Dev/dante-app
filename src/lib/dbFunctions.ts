@@ -2,7 +2,7 @@ import Flashcards from "@/app/flashcards/page";
 import { neon } from "@neondatabase/serverless";
 
 
-export async function deleteSet(id: number) {
+export async function deleteSetById(id: number) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
     try {
@@ -12,7 +12,17 @@ export async function deleteSet(id: number) {
     }
 }
 
-export async function getSet(id: number) {
+export async function getSetById(id: number) {
+    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
+
+    try {
+        return await sql('SELECT * FROM flashcards WHERE "id"= $1', [id]);
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export async function getSetByTitle(id: number) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
     try {

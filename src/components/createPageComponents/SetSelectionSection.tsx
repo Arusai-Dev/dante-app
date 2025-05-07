@@ -30,7 +30,7 @@ export default function SetSelectionSection({ sets }) {
         setIsPrivate(false);
     }
 
-    
+
     const [newSetTitle, setNewSetTitle] = useState("");
     const [newSetDescription, setNewSetDescription] = useState("");
     const [isPrivate, setIsPrivate] = useState(false);
@@ -39,8 +39,12 @@ export default function SetSelectionSection({ sets }) {
     const date_created = new Date();
     const number_cards = 0;
 
-
-
+    const onNewSetSubmit = () => {
+        createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
+        toggleNewSetUI();
+        clearNewSetForm();
+        setSelectedSet()
+    }
 
 
     return (
@@ -154,16 +158,13 @@ export default function SetSelectionSection({ sets }) {
                                         className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
                                         onClick={() => {
                                             toggleNewSetUI();
-                                            setNewSetDescription("");
+                                            clearNewSetForm();
                                         }}
                                     >Cancel</button>
 
                                     <button 
                                         className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                        onClick={() => {
-                                            createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
-                                            toggleNewSetUI();
-                                        }}
+                                        onClick={onNewSetSubmit}
                                     >Save</button>
                                 </div>
                             </div>

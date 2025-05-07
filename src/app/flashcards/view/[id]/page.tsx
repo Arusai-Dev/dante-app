@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { getSet } from "@/lib/dbFunctions"
+import { getSetById } from "@/lib/dbFunctions"
 import { Play, Share, Target } from "lucide-react";
 import Link from "next/link";
 
@@ -7,7 +7,7 @@ export default async function ViewSet({ params }) {
     const { id } = await params;
     
     //@ts-ignore
-    const [set] = await getSet(id)
+    const [set] = await getSetById(id)
     const jsonCards = set.cards;
     
     return (
