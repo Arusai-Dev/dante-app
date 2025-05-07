@@ -24,7 +24,7 @@ export default function Create() {
         }
     
         fetchData();
-    }, [sets]);
+    }, []);
     
     // Current Card Data
     const [currentCardData, setCurrentCardData] = useState(['Category', 'Front', 'Back', 0, 2.5, 0]);

@@ -100,7 +100,7 @@ export default function SetSelectionSection() {
                             {sets.map((set, index:number) => (
                                 <div 
                                     key={index} 
-                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation overflow-x-scroll whitespace-nowrap hide-scrollbar"
+                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation whitespace-nowrap hide-scrollbar"
                                     onClick={() => {
                                         setSelectedSetTitle(set.title)
                                         setSelectedSetDescription(set.description)
