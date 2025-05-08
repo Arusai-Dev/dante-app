@@ -12,6 +12,7 @@ export default function Create() {
         active, 
         selectedSet, 
         sets,
+        currentSet,
         setActive, 
         setSets, 
         setDropDownIsOpen, 
@@ -28,7 +29,7 @@ export default function Create() {
     }, []);
     
     // Current Card Data
-    const [currentCardData, setCurrentCardData] = useState(['Category', 'Front', 'Back', 0, 2.5, 0]);
+    const [currentCardData, setCurrentCardData] = useState([0, 0, 'Category', 'Front', 'Back', 0, 2.5, 0, 0, new Date()]);
     const updateCard = (index: number, value: string) => {
         const updatedCard = [...currentCardData]
         updatedCard[index] = value;
@@ -63,8 +64,19 @@ export default function Create() {
         };
     }, []);
 
-    const handleAddCard = (data: [string, string, string, number, number, number]) => {
-        const [category, front, back, qualityScore, easeFactor, repetition] = data;
+    const handleAddCard = (data: [number, number, string, string, string, number, number, number, number, Date]) => {
+        const [
+            cardId = currentSet.number_cards + 1,
+            selectedSet,
+            category, 
+            front, 
+            back, 
+            qualityScore, 
+            easeFactor, 
+            repetition,
+            interval,
+            next_review = new Date(),
+        ] = data;
 
         // FUTURE WORK: HANDLE ERROR WHEN NO SET IS SELECTED
         if (!selectedSet) {
@@ -72,7 +84,18 @@ export default function Create() {
             return;
         }
         
-        addOneCardToSet(selectedSet, category, front, back, qualityScore, easeFactor, repetition);
+        addOneCardToSet(
+            cardId,
+            selectedSet,
+            category, 
+            front, 
+            back, 
+            qualityScore, 
+            easeFactor, 
+            repetition,
+            interval,
+            next_review,
+        );
     };   
 
     return (
@@ -140,28 +163,28 @@ export default function Create() {
 
                         <h2 className="text-[16px] pb-2">Category (optional)</h2>
                         <input className="px-2 py-1 mb-6 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                            value={currentCardData[0] == "Category" ? '' : currentCardData[0]}
-                            onChange={(e) => updateCard(0, e.target.value)}
+                            value={currentCardData[2] == "Category" ? '' : currentCardData[2]}
+                            onChange={(e) => updateCard(2, e.target.value)}
                         ></input>
 
                         
                         <h2 className="text-[16px] pb-2">Front Side</h2>
                         <textarea className=" mb-6 px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                            value={currentCardData[1] == "Front" ? '' : currentCardData[1]}
-                            onChange={(e) => updateCard(1, e.target.value)}
+                            value={currentCardData[3] == "Front" ? '' : currentCardData[3]}
+                            onChange={(e) => updateCard(3, e.target.value)}
                         ></textarea>
 
                         
                         <h2 className="text-[16px] pb-2">Back Side</h2>
                         <textarea className=" mb-6 px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                            value={currentCardData[2] == "Back" ? '' : currentCardData[2]}
-                            onChange={(e) => updateCard(2, e.target.value)}
+                            value={currentCardData[4] == "Back" ? '' : currentCardData[4]}
+                            onChange={(e) => updateCard(4, e.target.value)}
                         ></textarea>
                         
                         <div className="flex gap-2 w-full max-w-[600px] mb-1">
                             <button 
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
-                                onClick={() => handleAddCard(currentCardData)}
+                                onClick={() => {handleAddCard(currentCardData)}}
                                 >
                                 <Save/>
                                 {`Add Card`} 
@@ -186,14 +209,14 @@ export default function Create() {
                             
                             {/* front */}
                             <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px] hover-animation">
-                                <h2 className="pl-3 py-2">{currentCardData[0]}</h2>
-                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData[1]}</div>
+                                <h2 className="pl-3 py-2">{currentCardData[2] == "" ? "Category" : currentCardData[2]}</h2>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData[3]}</div>
                             </div>
 
                             {/* back */}
                             <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded-[10px] hover-animation">
-                                <h2 className="pl-3 py-2">{currentCardData[0]}</h2>
-                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData[2]}</div>
+                                <h2 className="pl-3 py-2">{currentCardData[2] == "" ? "Category" : currentCardData[2]}</h2>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData[4]}</div>
                             </div>
                             
                         </div>

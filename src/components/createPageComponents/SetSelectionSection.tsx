@@ -48,7 +48,7 @@ export default function SetSelectionSection() {
     const number_cards = 0;
 
     const onNewSetSubmit = async () => {
-        createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
+        await createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
         console.log(date_created)
         const result = await getSetByTitle(newSetUserId, newSetTitle)
         const id = result?.[0]?.id;
@@ -59,7 +59,6 @@ export default function SetSelectionSection() {
         setSelectedSetCardCnt(result?.[0]?.number_cards)
         toggleNewSetUI();
         clearNewSetForm();
-        window.location.reload()
     }
 
     return (
@@ -102,6 +101,7 @@ export default function SetSelectionSection() {
                                     key={index} 
                                     className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation whitespace-nowrap hide-scrollbar"
                                     onClick={() => {
+                                        setCurrentSet(set)
                                         setSelectedSetTitle(set.title)
                                         setSelectedSetDescription(set.description)
                                         setSelectedSet(set.id)
