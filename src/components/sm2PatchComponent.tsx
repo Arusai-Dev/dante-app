@@ -1,11 +1,15 @@
+'use server'
+
 import SM2calculateInterval from "@/lib/sm2";
 
 export default async function Sm2PatchComponent({ qualityScore, easeFactor, repetition, id, setId }) {
     
+    console.log("HERE!!:!p@<p{#jj#o!#ipoh")
     const { I, efPrime, r } = SM2calculateInterval(parseInt(qualityScore), easeFactor, repetition);
 
     const now = new Date();
     const nextReview = new Date(now.setDate(now.getDate() + I));
+
 
     await fetch(`/api/sm2update/${setId}/${id}`, {
         method: "PATCH",

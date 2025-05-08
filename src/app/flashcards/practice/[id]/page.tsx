@@ -14,7 +14,7 @@ export default async function PracticeSet({ params }) {
 
     return (
         
-        <CardButton jsonCards={await jsonCards} number_cards={await set.number_cards} setId={set.id} />
+        <CardButton jsonCards={await jsonCards} number_cards={await set.number_cards} setId={id} />
     )
 
 

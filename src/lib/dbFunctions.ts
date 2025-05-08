@@ -88,5 +88,7 @@ export async function updateCardCount(id: number, card_cnt) {
             `UPDATE flashcards
             SET card_cnt`
         )
+    } catch (error) {
+        console.log(error)
     }
 } 
