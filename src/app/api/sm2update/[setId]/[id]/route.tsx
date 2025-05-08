@@ -12,13 +12,42 @@ export async function PATCH(req: NextRequest, { params }: { params: { setId:stri
     const interval = request.interval;
     const nextReview = request.next_review;
 
-    console.log(repetition, easeFactor, interval, nextReview)
-    
-    const response = await sql(
-        'UPDATE flashcards SET "repetition"=$1, "ease_factor"=$2, "interval"=$3, "next_review"=$4 WHERE "id"=$5 AND "indv_card_id"=$6', [repetition, easeFactor, interval, nextReview, setId, id]
-    );
+    const query = `
+        UPDATE flashcards
+        SET cards = (
+            SELECT jsonb_agg(
+                    CASE
+                    WHEN card->>'indv_card_id' = $6 THEN
+                        card || jsonb_build_object(
+                        'repetition', $1::int,
+                        'ease_factor', $2::float,
+                        'interval', $3::int,
+                        'next_review', $4::timestamp
+                        )
+                    ELSE
+                        card
+                    END
+                )
+            FROM jsonb_array_elements(cards::jsonb) AS card
+        )
+        WHERE id = $5
+    `;
 
-    console.log(response)
+    const values = [
+        repetition,     
+        easeFactor,     
+        interval,       
+        nextReview, 
+        setId,    
+        id      
+    ];
 
-    return NextResponse.json({message: "hello"}, {status:200})
+    try {
+        await sql(query, values);
+        return NextResponse.json({message: "success"}, {status:200})
+
+    } catch (error) {
+        return NextResponse.json({error: error}, {status:500})
+    }
+
 }
