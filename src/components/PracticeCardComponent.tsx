@@ -31,7 +31,8 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
     }
 
     const handleQualityScoreSubmit = async () => {
-        Sm2PatchAction(parseInt(qualityScore), jsonCards[currentCard].ease_factor, jsonCards[currentCard].repetition, jsonCards[currentCard].indv_card_id, setId)
+        console.log(qualityScore)
+        Sm2PatchAction(parseInt(qualityScore), jsonCards[currentCard].ease_factor, jsonCards[currentCard].repetition, jsonCards[currentCard].indv_card_id, setId, jsonCards[currentCard].interval)
         setQualityScore('')
     }
 

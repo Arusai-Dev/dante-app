@@ -2,9 +2,11 @@
 
 import SM2calculateInterval from "@/lib/sm2";
 
-export default async function Sm2PatchAction(qualityScore, easeFactor, repetition, id, setId) {
+export default async function Sm2PatchAction(qualityScore, easeFactor, repetition, id, setId, prevInterval) {
     
-    const { I, efPrime, r } = SM2calculateInterval(parseInt(qualityScore), easeFactor, repetition);
+    const { I, efPrime, newR } = SM2calculateInterval(parseInt(qualityScore), easeFactor, repetition, prevInterval);
+
+    
 
     const now = new Date();
     const nextReview = new Date(now.setDate(now.getDate() + I));
@@ -14,10 +16,11 @@ export default async function Sm2PatchAction(qualityScore, easeFactor, repetitio
         method: "PATCH",
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({
-            repetition: r,
+            repetition: newR,
             easeFactor: efPrime,
             interval: I,
-            next_review: nextReview
+            next_review: nextReview,
+            quality_score: parseInt(qualityScore),
         })
 
     })

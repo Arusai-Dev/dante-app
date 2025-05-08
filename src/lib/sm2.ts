@@ -8,22 +8,31 @@ r = Repetition count
 
 */
 
-export default function SM2calculateInterval(q: number, eF: number, r: number) {
-    let I:number;
+export default function SM2calculateInterval(q: number, eF: number, r: number, prevInterval: number) {
+    let I: number;
+    let efPrime:number; 
+    let newR:number;
 
     if (q >= 3) {
-        if (r == 0) { I = 0 }
-        else if (r == 1) { I = 6 }
-        else if (r >= 2) {
-            I = Math.round( (r-1) * eF )
+        if (r == 0) {
+            I = 1;
+            newR = 1;
+        } else if (r == 1) {
+            I = 6;
+            newR = 2;
+        } else {
+            I = Math.round(prevInterval * eF)
+            newR = r +=1;
         }
+    } else {
+        I = 1;
+        newR = 0;
     }
 
-    r += 1;
+    efPrime = eF + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    if (efPrime < 1.3) efPrime = 1.3;
 
-    let efPrime = eF = 0.8 + (0.28 * q) - (0.02 * q**2)
-    if (efPrime < 1.3) { efPrime = 1.3 }
+    return { I, efPrime, newR }
 
-
-    return {I, efPrime, r}
 }
+
