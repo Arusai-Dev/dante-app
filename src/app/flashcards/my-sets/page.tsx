@@ -43,7 +43,7 @@ export default async function MyFlashcards() {
                                 </div>
 
                                 <div className="absolute bottom-0 right-0 m-2">
-                                    <p className="inline-block m-1">{set.number_cards}</p>
+                                    <p className="inline-block m-1">{set.card_cnt}</p>
                                     <Layers2 className="inline-block m-1"/>
 
                                 </div>

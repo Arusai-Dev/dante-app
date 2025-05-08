@@ -14,7 +14,7 @@ export default async function PlaySet({ params }) {
 
     return (
         
-        <CardButton jsonCards={await jsonCards} number_cards={await set.number_cards} />
+        <CardButton jsonCards={await jsonCards} number_cards={await set.card_cnt} />
     )
 
 
