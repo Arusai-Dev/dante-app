@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { setId:stri
     const repetition = request.repetition;
     const easeFactor = request.easeFactor;
     const interval = request.interval;
-    const nextReview = request.next_review;
+    const dueDate = request.due_date;
 
     const query = `
         UPDATE flashcards
@@ -22,7 +22,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { setId:stri
                         'repetition', $1::int,
                         'ease_factor', $2::float,
                         'interval', $3::int,
-                        'next_review', $4::timestamp
+                        'due_date', $4::timestamp
                         )
                     ELSE
                         card
@@ -37,7 +37,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { setId:stri
         repetition,     
         easeFactor,     
         interval,       
-        nextReview, 
+        dueDate, 
         setId,    
         id      
     ];

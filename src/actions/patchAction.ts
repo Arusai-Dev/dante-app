@@ -1,16 +1,13 @@
 'use server'
 
 import SM2calculateInterval from "@/lib/sm2";
+import dayjs from 'dayjs';
 
 export default async function Sm2PatchAction(qualityScore, easeFactor, repetition, id, setId, prevInterval) {
     
     const { I, efPrime, newR } = SM2calculateInterval(parseInt(qualityScore), easeFactor, repetition, prevInterval);
 
-    
-
-    const now = new Date();
-    const nextReview = new Date(now.setDate(now.getDate() + I));
-
+    const dueDate = await dayjs(Date.now()).add(I, 'day').toISOString();
 
     await fetch(`http://localhost:3000/api/sm2update/${setId}/${id}`, {
         method: "PATCH",
@@ -19,8 +16,7 @@ export default async function Sm2PatchAction(qualityScore, easeFactor, repetitio
             repetition: newR,
             easeFactor: efPrime,
             interval: I,
-            next_review: nextReview,
-            quality_score: parseInt(qualityScore),
+            due_date: dueDate,
         })
 
     })

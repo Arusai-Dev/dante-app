@@ -18,6 +18,9 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
     const nextCard = () => {
         if (currentCard == number_cards-1) {setCurrentCard(0)} 
         else { setCurrentCard(i => i+1) } 
+
+        Sm2PatchAction(parseInt(qualityScore), jsonCards[currentCard].ease_factor, jsonCards[currentCard].repetition, jsonCards[currentCard].indv_card_id, setId, jsonCards[currentCard].interval)
+        setQualityScore('')
     }
 
     const prevCard = () => {
@@ -30,14 +33,8 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
 
     }
 
-    const handleQualityScoreSubmit = async () => {
-        console.log(qualityScore)
-        Sm2PatchAction(parseInt(qualityScore), jsonCards[currentCard].ease_factor, jsonCards[currentCard].repetition, jsonCards[currentCard].indv_card_id, setId, jsonCards[currentCard].interval)
-        setQualityScore('')
-    }
-
     return (
-        <form action={handleQualityScoreSubmit}>
+
             <div className="h-screen w-screen flex items-center justify-center">
                 <Toaster />
 
@@ -70,7 +67,7 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
                 </div>
 
                 <div className="right-0 absolute lg:p-50 sm:p-10">
-                    <Button type="submit" className="rounded-4xl border border-white px-50 hover-animation" onClick={nextCard}>
+                    <Button className="rounded-4xl border border-white px-50 hover-animation" onClick={nextCard}>
                         <ArrowRight />
                     </Button>
 
@@ -88,6 +85,5 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
                 </div>
 
             </div>
-        </form>
     );
 }
