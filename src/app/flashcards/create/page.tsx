@@ -4,15 +4,13 @@ import Image from "next/image"
 import SetSelectionSection from "@/components/createPageComponents/SetSelectionSection"
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
-import { addOneCardToSet, getSetById, updateCardCount } from "@/lib/dbFunctions"
-import { Save } from "lucide-react"
-import { toast, Toaster } from "sonner"
+import { addOneCardToSet, deleteCardById, getSetById, updateCardCount } from "@/lib/dbFunctions"
+import { Trash2, Edit, PlusCircle, Save } from "lucide-react"
 
 export default function Create() {
     const { 
         active, 
         currentSet,
-        setCurrentSet,
         setActive, 
         setSets, 
         setDropDownIsOpen, 
@@ -26,6 +24,7 @@ export default function Create() {
             });
             const data = await res.json();
             setSets(data.Sets);
+            setActive("create")
         }
 
         fetchData();
@@ -110,7 +109,6 @@ export default function Create() {
     return (
 
         <section className="flex flex-col items-center pt-[65px] pb-[65px] font-(family-name:inter)">
-            <Toaster/>
 
             {/* Title */}
             <div className="flex flex-col items-center pt-[30px] pb-9">
@@ -251,8 +249,54 @@ export default function Create() {
             
             {/* Manage Cards Section */}
             {active == "manage" && (
-                <div>
-                    
+                <div className="flex items-center text-center justify-center overflow-y-visible border-1 border-[#8c8c8c] w-[1150px] min-h-[250px] mt-3 rounded-[10px]">
+                    {currentSet.cards.length == 0 ? (
+                        <div className="flex flex-col items-center">
+                            {// TODO: Change /\ to ==  
+                            }
+                            <h1 className="pb-2 text-2xl font-bold">No cards in this set yet</h1>
+                            <h1 className="pb-5 text-xl">Create your first card to begin</h1>
+                            <button 
+                                className="flex cursor-pointer justify-center items-center w-[150px] gap-2 h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                                onClick={() => setActive("create")}
+                            ><PlusCircle height={18}/> Create Card</button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-3 p-[15px] gap-[15px] w-full">
+                            {currentSet.cards.map((card, id: number) => (
+                                <div
+                                    key={id}
+                                    className="w-auto md:h-[140px] bg-[#D9D9D9]/3 rounded-[10px] flex flex-col"
+                                >
+                                    <div className="h-full flex flex-col">
+                                        <div className="flex justify-between pt-2 px-3">
+                                            <h1 className="text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
+                                                {card.category == "category" ? card.category : "Uncategorized"}
+                                            </h1>
+                                            <div className="flex gap-2 items-center">
+                                                <Edit 
+                                                    height={20} 
+                                                    className="hover:text-purple-700 transition-colors duration-200"
+                                                />
+                                                <Trash2 
+                                                    height={20}
+                                                    onClick={() => deleteCardById(currentSet.id, card.indv_card_id)}
+                                                    className="hover:text-purple-700 transition-colors duration-200"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="h-full flex pt-[40px] pl-2">
+                                            <h1 className="text-lg font-semibold">{card.front}</h1>
+                                        </div>
+                                    </div>
+                                    <div className="w-full md:h-auto py-1 flex bg-[#dddddd]">
+                                        <h1 className="text-lg font-semibold text-[#474747] pl-2">{card.back}</h1>
+                                    </div>
+                                </div>
+                            ))}
+
+                        </div>
+                    )}
                 </div>
             )}
 

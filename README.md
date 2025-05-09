@@ -12,7 +12,7 @@
     - [x] - After selecting a set in the drop down, sets data should be displayed
     - [x] - Creating a new set causes selected set == new set
     - [ ] - When you click edit on a card in the manage section it should open up the cards info on the form\
-    - [ ] - Card Count needs to update on new card and when you retrieve a card
+    - [x] - Card Count needs to update on new card and when you retrieve a card
 - [x] - Upload flashcard set to database with corresponding user.
 - [ ] - Allow images to be input as questions or answers. (Set up an s3 bucket and handle image processing)
 - [ ] - Ability to review a user created flashcard set from 1 to 5 stars, allow users to have a user review rating and verified accounts

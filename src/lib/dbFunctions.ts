@@ -9,7 +9,16 @@ export async function deleteSetById(id: number) {
     } catch (error) {
         console.log(error)
     }
-    
+}
+
+export async function deleteCardById(setId: number, cardId: number) {
+    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
+
+    try {
+        await sql('DELETE FROM flashcards WHERE "id" = $1 AND "indv_card_id" = $2', [setId, cardId])
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 export async function getSetById(id: number) {
@@ -21,6 +30,8 @@ export async function getSetById(id: number) {
         console.log(error)
     }
 }
+
+
 
 export async function getSetByTitle(user_id: string, title: string) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
@@ -96,3 +107,4 @@ export async function updateCardCount(id: number, cardCnt: number) {
         console.log(error)
     }
 } 
+
