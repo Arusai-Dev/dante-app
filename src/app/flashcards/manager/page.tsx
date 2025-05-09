@@ -4,12 +4,14 @@ import Image from "next/image"
 import SetSelectionSection from "@/components/createPageComponents/SetSelectionSection"
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
-import { addOneCardToSet, deleteCardById, getSetById, updateCardCount } from "@/lib/dbFunctions"
+import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { Trash2, Edit, PlusCircle, Save } from "lucide-react"
 
 export default function Create() {
     const { 
         active, 
+        updatingCard,
+        setUpdatingCard,
         currentSet,
         setCurrentSet,
         setActive, 
@@ -25,14 +27,13 @@ export default function Create() {
             });
             const data = await res.json();
             setSets(data.Sets);
-            setActive("create")
         }
 
         fetchData();
     }, []);
     
     // Current Card Data
-    const [currentCardData, setCurrentCardData] = useState([1, 0, 'Category', 'Front', 'Back', 0, 2.5, 0, 0, new Date()]);
+    const [currentCardData, setCurrentCardData] = useState([1, 0, 'Category', 'Front', 'Back']);
     const updateCard = (index: number, value: string) => {
         const updatedCard = [...currentCardData]
         updatedCard[index] = value;
@@ -41,9 +42,9 @@ export default function Create() {
 
     const clearCurrentCardData = () => {
         const updatedCard = [...currentCardData]
-        updatedCard[0] = 'Category';
-        updatedCard[1] = 'Front';
-        updatedCard[2] = 'Back';
+        updatedCard[2] = 'Category';
+        updatedCard[3] = 'Front';
+        updatedCard[4] = 'Back';
         setCurrentCardData(updatedCard);
     }
 
@@ -68,24 +69,21 @@ export default function Create() {
     }, []);
 
 
-    const handleAddCard = async (data: [number, number, string, string, string, number, number, number, number, Date]) => {
+    const handleAddCard = async (data: [number, number, string, string, string]) => {
         const [
             ,
             ,
             category, 
             front, 
             back, 
-            qualityScore, 
-            easeFactor, 
-            repetition,
-            interval,
-            next_review,
         ] = data;
 
         updateCurrentSet(currentSet.id)
         const currentSetId = currentSet.id
         const cardId = currentSet.cards.length
         
+        currentCardData[0] = currentSetId
+        currentCardData[1] = cardId
         currentCardData[2] = "Category"
         currentCardData[3] = "Front"
         currentCardData[4] = "Back"
@@ -101,11 +99,6 @@ export default function Create() {
             category, 
             front, 
             back, 
-            qualityScore, 
-            easeFactor, 
-            repetition,
-            interval,
-            next_review,
         );
         
         const updatedSet = await getSetById(currentSetId);
@@ -125,13 +118,29 @@ export default function Create() {
         updateCurrentSet(setId)
     }
 
+    const handleEditCardBtnPress = (setId: number, cardId: number, category: string, front: string, back: string) => {  
+        setCurrentCardData([setId, cardId, category, front, back])
+        setActive("create")
+        setUpdatingCard(true)
+    }
+
+    const handleUpdateCard = async (data: [number, number, string, string, string]) => {
+        const [setId, cardId, category, front, back] = data 
+
+        await updateCardData(setId, cardId, category, front, back)
+        setUpdatingCard(false)
+        setActive("manage")
+        clearCurrentCardData()
+        updateCurrentSet(setId)
+    }
+
     return (
 
         <section className="flex flex-col items-center pt-[65px] pb-[65px] font-(family-name:inter)">
 
             {/* Title */}
             <div className="flex flex-col items-center pt-[30px] pb-9">
-                <h1 className=" text-4xl font-bold ">Set Creator</h1>
+                <h1 className=" text-4xl font-bold ">Set Manager</h1>
                 <p className=" text-[22px] pt-2">Create, organize, and manage your sets!</p>   
             </div>        
 
@@ -212,11 +221,15 @@ export default function Create() {
                             <button 
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
                                 onClick={() => {
-                                    handleAddCard(currentCardData)
+                                    if (updatingCard) {
+                                        handleUpdateCard(currentCardData)
+                                    } else {
+                                        handleAddCard(currentCardData)
+                                    }
                                 }}
                                 >
                                 <Save/>
-                                {`Add Card`} 
+                                {updatingCard ? "Update Card" : "Add Card"}
                             </button>
 
                             <button 
@@ -287,19 +300,22 @@ export default function Create() {
                                     <div className="h-full flex flex-col">
                                         <div className="flex justify-between pt-2 px-3">
                                             <h1 className="text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
-                                                {card.category == "category" ? card.category : "N/A"}
+                                                {card.category == "Category" ? "N/A": card.category }
                                             </h1>
                                             <div className="flex gap-2 items-center">
                                                 <Edit 
                                                     height={20} 
-                                                    className="hover:text-purple-700 transition-colors duration-200"
+                                                    className="hover:text-purple-400 transition-colors duration-200"
+                                                    onClick={() => {
+                                                        handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back)
+                                                    }}
                                                 />
                                                 <Trash2 
                                                     height={20}
                                                     onClick={() => {
                                                         handleCardDelete(currentSet.id, card.cardId)
                                                     }}
-                                                    className="hover:text-purple-700 transition-colors duration-200"
+                                                    className="hover:text-purple-400 transition-colors duration-200"
                                                 />
                                             </div>
                                         </div>
@@ -307,7 +323,7 @@ export default function Create() {
                                             <h1 className="text-lg font-semibold">{card.front}</h1>
                                         </div>
                                     </div>
-                                    <div className="w-full md:h-auto py-1 flex bg-[#dddddd]">
+                                    <div className="w-full md:h-auto py-1 flex text-left bg-[#dddddd] rounded-b-[10px]">
                                         <h1 className="text-lg font-semibold whitespace-nowrap w-full truncate text-[#474747] pl-2">{card.back}</h1>
                                     </div>
                                 </div>

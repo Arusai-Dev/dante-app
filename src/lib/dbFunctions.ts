@@ -93,11 +93,6 @@ export async function addOneCardToSet(
     category: string,
     front: string,
     back: string,
-    qualityScore: number,
-    easeFactor: number,
-    repetition: number,
-    interval: number,
-    nextReview: Date
 ) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
@@ -106,7 +101,7 @@ export async function addOneCardToSet(
             `UPDATE flashcards
              SET cards = cards::jsonb || $1::jsonb
              WHERE id = $2`,
-            [JSON.stringify([{ cardId, category, front, back, qualityScore, easeFactor, repetition, interval, nextReview }]), currentSetId]
+            [JSON.stringify([{ cardId, category, front, back}]), currentSetId]
         ); 
     } catch (error) {
         console.log(error);
@@ -127,10 +122,32 @@ export async function updateCardCount(id: number, cardCnt: number) {
     } catch (error) {
         console.log(error)
     }
-} 
-
-
-function setCurrentSet(arg0: Record<string, any>) {
-    throw new Error("Function not implemented.");
 }
 
+export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string) {
+    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
+
+    try {
+        const result = await sql<{ cards: any[] }>(
+            'SELECT cards FROM flashcards WHERE id = $1',
+            [setId]
+        );
+
+        const currentCards = result[0]?.cards;
+
+        const updatedCards = currentCards.map((card) => {
+            if (card.cardId === cardId) {
+                return { ...card, category, front, back };
+            }
+            return card;
+        });
+
+        await sql(
+            'UPDATE flashcards SET cards = $2 WHERE id = $1',
+            [setId, JSON.stringify(updatedCards)]
+        );
+
+    } catch (error) {
+        console.error("Failed to update card data:", error);
+    }
+}
