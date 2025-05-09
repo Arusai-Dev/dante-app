@@ -11,6 +11,7 @@ export default function Create() {
     const { 
         active, 
         currentSet,
+        setCurrentSet,
         setActive, 
         setSets, 
         setDropDownIsOpen, 
@@ -69,8 +70,8 @@ export default function Create() {
 
     const handleAddCard = async (data: [number, number, string, string, string, number, number, number, number, Date]) => {
         const [
-            currentSetId,
-            cardId,
+            ,
+            ,
             category, 
             front, 
             back, 
@@ -81,11 +82,15 @@ export default function Create() {
             next_review,
         ] = data;
 
-        data[0] = currentSet.id
-        data[1] = currentSet.card_cnt + 1
+        updateCurrentSet(currentSet.id)
+        const currentSetId = currentSet.id
+        const cardId = currentSet.cards.length
         
-        console.log(data)
-        if (currentSetId == 0) {
+        currentCardData[2] = "Category"
+        currentCardData[3] = "Front"
+        currentCardData[4] = "Back"
+        
+        if (!currentSetId) {
             console.warn("No set selected.");
             return;
         }
@@ -103,8 +108,22 @@ export default function Create() {
             next_review,
         );
         
-        await updateCardCount(currentSet.id, currentSet.cards.length)
+        const updatedSet = await getSetById(currentSetId);
+        setCurrentSet(updatedSet[0])
+
+        await updateCardCount(currentSetId, updatedSet[0].cards.length)
+        await updateCurrentSet(currentSetId)
     };   
+
+    const updateCurrentSet = async (id: number) => {
+        const updatedSet = await getSetById(id)
+        setCurrentSet(updatedSet[0])
+    }
+
+    const handleCardDelete = async (setId, cardId) => {
+        await deleteCardById(setId, cardId)
+        updateCurrentSet(setId)
+    }
 
     return (
 
@@ -194,7 +213,6 @@ export default function Create() {
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
                                 onClick={() => {
                                     handleAddCard(currentCardData)
-
                                 }}
                                 >
                                 <Save/>
@@ -249,11 +267,9 @@ export default function Create() {
             
             {/* Manage Cards Section */}
             {active == "manage" && (
-                <div className="flex items-center text-center justify-center overflow-y-visible border-1 border-[#8c8c8c] w-[1150px] min-h-[250px] mt-3 rounded-[10px]">
-                    {currentSet.cards.length == 0 ? (
-                        <div className="flex flex-col items-center">
-                            {// TODO: Change /\ to ==  
-                            }
+                <div className="flex text-center justify-center overflow-y-visible border-1 border-[#8c8c8c] w-[1150px] min-h-[350px] mt-3 rounded-[10px]">
+                    {currentSet.cards && currentSet.cards.length == 0 ? (
+                        <div className="flex flex-col items-center justify-center">
                             <h1 className="pb-2 text-2xl font-bold">No cards in this set yet</h1>
                             <h1 className="pb-5 text-xl">Create your first card to begin</h1>
                             <button 
@@ -263,7 +279,7 @@ export default function Create() {
                         </div>
                     ) : (
                         <div className="grid grid-cols-3 p-[15px] gap-[15px] w-full">
-                            {currentSet.cards.map((card, id: number) => (
+                            {currentSet.cards && currentSet.cards.map((card, id: number) => (
                                 <div
                                     key={id}
                                     className="w-auto md:h-[140px] bg-[#D9D9D9]/3 rounded-[10px] flex flex-col"
@@ -271,7 +287,7 @@ export default function Create() {
                                     <div className="h-full flex flex-col">
                                         <div className="flex justify-between pt-2 px-3">
                                             <h1 className="text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
-                                                {card.category == "category" ? card.category : "Uncategorized"}
+                                                {card.category == "category" ? card.category : "N/A"}
                                             </h1>
                                             <div className="flex gap-2 items-center">
                                                 <Edit 
@@ -280,7 +296,9 @@ export default function Create() {
                                                 />
                                                 <Trash2 
                                                     height={20}
-                                                    onClick={() => deleteCardById(currentSet.id, card.indv_card_id)}
+                                                    onClick={() => {
+                                                        handleCardDelete(currentSet.id, card.cardId)
+                                                    }}
                                                     className="hover:text-purple-700 transition-colors duration-200"
                                                 />
                                             </div>
@@ -290,7 +308,7 @@ export default function Create() {
                                         </div>
                                     </div>
                                     <div className="w-full md:h-auto py-1 flex bg-[#dddddd]">
-                                        <h1 className="text-lg font-semibold text-[#474747] pl-2">{card.back}</h1>
+                                        <h1 className="text-lg font-semibold whitespace-nowrap w-full truncate text-[#474747] pl-2">{card.back}</h1>
                                     </div>
                                 </div>
                             ))}

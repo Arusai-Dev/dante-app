@@ -1,3 +1,4 @@
+import { useCreateStore } from "@/app/stores/createStores";
 import { neon } from "@neondatabase/serverless";
 
 
@@ -12,10 +13,31 @@ export async function deleteSetById(id: number) {
 }
 
 export async function deleteCardById(setId: number, cardId: number) {
+
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
+    
+    console.log("setId: ", setId, "cardId: ", cardId)
 
     try {
-        await sql('DELETE FROM flashcards WHERE "id" = $1 AND "indv_card_id" = $2', [setId, cardId])
+
+        const result = await sql<{ cards: any[] }>(
+            'SELECT cards FROM flashcards WHERE id = $1',
+            [setId]
+        )
+
+        const currentCards = result[0]?.cards
+
+        if (!currentCards) {
+            console.error("No cards found");
+            return;
+        }
+
+        const updateCards = currentCards.filter((card) => card.cardId !== cardId);
+        console.log(updateCards)
+        updateCardCount(setId, updateCards.length)
+
+
+        await sql('UPDATE flashcards SET cards = $2 WHERE "id" = $1', [setId, JSON.stringify(updateCards)])
     } catch (error) {
         console.log(error)
     }
@@ -94,7 +116,6 @@ export async function addOneCardToSet(
 export async function updateCardCount(id: number, cardCnt: number) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
-    console.log(id, cardCnt)
     try {
         const update = await sql(
             `UPDATE flashcards
@@ -107,4 +128,9 @@ export async function updateCardCount(id: number, cardCnt: number) {
         console.log(error)
     }
 } 
+
+
+function setCurrentSet(arg0: Record<string, any>) {
+    throw new Error("Function not implemented.");
+}
 
