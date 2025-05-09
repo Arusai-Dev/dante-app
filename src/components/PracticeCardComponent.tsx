@@ -10,16 +10,28 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
     const [currentCard, setCurrentCard] = useState(0);
     const [showFront, setShowFront] = useState(true);
     const [qualityScore, setQualityScore] = useState('');
+    const [dueCards, setDueCards] = useState(jsonCards);
 
     const flipCard = () => {
         setShowFront(!showFront);
     }
 
-    const nextCard = () => {
-        if (currentCard == number_cards-1) {setCurrentCard(0)} 
+    const nextCard = async () => {
+
+        await Sm2PatchAction(parseInt(qualityScore), dueCards[currentCard].ease_factor, dueCards[currentCard].repetition, dueCards[currentCard].indv_card_id, setId, dueCards[currentCard].interval)
+
+        const result = jsonCards.sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+        // console.log(result)
+
+        setDueCards(result)
+
+        console.log(dueCards)
+
+        if (currentCard == dueCards.length-1) {
+            setCurrentCard(0)
+        } 
         else { setCurrentCard(i => i+1) } 
 
-        Sm2PatchAction(parseInt(qualityScore), jsonCards[currentCard].ease_factor, jsonCards[currentCard].repetition, jsonCards[currentCard].indv_card_id, setId, jsonCards[currentCard].interval)
         setQualityScore('')
     }
 
@@ -41,15 +53,15 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
                 <div className={`absolute w-1/2 h-1/2 transition-transform duration-500 flip-inner cursor-pointer ${!showFront ? 'flipped' : ''}`} onClick={flipCard} >
 
                     <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px] hover-animation">
-                        <h2 className="pl-3 py-2"><Album className="inline-block mr-1" /> {jsonCards[currentCard].category}</h2>
-                        <div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">{jsonCards[currentCard].front}</div>
+                        <h2 className="pl-3 py-2"><Album className="inline-block mr-1" /> {dueCards[currentCard].category}</h2>
+                        <div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">{dueCards[currentCard].front}</div>
                         <h2 className="absolute right-0 bottom-0 m-2">front</h2>
                     </div>
 
                         
                     <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded-[10px] hover-animation">
-                        <h2 className="pl-3 py-2"><Album className="inline-block mr-1" /> {jsonCards[currentCard].category}</h2>
-                        <div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">{jsonCards[currentCard].back}</div>
+                        <h2 className="pl-3 py-2"><Album className="inline-block mr-1" /> {dueCards[currentCard].category}</h2>
+                        <div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">{dueCards[currentCard].back}</div>
 
                         <div className="flex justify-center items-center gap-6">
                             <input onChange={handleQualityScoreClick} checked={qualityScore == "0"} className="w-7 h-7 border-2 rounded-full" type="radio" id="0" name="quality_score" value="0" />

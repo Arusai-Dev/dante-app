@@ -21,5 +21,7 @@ export default async function Sm2PatchAction(qualityScore, easeFactor, repetitio
 
     })
 
+    return dueDate
+
 
 }
