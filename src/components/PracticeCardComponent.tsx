@@ -10,7 +10,10 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
     const [currentCard, setCurrentCard] = useState(0);
     const [showFront, setShowFront] = useState(true);
     const [qualityScore, setQualityScore] = useState('');
-    const [dueCards, setDueCards] = useState(jsonCards);
+
+    let result = jsonCards.sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
+
+    const [dueCards, setDueCards] = useState(result);
 
     const flipCard = () => {
         setShowFront(!showFront);
@@ -20,12 +23,9 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
 
         await Sm2PatchAction(parseInt(qualityScore), dueCards[currentCard].ease_factor, dueCards[currentCard].repetition, dueCards[currentCard].indv_card_id, setId, dueCards[currentCard].interval)
 
-        const result = jsonCards.sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
-        // console.log(result)
-
+        result = jsonCards.sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
         setDueCards(result)
 
-        console.log(dueCards)
 
         if (currentCard == dueCards.length-1) {
             setCurrentCard(0)
