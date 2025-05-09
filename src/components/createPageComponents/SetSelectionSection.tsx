@@ -18,7 +18,6 @@ export default function SetSelectionSection() {
         setDropDownIsOpen, 
     } = useCreateStore()
 
-    console.log(currentSet)
 
     const toggleDropDown = () => {
         setDropDownIsOpen(!dropDownIsOpen);

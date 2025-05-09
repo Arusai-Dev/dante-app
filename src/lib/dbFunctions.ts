@@ -55,16 +55,16 @@ export async function createNewSet(
 }
 
 export async function addOneCardToSet(
-    setId: number,
+    currentSetId: number,
     cardId: number,
     category: string,
     front: string,
     back: string,
-    quality_score: number,
-    ease_factor: number,
+    qualityScore: number,
+    easeFactor: number,
     repetition: number,
     interval: number,
-    next_review: Date
+    nextReview: Date
 ) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
@@ -73,22 +73,23 @@ export async function addOneCardToSet(
             `UPDATE flashcards
              SET cards = cards::jsonb || $1::jsonb
              WHERE id = $2`,
-            [JSON.stringify([{ cardId, category, front, back, quality_score, ease_factor, repetition, interval, next_review }]), setId]
+            [JSON.stringify([{ cardId, category, front, back, qualityScore, easeFactor, repetition, interval, nextReview }]), currentSetId]
         ); 
     } catch (error) {
         console.log(error);
     }
 }
 
-export async function updateCardCount(id: number, card_cnt: number) {
+export async function updateCardCount(id: number, cardCnt: number) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
     try {
         return await sql(
             `UPDATE flashcards
             SET card_cnt = $1
-            WHERE id = $2`,
-            [card_cnt, id]
+            WHERE id = $2
+            RETURNING *`,
+            [cardCnt, id]
         )
     } catch (error) {
         console.log(error)

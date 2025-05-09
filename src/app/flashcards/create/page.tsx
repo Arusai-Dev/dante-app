@@ -11,7 +11,6 @@ import { toast, Toaster } from "sonner"
 export default function Create() {
     const { 
         active, 
-        sets,
         currentSet,
         setActive, 
         setSets, 
@@ -67,8 +66,8 @@ export default function Create() {
 
     const handleAddCard = async (data: [number, number, string, string, string, number, number, number, number, Date]) => {
         const [
-            selectedSet = currentSet.id,
-            cardId = currentSet.card_cnt + 1,
+            currentSetId,
+            cardId,
             category, 
             front, 
             back, 
@@ -79,16 +78,17 @@ export default function Create() {
             next_review,
         ] = data;
 
-        console.log("\ncurrentSet:", currentSet, "\nTitle:", currentSet.Title, "\nDescription:", currentSet.Description, "\nCard_Cnt:", currentSet.CardCnt )
+        data[0] = currentSet.id
+        data[1] = currentSet.card_cnt + 1
         
-        console.log(selectedSet)
-        if (selectedSet == 0) {
+        console.log(data)
+        if (currentSetId == 0) {
             console.warn("No set selected.");
             return;
         }
         
         await addOneCardToSet(
-            selectedSet,
+            currentSetId,
             cardId,
             category, 
             front, 
