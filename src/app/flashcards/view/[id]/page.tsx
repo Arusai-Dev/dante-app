@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { getSetById } from "@/lib/dbFunctions"
-import { Play, Share, Target } from "lucide-react";
+import { CircleHelp, Play, Share, Target } from "lucide-react";
 import Link from "next/link";
 
 export default async function ViewSet({ params }) {  
@@ -28,10 +28,18 @@ export default async function ViewSet({ params }) {
                     </Link>
 
                     <Link href={`/flashcards/practice/${set.id}`}>
-                        <button className="flex items-center  py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200">
-                            <Target className="mr-3"/>
-                            <h1>Practice Mode </h1> 
+
+                        <button className="flex items-center py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"> 
+
+                            <Target className="mr-3 inline-block"/>
+                            <h1 className="inline-block">Practice Mode </h1> 
+
+                            <div className="tooltip ml-3" data-tip="Practice mode implements specialized algorithms to optimize your learning.">
+                                <CircleHelp className="size-4"/>
+                            </div>
+
                         </button>
+
                     </Link>
 
                     <button className="flex items-center py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200">
