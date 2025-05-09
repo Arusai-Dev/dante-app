@@ -5,7 +5,6 @@ import { currentUser } from "@clerk/nextjs/server";
 
 
 export async function GET() {
-    //@ts-ignore
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
     
     // TODO 

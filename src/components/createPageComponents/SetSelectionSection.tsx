@@ -1,11 +1,10 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowDown, Check, PlusCircle, Eye, EyeOff } from "lucide-react";
-import { createNewSet, getSetById, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
+import { createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast, Toaster } from "sonner";
-import { currentUser } from "@clerk/nextjs/server";
 
 export default function SetSelectionSection() {
 
@@ -52,7 +51,6 @@ export default function SetSelectionSection() {
         toggleNewSetUI();
         clearNewSetForm();
     }
-
 
     return (
         <>

@@ -4,7 +4,7 @@ import Image from "next/image"
 import SetSelectionSection from "@/components/createPageComponents/SetSelectionSection"
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
-import { addOneCardToSet, updateCardCount } from "@/lib/dbFunctions"
+import { addOneCardToSet, getSetById, updateCardCount } from "@/lib/dbFunctions"
 import { Save } from "lucide-react"
 import { toast, Toaster } from "sonner"
 
@@ -12,6 +12,7 @@ export default function Create() {
     const { 
         active, 
         currentSet,
+        setCurrentSet,
         setActive, 
         setSets, 
         setDropDownIsOpen, 
@@ -19,11 +20,14 @@ export default function Create() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const res = await fetch("http://localhost:3000/api/my-sets");
+            const res = await fetch("http://localhost:3000/api/my-sets", {
+                method: "GET",
+                headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" }
+            });
             const data = await res.json();
             setSets(data.Sets);
         }
-    
+
         fetchData();
     }, []);
     
@@ -99,7 +103,7 @@ export default function Create() {
             interval,
             next_review,
         );
-
+        
         await updateCardCount(currentSet.id, currentSet.cards.length)
     };   
 

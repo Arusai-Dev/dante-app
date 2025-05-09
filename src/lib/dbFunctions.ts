@@ -83,14 +83,15 @@ export async function addOneCardToSet(
 export async function updateCardCount(id: number, cardCnt: number) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
+    console.log(id, cardCnt)
     try {
-        return await sql(
+        const update = await sql(
             `UPDATE flashcards
-            SET card_cnt = $1
-            WHERE id = $2
-            RETURNING *`,
-            [cardCnt, id]
+            SET "card_cnt" = $2
+            WHERE id = $1`,
+            [id, cardCnt]
         )
+        console.log(update)
     } catch (error) {
         console.log(error)
     }
