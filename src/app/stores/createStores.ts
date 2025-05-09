@@ -6,18 +6,10 @@ type createStoreState = {
     sets: any[]
     currentSet: any
     dropDownIsOpen: boolean
-    selectedSet: number | null// id of set
-    selectedSetTitle: string
-    selectedSetDescription: string
-    selectedSetCardCnt: number | null
     setActive: (mode: string) => void
     setSets: (data: any[]) => void
     setCurrentSet: (data: any) => void
     setDropDownIsOpen: (mode: boolean) => void
-    setSelectedSet: (mode: number) => void
-    setSelectedSetTitle: (mode: string) => void
-    setSelectedSetDescription: (mode: string) => void
-    setSelectedSetCardCnt: (mode: number) => void
 }
 
 export const useCreateStore = create(
@@ -27,18 +19,10 @@ export const useCreateStore = create(
         sets: [],
         currentSet: [],
         dropDownIsOpen: false,
-        selectedSet: null,
-        selectedSetTitle: "",
-        selectedSetDescription: "",
-        selectedSetCardCnt: null,
         setActive: (mode) => set({ active: mode }),
         setSets: (data) => set({ sets: data }),
         setCurrentSet: (data) => set({ currentSet: data }),
         setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
-        setSelectedSet: (mode) => set({ selectedSet: mode }),
-        setSelectedSetTitle: (mode) => set({ selectedSetTitle: mode }),
-        setSelectedSetDescription: (mode) => set({ selectedSetDescription: mode }),
-        setSelectedSetCardCnt: (mode) => set({ selectedSetCardCnt: mode })
     }),
     {
         name: 'create-storage', 

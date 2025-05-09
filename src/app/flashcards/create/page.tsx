@@ -4,13 +4,13 @@ import Image from "next/image"
 import SetSelectionSection from "@/components/createPageComponents/SetSelectionSection"
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
-import { addOneCardToSet } from "@/lib/dbFunctions"
+import { addOneCardToSet, updateCardCount } from "@/lib/dbFunctions"
 import { Save } from "lucide-react"
+import { toast, Toaster } from "sonner"
 
 export default function Create() {
     const { 
         active, 
-        selectedSet, 
         sets,
         currentSet,
         setActive, 
@@ -29,7 +29,7 @@ export default function Create() {
     }, []);
     
     // Current Card Data
-    const [currentCardData, setCurrentCardData] = useState([0, 0, 'Category', 'Front', 'Back', 0, 2.5, 0, 0, new Date()]);
+    const [currentCardData, setCurrentCardData] = useState([1, 0, 'Category', 'Front', 'Back', 0, 2.5, 0, 0, new Date()]);
     const updateCard = (index: number, value: string) => {
         const updatedCard = [...currentCardData]
         updatedCard[index] = value;
@@ -64,10 +64,11 @@ export default function Create() {
         };
     }, []);
 
-    const handleAddCard = (data: [number, number, string, string, string, number, number, number, number, Date]) => {
+
+    const handleAddCard = async (data: [number, number, string, string, string, number, number, number, number, Date]) => {
         const [
-            cardId = currentSet.number_cards + 1,
-            selectedSet,
+            selectedSet = currentSet.id,
+            cardId = currentSet.card_cnt + 1,
             category, 
             front, 
             back, 
@@ -75,18 +76,20 @@ export default function Create() {
             easeFactor, 
             repetition,
             interval,
-            next_review = new Date(),
+            next_review,
         ] = data;
 
-        // FUTURE WORK: HANDLE ERROR WHEN NO SET IS SELECTED
-        if (!selectedSet) {
+        console.log("\ncurrentSet:", currentSet, "\nTitle:", currentSet.Title, "\nDescription:", currentSet.Description, "\nCard_Cnt:", currentSet.CardCnt )
+        
+        console.log(selectedSet)
+        if (selectedSet == 0) {
             console.warn("No set selected.");
             return;
         }
         
-        addOneCardToSet(
-            cardId,
+        await addOneCardToSet(
             selectedSet,
+            cardId,
             category, 
             front, 
             back, 
@@ -96,11 +99,14 @@ export default function Create() {
             interval,
             next_review,
         );
+
+        await updateCardCount(currentSet.id, currentSet.cards.length)
     };   
 
     return (
 
         <section className="flex flex-col items-center pt-[65px] pb-[65px] font-(family-name:inter)">
+            <Toaster/>
 
             {/* Title */}
             <div className="flex flex-col items-center pt-[30px] pb-9">
@@ -184,7 +190,10 @@ export default function Create() {
                         <div className="flex gap-2 w-full max-w-[600px] mb-1">
                             <button 
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[45px] py-1 px-3 font-bold text-xl rounded-[5px] hover-animation-secondary"
-                                onClick={() => {handleAddCard(currentCardData)}}
+                                onClick={() => {
+                                    handleAddCard(currentCardData)
+
+                                }}
                                 >
                                 <Save/>
                                 {`Add Card`} 

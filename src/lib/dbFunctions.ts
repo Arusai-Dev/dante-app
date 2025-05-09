@@ -1,4 +1,3 @@
-import Flashcards from "@/app/flashcards/page";
 import { neon } from "@neondatabase/serverless";
 
 
@@ -10,6 +9,7 @@ export async function deleteSetById(id: number) {
     } catch (error) {
         console.log(error)
     }
+    
 }
 
 export async function getSetById(id: number) {
@@ -45,9 +45,9 @@ export async function createNewSet(
 
     try {
         return await sql(
-            `INSERT INTO flashcards ("user", is_private, description, date_created, title, card_cnt, cards) 
+            `INSERT INTO flashcards (cards, "user", is_private, description, date_created, title, card_cnt) 
             values ($1, $2, $3, $4, $5, $6, $7)`, 
-            [user_id, is_private, description, date_created, title, number_cards, JSON.stringify(cards)]
+            [JSON.stringify(cards), user_id, is_private, description, date_created, title, number_cards]
         );
     } catch (error) {
         console.log(error);
@@ -80,13 +80,15 @@ export async function addOneCardToSet(
     }
 }
 
-export async function updateCardCount(id: number, card_cnt) {
+export async function updateCardCount(id: number, card_cnt: number) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
     try {
         return await sql(
             `UPDATE flashcards
-            SET card_cnt`
+            SET card_cnt = $1
+            WHERE id = $2`,
+            [card_cnt, id]
         )
     } catch (error) {
         console.log(error)

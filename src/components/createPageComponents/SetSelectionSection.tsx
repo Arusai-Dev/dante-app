@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { ArrowDown, Check, PlusCircle, Eye, EyeOff } from "lucide-react";
-import { createNewSet, getSetById, getSetByTitle } from "@/lib/dbFunctions";
+import { createNewSet, getSetById, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast, Toaster } from "sonner";
+import { currentUser } from "@clerk/nextjs/server";
 
 export default function SetSelectionSection() {
 
@@ -12,21 +13,18 @@ export default function SetSelectionSection() {
     const { 
         sets,
         dropDownIsOpen, 
-        selectedSetTitle, 
-        selectedSetDescription, 
-        selectedSetCardCnt, 
-        setSelectedSet, 
+        currentSet,
         setCurrentSet,
         setDropDownIsOpen, 
-        setSelectedSetTitle,
-        setSelectedSetDescription,
-        setSelectedSetCardCnt,
     } = useCreateStore()
+
+    console.log(currentSet)
 
     const toggleDropDown = () => {
         setDropDownIsOpen(!dropDownIsOpen);
     }
 
+    
     // New Set
     const [newSetIsOpen, setNewSetIsOpen] = useState(false);
     const toggleNewSetUI = () => {
@@ -51,15 +49,11 @@ export default function SetSelectionSection() {
         await createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
         console.log(date_created)
         const result = await getSetByTitle(newSetUserId, newSetTitle)
-        const id = result?.[0]?.id;
-        if (id) setSelectedSet(id);
         setCurrentSet(result?.[0])
-        setSelectedSetTitle(result?.[0]?.title)
-        setSelectedSetDescription(result?.[0]?.description)
-        setSelectedSetCardCnt(result?.[0]?.number_cards)
         toggleNewSetUI();
         clearNewSetForm();
     }
+
 
     return (
         <>
@@ -68,12 +62,12 @@ export default function SetSelectionSection() {
         <div className="flex justify-between h-[150px] w-[1150px] bg-[#D9D9D9]/3 py-3 px-4 rounded-[10px]">
             <div className="flex flex-col justify-between h-full">
                 <div>
-                    <h2 className="font-bold text-2xl">{selectedSetTitle == "" ? 'No Set Selected' : selectedSetTitle}</h2>
-                    <p>{selectedSetTitle == "" ? '' : selectedSetDescription}</p>
+                    <h2 className="font-bold text-2xl">{currentSet.title == "" ? 'No Set Selected' : currentSet.title}</h2>
+                    <p>{currentSet.title == "" ? '' : currentSet.description}</p>
                 </div>
-                {selectedSetDescription && (
+                {currentSet.description && (
                     <div>
-                        <p>{selectedSetCardCnt} Cards</p>
+                        <p>{currentSet.card_cnt} Cards</p>
                     </div>
                 )}
             </div>
@@ -85,15 +79,16 @@ export default function SetSelectionSection() {
                 {/* Select Set Drop Down */}
                 <div className="select-set-dd">
                     <button 
-                        className="flex justify-between cursor-pointer items-center w-[250px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
+                        className="flex justify-between cursor-pointer items-center w-[250px] h-[40px] whitespace-nowrap py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
                         onClick={toggleDropDown}
                         >
 
-                        {selectedSetTitle ? selectedSetTitle : "Select A Set"} 
+                        {currentSet.title ? currentSet.title : "Select A Set"} 
                         <ArrowDown/>
                     </button>
 
-                    {/* Drop Drown Content */}
+                    {/* Drop Drown Content */} 
+                    {/* TODO: On Hover should show full name of set long or not */}
                     {dropDownIsOpen && (
                         <div className="absolute mt-1 flex flex-col gap-2 overflow-y-auto z-50 w-[200px] max-h-[300px] py-2 bg-[#202020] rounded-[5px] border-1 border-[#828282] hidden-scrollbar">
                             {sets.map((set, index:number) => (
@@ -102,13 +97,13 @@ export default function SetSelectionSection() {
                                     className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation whitespace-nowrap hide-scrollbar"
                                     onClick={() => {
                                         setCurrentSet(set)
-                                        setSelectedSetTitle(set.title)
-                                        setSelectedSetDescription(set.description)
-                                        setSelectedSet(set.id)
-                                        setSelectedSetCardCnt(set.cards.length)
+                                        const updateCtn = async () => {
+                                            await updateCardCount(currentSet.id, currentSet.card_cnt)
+                                        }
+                                        updateCtn()
                                     }}
                                 >
-                                    {selectedSetTitle == set.title && (
+                                    {currentSet.title == set.title && (
                                         <Check/>
                                     )}
                                     <div className="overflow-x-auto max-w-[200px] hide-scrollbar">{set.title}</div>
