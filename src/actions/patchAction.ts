@@ -26,7 +26,7 @@ export default async function Sm2PatchAction(qualityScore, easeFactor, repetitio
 
 }
 
-export async function FsrsPatchAction(card, rating) {
+export async function FsrsPatchAction(card, rating, setId) {
 
     const emptyCard = createEmptyCard();
     const f: FSRS = new FSRS();
@@ -35,9 +35,9 @@ export async function FsrsPatchAction(card, rating) {
 
     const fsrsCard = { ...card, ...schedulingCards[parseInt(rating)].card };
 
-    console.log(fsrsCard);
 
-    await fetch(`http://localhost:3000/api/fsrs-update/${setId}/${card.cardId}`, {
+    console.log(fsrsCard.due)
+    const res = await fetch(`http://localhost:3000/api/fsrs-update/${setId}/${card.indv_card_id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" },
         body: JSON.stringify({

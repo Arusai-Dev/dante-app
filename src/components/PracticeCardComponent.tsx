@@ -23,7 +23,7 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
     const nextCard = async () => {
 
         // await Sm2PatchAction(parseInt(qualityScore), dueCards[currentCard].ease_factor, dueCards[currentCard].repetition, dueCards[currentCard].indv_card_id, setId, dueCards[currentCard].interval)
-        await FsrsPatchAction(jsonCards[currentCard], qualityScore);
+        await FsrsPatchAction(jsonCards[currentCard], qualityScore, setId);
 
         result = jsonCards.sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
         setDueCards(result)
