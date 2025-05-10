@@ -23,7 +23,7 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
     const nextCard = async () => {
 
         // await Sm2PatchAction(parseInt(qualityScore), dueCards[currentCard].ease_factor, dueCards[currentCard].repetition, dueCards[currentCard].indv_card_id, setId, dueCards[currentCard].interval)
-        await FsrsPatchAction(jsonCards[currentCard]);
+        await FsrsPatchAction(jsonCards[currentCard], qualityScore);
 
         result = jsonCards.sort((a, b) => new Date(a.due_date) - new Date(b.due_date))
         setDueCards(result)
@@ -66,12 +66,12 @@ export default function CardButton({ jsonCards, number_cards, setId }) {
                         <div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">{dueCards[currentCard].back}</div>
 
                         <div className="flex justify-center items-center gap-6">
-                            <input onChange={handleQualityScoreClick} checked={qualityScore == "0"} className="w-7 h-7 border-2 rounded-full" type="radio" id="0" name="quality_score" value="0" />
+                            {/* <input onChange={handleQualityScoreClick} checked={qualityScore == "0"} className="w-7 h-7 border-2 rounded-full" type="radio" id="0" name="quality_score" value="0" /> */}
                             <input onChange={handleQualityScoreClick} checked={qualityScore == "1"} className="w-7 h-7 border-2 rounded-full" type="radio" id="1" name="quality_score" value="1" />
                             <input onChange={handleQualityScoreClick} checked={qualityScore == "2"} className="w-7 h-7 border-2 rounded-full" type="radio" id="2" name="quality_score" value="2" />
                             <input onChange={handleQualityScoreClick} checked={qualityScore == "3"} className="w-7 h-7 border-2 rounded-full" type="radio" id="3" name="quality_score" value="3" />
                             <input onChange={handleQualityScoreClick} checked={qualityScore == "4"} className="w-7 h-7 border-2 rounded-full" type="radio" id="4" name="quality_score" value="4" />
-                            <input onChange={handleQualityScoreClick} checked={qualityScore == "5"} className="w-7 h-7 border-2 rounded-full" type="radio" id="5" name="quality_score" value="5" />
+                            {/* <input onChange={handleQualityScoreClick} checked={qualityScore == "5"} className="w-7 h-7 border-2 rounded-full" type="radio" id="5" name="quality_score" value="5" /> */}
 
                         </div>
 
