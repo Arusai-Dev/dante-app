@@ -31,9 +31,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { setId:stri
                         'elapsed_days', $4::int,
                         'scheduled_days', $5::int,
                         'reps', $6::int,
-                        lapses, $7::int,
+                        'lapses', $7::int,
                         'state', $8::int,
-                        last_review, $9::timestamp
+                        'last_review', $9::timestamp
                         )
                     ELSE
                         card
@@ -63,6 +63,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { setId:stri
         return NextResponse.json({message: "success"}, {status:200})
 
     } catch (error) {
+        console.log(error);
+        
         return NextResponse.json({error: error}, {status:500})
     }
 

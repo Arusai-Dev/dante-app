@@ -35,8 +35,6 @@ export async function FsrsPatchAction(card, rating, setId) {
 
     const fsrsCard = { ...card, ...schedulingCards[parseInt(rating)].card };
 
-
-    console.log(fsrsCard.due)
     const res = await fetch(`http://localhost:3000/api/fsrs-update/${setId}/${card.indv_card_id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" },
@@ -51,7 +49,8 @@ export async function FsrsPatchAction(card, rating, setId) {
             state: fsrsCard.state,
             last_review: fsrsCard.last_review,
         })
-
     })
+    
+    return fsrsCard.due;
 
 }
