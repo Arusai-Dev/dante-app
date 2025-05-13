@@ -1,68 +1,67 @@
-'use client'
-
+"use client"
+import { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
-import {
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/nextjs'
-import { useState } from "react";
-import { Menu } from "lucide-react";
 import clsx from "clsx";
+import { SignedIn, SignedOut, SignUpButton, UserButton } from "@clerk/nextjs";
 
 export default function Navbar() {
+    const [scrolled, setScrolled] = useState(false);
     const [responsive, setResponsive] = useState(false);
-    const ani = "bottom-0";
+
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 0);
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     return (
-        <nav className='fixed items-center z-1000 bg-[#141414] w-full '>
+        <nav className={clsx(
+            "fixed top-0 left-0 w-full z-50 transition-transform duration-300",
+            scrolled ? "bg-[#141414] shadow-md" : "bg-transparent"
+        )}>
+            <div className="flex items-center justify-between h-[50px] px-4 text-white border-b-1 border-b-[#828282]">
+                <div className="text-[16px] font-bold z-[999]">Dante</div>
 
-            <div className="hidden md:flex border-b-2 border-[#4a4a4a]">
-                <div className="Logo">
-                    <Link href="/">
-                        <Image src="/logo/dante-logo.png" alt="Dante" width="65" height="65"/>
-                    </Link>
-                </div>
+                {/* Desktop Nav */}
+                <ul className="hidden md:flex gap-3 text-md">
+                    <Link href="/flashcards/my-sets">My Sets</Link>
+                    <Link href="/flashcards/manager">Set Manager</Link>
+                    {/* <Link href="/contact">Pricing</Link> */}
+                </ul>
 
-                <div>
-                    <ul className="flex list-none gap-7 text-[15px] font-normal items-center">
-                        <li><Link href="/flashcards/my-sets">My Sets</Link></li>
-                        <li><Link href="/flashcards/manager">Set Manager</Link></li>
-                        {/* <li><Link href="/pricing">Pricing</Link></li> */}
-                    </ul>
-                </div>
+                {/* Mobile Toggle Button */}
+                <button
+                    className="md:hidden text-white z-[999]"
+                    onClick={() => setResponsive(!responsive)}
+                >
+                    {responsive ? <X size={20} /> : <Menu size={20} />}
+                </button>
 
-                <div className="w-[65px] flex justify-center z-1 text-[#141414]">
+                <div className="hidden md:flex">
                     <SignedIn><UserButton/></SignedIn>
 
                     <SignedOut><SignUpButton/></SignedOut>
-
                 </div>
-                <div className="fixed w-[75px] h-[50px] top-[5px] right-0 bg-[#D9D9D9] z-0 rounded-tl-3xl rounded-bl-3xl"></div>
             </div>
 
-
-            <div className="flex md:hidden items-center justify-between border-b-2 border-[#4a4a4a] p-2">
-                <div className={clsx("Logo", responsive && "left-[8.4px] top-[11.5px] absolute")}>
-                    <Link href="/">
-                        <Image src="/logo/dante-logo.png" alt="Dante" width="40" height="40"/>
-                    </Link>
-                </div>
-
-                <div className={`absolute bottom-[100vh] ${responsive ? ani : "hidden"} h-screen w-screen bg-[#141414]`}>
-                        
-                </div>
-
-                <div>
-                    <Menu className={responsive && "right-2 top-2 absolute"} height={20} onClick={() => setResponsive(!responsive)}/>
-                </div>
-
+            {/* Mobile Menu */}
+            <div
+                className={clsx(
+                    "fixed top-0 left-0 w-full h-screen bg-[#141414] flex flex-col items-center justify-center gap-3 text-white text-md transform transition-transform duration-500 ease-in-out lg:hidden",
+                    responsive ? "translate-y-0" : "-translate-y-full pointer-events-none"
+                )}
+            >
+                <Link href="/flashcards/my-sets" onClick={() => setResponsive(false)}>
+                    My Sets
+                </Link>
+                <Link href="/flashcards/manager" onClick={() => setResponsive(false)}>
+                    Set Manager
+                </Link>
+                {/* <Link href="/contact" onClick={() => setResponsive(false)}>
+                    Pricing
+                </Link> */}
             </div>
-
-
-        </nav>
-        
-    )
+        </nav>   
+    );
 }

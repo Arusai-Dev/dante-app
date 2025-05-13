@@ -79,7 +79,7 @@ export default function SetSelectionSection() {
                 max-w-[400px] md:max-w-[1150px] 
                 absolute md:static 
                 left-1/2 md:left-auto 
-                top-[175px] md:top-auto 
+                top-[145px] md:top-auto 
                 -translate-x-1/2 md:translate-x-0 
                 justify-center md:justify-between
             ">

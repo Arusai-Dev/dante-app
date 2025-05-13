@@ -135,7 +135,7 @@ export default function Create() {
 
     return (
 
-        <section className="flex flex-col items-center pt-[65px] pb-[65px] font-(family-name:inter) force-scrollbar">
+        <section className="flex flex-col items-center pt-[35px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
             {/* Title */}
             <div className="flex flex-col items-center pt-[40px] md:pt-[30px] pb-15 md:pb-9">
