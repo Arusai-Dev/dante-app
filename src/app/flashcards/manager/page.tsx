@@ -138,9 +138,9 @@ export default function Create() {
         <section className="flex flex-col items-center pt-[35px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
             {/* Title */}
-            <div className="flex flex-col items-center pt-[40px] md:pt-[30px] pb-15 md:pb-9">
-                <h1 className="text-[16px] lg:text-4xl font-bold ">Set Manager</h1>
-                <p className="text-[12px] lg:text-[22px] pt-1">Create, organize, and manage your sets!</p>   
+            <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[80px]">
+                <h1 className="text-[16px] sm:text-xl md:text-3xl lg:text-4xl font-bold ">Set Manager</h1>
+                <p className="text-[12px] sm:text-md md:text-2xl lg:text-3xl pt-1 text-center">Create, organize, and manage your sets!</p>   
             </div>        
 
 
@@ -148,16 +148,19 @@ export default function Create() {
 
 
             {/* Nav -> Create Card / Manage Cards */}
-            <div className="flex gap-2 items-center p-2 mt-3 md:mt-4 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] lg:w-[1150px] h-[40px] md:h-[65px] bg-[#D9D9D9]/3 rounded md:rounded-[5px]">
+            <div className="
+                flex items-center gap-2  p-2 
+                mt-3 md:mt-4 
+                w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px] bg-[#D9D9D9]/3 rounded md:rounded-[5px]">
                 <button 
-                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] lg:text-2xl rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
+                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={() => setActive("create")}
                     >
                     Create Card
                 </button>
                 
                 <button 
-                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] lg:text-2xl rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
+                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={() => setActive("manage")}
                     >
 
@@ -266,7 +269,7 @@ export default function Create() {
                             ><PlusCircle height={18}/> Create Card</button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-[15px] p-1 py-2 w-full">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-[15px] p-1 py-2 w-full">
                             {currentSet.cards && currentSet.cards.map((card, id: number) => (
                                 <div
                                     key={id}

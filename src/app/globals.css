@@ -10,7 +10,8 @@
 
 @theme {
   --font-inter: 'Inter', sans-serif;
-  --breakpoint-lg: 1200px;
+  --breakpoint-lg: 820px;
+  --breakpoint-md: 540px;
   --breakpoint-sm: 320px;
 }
 

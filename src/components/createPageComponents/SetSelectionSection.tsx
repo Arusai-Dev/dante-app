@@ -79,7 +79,7 @@ export default function SetSelectionSection() {
                 max-w-[400px] md:max-w-[1150px] 
                 absolute md:static 
                 left-1/2 md:left-auto 
-                top-[145px] md:top-auto 
+                top-[145px] sm:top-[165px]
                 -translate-x-1/2 md:translate-x-0 
                 justify-center md:justify-between
             ">
@@ -139,76 +139,81 @@ export default function SetSelectionSection() {
                         New Set
                     </button>
                     
-                    {newSetIsOpen && (
-                        <>
-                        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40" onClick={toggleNewSetUI}></div>
 
-                        <div className="new-set-btn-pop-up z-50 px-7 py-6 flex flex-col gap-8 rounded-md fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] bg-[#1e1e1e] transition-all duration-[0.2s]">
-                            
-                            <div>
-                                <h1 className="text-2xl font-bold">Create New Set</h1>
-                                <p className="text-[#8c8c8c]">Create a new set to organize your flashcards.</p>
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <h2>Set Title</h2>
-                                <input 
-                                    className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                                    onChange={(e) => setNewSetTitle(e.target.value)}
-                                ></input>
-                            </div>
-
-                            <div>
-                                <h2 className="pb-2">Set Description (optional)</h2>
-                                <textarea 
-                                    className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                                    value={newSetDescription}
-                                    onChange={(e) => {
-                                        setNewSetDescription(e.target.value)
-                                    }}
-                                ></textarea>
-                            </div>
-
-                            <div className="flex gap-3 justify-between items-center">
-                                <div className="flex items-center">
-                                    <h1 className="font-semibold pr-2">Visibility:</h1>
-                                    <button 
-                                        className="flex justify-center cursor-pointer items-center w-[50px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                        onClick={() => {setIsPrivate(!isPrivate); toast(`Set is now ${isPrivate ? "private" : "public"}`)}}
-                                    >
-                                        {isPrivate ? 
-                                            <div className="flex items-center justify-center">
-                                                <Eye className="h-[16px] md:h-[20px] md:w-[20px]"/>
-                                            </div> 
-                                            : 
-                                            <div className="flex items-center justify-center">
-                                                <EyeOff className="h-[16px] md:h-[20px] md:w-[20px]"/>
-                                            </div>
-                                        }
-                                    </button>
-                                </div>
-
-                                <div className="flex gap-3">
-                                    <button 
-                                        className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
-                                        onClick={() => {
-                                            toggleNewSetUI();
-                                            clearNewSetForm();
-                                        }}
-                                    >Cancel</button>
-
-                                    <button 
-                                        className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                        onClick={onNewSetSubmit}
-                                    >Save</button>
-                                </div>
-                            </div>
-                        </div>
-                        </>
-                    )}
                 </div>
             </div>
         </div>
+
+
+        {newSetIsOpen && (
+            <>
+            <div className="absolute bg-black/3 backdrop-blur-sm z-40" onClick={toggleNewSetUI}></div>
+
+            <div className="fixed inset-0 z-40 flex items-center justify-center">
+                <div className="new-set-btn-pop-up z-50 px-7 py-6 flex flex-col gap-8 rounded-md md:w-fit bg-[#1e1e1e] transition-all duration-[0.2s]">
+                    
+                    <div>
+                        <h1 className="text-2xl font-bold">Create New Set</h1>
+                        <p className="text-[#8c8c8c]">Create a new set to organize your flashcards.</p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <h2>Set Title</h2>
+                        <input 
+                            className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                            onChange={(e) => setNewSetTitle(e.target.value)}
+                        ></input>
+                    </div>
+
+                    <div>
+                        <h2 className="pb-2">Set Description (optional)</h2>
+                        <textarea 
+                            className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                            value={newSetDescription}
+                            onChange={(e) => {
+                                setNewSetDescription(e.target.value)
+                            }}
+                        ></textarea>
+                    </div>
+
+                    <div className="flex gap-3 justify-between items-center">
+                        <div className="flex items-center">
+                            <h1 className="font-semibold pr-2">Visibility:</h1>
+                            <button 
+                                className="flex justify-center cursor-pointer items-center w-[50px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                onClick={() => {setIsPrivate(!isPrivate); toast(`Set is now ${isPrivate ? "private" : "public"}`)}}
+                            >
+                                {isPrivate ? 
+                                    <div className="flex items-center justify-center">
+                                        <Eye className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                                    </div> 
+                                    : 
+                                    <div className="flex items-center justify-center">
+                                        <EyeOff className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                                    </div>
+                                }
+                            </button>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button 
+                                className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
+                                onClick={() => {
+                                    toggleNewSetUI();
+                                    clearNewSetForm();
+                                }}
+                            >Cancel</button>
+
+                            <button 
+                                className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                onClick={onNewSetSubmit}
+                            >Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </>
+        )}
         </>
     )
 }
