@@ -7,9 +7,9 @@
 - [ ] - Option to paste in flashcard data to auto create cards
 - [ ] - When using manual creation mode implement auto complete for answers
 - [ ] - Create Page
-    - [ ] - Manage cards section
-        - [ ] - When you click edit on a card in the manage section it should open up the cards info on the form and the add card button changes to save card
-        - [ ] - Clicking delete will delete card from database, pop up verify user choice -> option to not show again
+    - [x] - Manage cards section
+        - [x] - When you click edit on a card in the manage section it should open up the cards info on the form and the add card button changes to save card
+        - [x] - Clicking delete will delete card from database, pop up verify user choice -> option to not show again
     - [x] - When making a new card after submission clear form
     - [x] - After selecting a set in the drop down, sets data should be displayed
     - [x] - Creating a new set causes selected set == new set

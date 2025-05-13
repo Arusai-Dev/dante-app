@@ -5,6 +5,7 @@ import { ArrowDown, Check, PlusCircle, Eye, EyeOff } from "lucide-react";
 import { createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast, Toaster } from "sonner";
+import Tooltip from "../Tooltip";
 
 export default function SetSelectionSection() {
 
@@ -56,42 +57,54 @@ export default function SetSelectionSection() {
         <>
         {/* Set Selection / Description */}
         <Toaster />
-        <div className="flex justify-between h-[150px] w-[1150px] bg-[#D9D9D9]/3 py-3 px-4 rounded-[10px]">
+        <div className="flex flex-col-reverse md:flex-row w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:justify-between h-[100px] md:h-[150px] bg-[#D9D9D9]/3 py-2 px-2 md:px-3 rounded-[10px] gap-2">
             <div className="flex flex-col justify-between h-full">
                 <div>
-                    <h2 className="font-bold text-2xl">{currentSet.title == "" ? 'No Set Selected' : currentSet.title}</h2>
-                    <p>{currentSet.title == "" ? '' : currentSet.description}</p>
+                    <h2 className="font-bold text-[14px] pb-1 lg:text-2xl truncate">{currentSet.title == "" ? 'No Set Selected' : currentSet.title}</h2>
+                    <p className="text-[12px] md:text-xl truncate">{currentSet.title == "" ? '' : currentSet.description}</p>
                 </div>
                 {currentSet.description && (
                     <div>
-                        <p>{currentSet.card_cnt} Cards</p>
+                        <p className="text-[12px] md:text-xl">{currentSet.card_cnt} Cards</p>
                     </div>
                 )}
             </div>
 
-            {/* Select Set Drop Down / New Set Button */}
-            <div className="flex gap-[11px]">
-
+            {/* Select Set Drop Down / New Set Button */} 
+            {/* mobile/desktop tailwind */}
+            <div className="
+                flex
+                gap-[5px] md:gap-[11px] 
+                w-[calc(100vw-20px)] md:w-fit 
+                max-w-[400px] md:max-w-[1150px] 
+                absolute md:static 
+                left-1/2 md:left-auto 
+                top-[175px] md:top-auto 
+                -translate-x-1/2 md:translate-x-0 
+                justify-center md:justify-between
+            ">
 
                 {/* Select Set Drop Down */}
-                <div className="select-set-dd">
+                <div className="select-set-dd basis-[70%] max-w-[68%] grow">
                     <button 
-                        className="flex justify-between cursor-pointer items-center w-[250px] h-[40px] whitespace-nowrap py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
+                        className="flex justify-between cursor-pointer items-center w-full gap-[3px] md:gap-2 h-[25px] md:w-[250px] md:h-[40px] whitespace-nowrap py-1 pl-[8px] pr-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
                         onClick={toggleDropDown}
                         >
 
-                        {currentSet.title ? currentSet.title : "Select A Set"} 
-                        <ArrowDown/>
+                        <div className="truncate font-semibold text-[12px] md:text-lg">{currentSet.title ? currentSet.title : "Select A Set"} </div>
+                        <div className="flex items-center justify-center">
+                            <ArrowDown className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                        </div>
                     </button>
 
                     {/* Drop Drown Content */} 
-                    {/* TODO: On Hover should show full name of set long or not */}
                     {dropDownIsOpen && (
-                        <div className="absolute mt-1 flex flex-col gap-2 overflow-y-auto z-50 w-[200px] max-h-[300px] py-2 bg-[#202020] rounded-[5px] border-1 border-[#828282] hidden-scrollbar">
+                        <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
                             {sets.map((set, index:number) => (
                                 <div 
                                     key={index} 
-                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] pl-1 gap-x-2 mx-2 hover-animation whitespace-nowrap hide-scrollbar"
+                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] md:pl-1 gap-x-1 mx-1 md:mx-2 hover-animation whitespace-nowrap "
+                                    
                                     onClick={() => {
                                         setCurrentSet(set)
                                         const updateCtn = async () => {
@@ -100,10 +113,13 @@ export default function SetSelectionSection() {
                                         updateCtn()
                                     }}
                                 >
-                                    {currentSet.title == set.title && (
-                                        <Check/>
-                                    )}
-                                    <div className="overflow-x-auto max-w-[200px] hide-scrollbar">{set.title}</div>
+                                    <div className="flex items-center justify-center">
+                                        {currentSet.title == set.title && (
+                                            <Check className="h-[16px] md:h-[20px] md:w-[36px]"/>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="w-fit md:max-w-[250px] text-[12px] md:text-lg overflow-x-hidden truncate" title={set.title}>{set.title}</div>
                                 </div>
                             ))}
                         </div>
@@ -112,12 +128,14 @@ export default function SetSelectionSection() {
                 
 
                 {/* New Set Button */}
-                <div className="new-set-btn">
+                <div className="new-set-btn basis-[30%]">
                     <button 
-                        className="flex cursor-pointer justify-between items-center w-[125px] h-[40px] py-1 px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                        className="flex cursor-pointer justify-between items-center font-semibold  w-full gap-1 md:w-[130px] h-[25px] md:h-[40px] text-[12px] md:text-lg whitespace-nowrap py-1 pr-[8px] pl-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
                         onClick={toggleNewSetUI}
                     >
-                        <PlusCircle/>
+                        <div className="flex items-center justify-center">
+                            <PlusCircle className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                        </div>
                         New Set
                     </button>
                     
@@ -157,7 +175,17 @@ export default function SetSelectionSection() {
                                     <button 
                                         className="flex justify-center cursor-pointer items-center w-[50px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
                                         onClick={() => {setIsPrivate(!isPrivate); toast(`Set is now ${isPrivate ? "private" : "public"}`)}}
-                                    >{isPrivate ? <Eye/> : <EyeOff/>}</button>
+                                    >
+                                        {isPrivate ? 
+                                            <div className="flex items-center justify-center">
+                                                <Eye className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                                            </div> 
+                                            : 
+                                            <div className="flex items-center justify-center">
+                                                <EyeOff className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                                            </div>
+                                        }
+                                    </button>
                                 </div>
 
                                 <div className="flex gap-3">
