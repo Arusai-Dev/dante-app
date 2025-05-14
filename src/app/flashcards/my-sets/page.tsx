@@ -15,7 +15,7 @@ export default async function MyFlashcards() {
     const setData = data.Sets;
     return (
 
-        <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)">
+        <section className="flex flex-col items-center pt-[65px] font-(family-name:inter) h-screen w-screen">
 
             <div className="flex flex-col items-center pt-[30px] pb-9">
                 <h1 className=" text-4xl font-bold ">My Sets</h1>

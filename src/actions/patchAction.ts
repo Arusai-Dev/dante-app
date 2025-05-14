@@ -51,6 +51,6 @@ export async function FsrsPatchAction(card, rating, setId) {
         })
     })
     
-    return fsrsCard.due;
+    return fsrsCard;
 
 }
