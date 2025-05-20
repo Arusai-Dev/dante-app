@@ -12,7 +12,7 @@ export default async function ViewSet({ params }) {
     
     return (
 
-        <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)">
+        <section className="flex flex-col items-center pt-[65px] font-(family-name:inter)r">
 
             <div className="flex flex-col items-center pt-[30px] pb-9">
                 <h1 className=" text-4xl font-bold ">{set.title}</h1>

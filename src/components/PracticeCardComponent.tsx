@@ -7,6 +7,7 @@ import { Toaster } from 'sonner'
 import { Sm2PatchAction, FsrsPatchAction } from "@/actions/patchAction";
 import { getSetById } from "@/lib/dbFunctions";
 import { fsrs } from "ts-fsrs";
+import ChatBubble from "./chatBubble";
 
 export default function CardButton({ jsonCards, number_cards, setId, set }) {
     const [currentCard, setCurrentCard] = useState(0);
@@ -18,7 +19,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
 
     
     const nextCard = async () => {
-        if (!reviewQueue.length || !qualityScore) return;
+        // if (!reviewQueue.length || !qualityScore) return;
     
         // const current = reviewQueue[currentCard];
         // const updatedCard = await FsrsPatchAction(current, qualityScore, setId);
@@ -30,13 +31,13 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
         // const sortedQueue = [...dueCards, ...newCards];
         // setReviewQueue(sortedQueue);
     
-        if (currentCard == dueCards.length-1) {
-            setCurrentCard(0)
-        } 
-        else { setCurrentCard(i => i+1) } 
+        // if (currentCard == dueCards.length-1) {
+        //     setCurrentCard(0)
+        // } 
+        // else { setCurrentCard(i => i+1) } 
     
-        setShowFront(true);
-        setQualityScore('');
+        // setShowFront(true);
+        // setQualityScore('');
     
     };
 
@@ -73,10 +74,10 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 <button onClick={handleSidebar}><PanelLeft className={`size-6 ${!showSidebar ? '' : 'top-0 right-0' }`}/></button>
                 {
                     showSidebar ? (
-                        <div className="">
-
+                        <div className="h-screen overflow-y-auto p-4 space-y-2">
+                            <ChatBubble message={"message"} isSender={true} />
+                            
                             <textarea name="" className="bg-neutral-800 focus:border-white bottom-10 inset-x-0 absolute w-80 rounded-xl" id=""></textarea>
-
                         </div>
                     ): (
                         <h1></h1>
