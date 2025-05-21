@@ -15,8 +15,15 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     const [qualityScore, setQualityScore] = useState('');
     const [reviewQueue, setReviewQueue] = useState(fsrs());
     const [showSidebar, setShowSidebar] = useState(false);
+    const [message, setMessage] = useState('');
 
-
+    
+    useEffect(() => {
+        if (!localStorage.getItem("chat_session_id")) {
+            localStorage.setItem("chat_session_id", crypto.randomUUID())
+        }
+    }, []);
+    
     
     const nextCard = async () => {
         // if (!reviewQueue.length || !qualityScore) return;
@@ -65,7 +72,20 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
             setShowSidebar(false)
         }
     }
-
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await fetch("/api/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                message: message,
+                sessionId: localStorage.getItem("chat_session_id")
+            })
+        })
+        
+    }
+    
     return (
         <>
         <Toaster />
@@ -74,11 +94,13 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 <button onClick={handleSidebar}><PanelLeft className={`size-6 ${!showSidebar ? '' : 'top-0 right-0' }`}/></button>
                 {
                     showSidebar ? (
-                        <div className="h-screen overflow-y-auto p-4 space-y-2">
-                            <ChatBubble message={"message"} isSender={true} />
-                            
-                            <textarea name="" className="bg-neutral-800 focus:border-white bottom-10 inset-x-0 absolute w-80 rounded-xl" id=""></textarea>
-                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="h-screen resize p-4 space-y-2">
+                                <ChatBubble message={"message"} isSender={true} />
+                                <input type="submit" hidden></input>
+                                <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} name="" className="bg-neutral-800 focus:border-white bottom-10 fixed inset-x-0 w-50 rounded-xl" id=""></input>
+                            </div>
+                        </form>
                     ): (
                         <h1></h1>
                     )
