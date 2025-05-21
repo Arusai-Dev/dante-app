@@ -83,32 +83,35 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        const userMessage: Message = {
-            sender: "user",
-            text: message
-        } 
-        
-        setAllMessages((prev) => [...prev, userMessage]);
-        
-        const res = await fetch("/api/chat", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                message: message,
-                sessionId: localStorage.getItem("chat_session_id")
+        if (message.length > 0) {
+            const userMessage: Message = {
+                sender: "user",
+                text: message
+            } 
+            
+            setAllMessages((prev) => [...prev, userMessage]);
+            
+            const res = await fetch("/api/chat", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    message: message,
+                    sessionId: localStorage.getItem("chat_session_id")
+                })
             })
-        })
-        
-        const data = await res.json();
-        
-        const modelMessage: Message = {
-            sender: "model",
-            text: await data.response
+            
+            const data = await res.json();
+            
+            const modelMessage: Message = {
+                sender: "model",
+                text: await data.response
+            }
+            
+            setAllMessages((prev) => [...prev, modelMessage])
+            
+            setMessage("")
         }
         
-        setAllMessages((prev) => [...prev, modelMessage])
-        
-        setMessage("")
         
     }
     
@@ -124,13 +127,25 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                             <div className="h-screen resize p-4 space-y-2">
                                 {
                                     allMessages.map((msg, index:number) => (
-                                        
                                         <ChatBubble key={index} message={msg.text} sender={msg.sender} />
-                                        
                                     ))
                                 }
+                                
                                 <input type="submit" hidden></input>
-                                <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} name="" className="bg-neutral-800 focus:border-white bottom-10 fixed inset-x-0 w-50 rounded-xl" id=""></input>
+                                
+                                <textarea 
+                                    value={message} 
+                                    onChange={(e) => setMessage(e.target.value)} 
+                                    onKeyDown={(e) => {
+                                        if (e.key == 'Enter' && !e.shiftKey) {
+                                            handleSubmit(e);
+                                        }
+                                    }}  
+                                    className="bg-neutral-800 w-85 h-20 focus:border-white bottom-5 absolute" 
+                                    id="">
+                                        
+                                </textarea>
+                                
                             </div>
                         </form>
                     ): (
