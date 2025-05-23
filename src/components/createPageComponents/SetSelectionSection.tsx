@@ -5,7 +5,6 @@ import { ArrowDown, Check, PlusCircle, Eye, EyeOff } from "lucide-react";
 import { createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast, Toaster } from "sonner";
-import Tooltip from "../Tooltip";
 
 export default function SetSelectionSection() {
 
@@ -80,7 +79,7 @@ export default function SetSelectionSection() {
                 max-w-[400px] md:max-w-[1150px] 
                 relative md:static 
                 left-1/2 md:left-auto 
-                top-[145px] sm:top-[10px]
+                top-[-45px] 
                 -translate-x-1/2 md:translate-x-0 
                 justify-center md:justify-between
             ">
@@ -88,13 +87,13 @@ export default function SetSelectionSection() {
                 {/* Select Set Drop Down */}
                 <div className="select-set-dd basis-[70%] max-w-[68%] grow">
                     <button 
-                        className="flex justify-between cursor-pointer items-center w-full gap-[3px] md:gap-2 h-[25px] md:w-[250px] md:h-[40px] whitespace-nowrap sm:pr-[2px] sm:pl-[4px] py-1 pl-[8px] pr-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
+                        className="flex justify-between cursor-pointer items-center w-full gap-[3px] md:gap-2 h-[25px] lg:w-[230px] md:w-[150px] lg:h-[40px] whitespace-nowrap sm:pr-[2px] py-1 pl-[8px] pr-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
                         onClick={toggleDropDown}
                         >
 
-                        <div className="truncate font-semibold text-[12px] md:text-[16px]">{currentSet.title ? currentSet.title : "Select A Set"} </div>
+                        <div className="truncate font-semibold text-[12px] lg:text-[18px] md:text-[14px]">{currentSet.title ? currentSet.title : "Select A Set"} </div>
                         <div className="flex items-center justify-center">
-                            <ArrowDown className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                            <ArrowDown className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
                         </div>
                     </button>
 
@@ -131,11 +130,11 @@ export default function SetSelectionSection() {
                 {/* New Set Button */}
                 <div className="new-set-btn basis-[30%]">
                     <button 
-                        className="flex cursor-pointer justify-between items-center font-semibold md:text-[16px] w-full gap-1 md:w-[130px] h-[25px] md:h-[40px] text-[12px] md:text-lg whitespace-nowrap py-1 pr-[8px] pl-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                        className="flex cursor-pointer justify-between items-center font-semibold text-[12px] md:text-[14px] lg:text-[18px] w-full md:w-[110px] lg:w-[130px] h-[25px] lg:h-[40px] md:text-lg whitespace-nowrap py-1 pb-[5px] lg:pr-[8px] lg:pl-[8px] pr-[7px] pl-[5px] sm:pr-[8px] bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
                         onClick={toggleNewSetUI}
                     >
                         <div className="flex items-center justify-center">
-                            <PlusCircle className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                            <PlusCircle className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
                         </div>
                         New Set
                     </button>

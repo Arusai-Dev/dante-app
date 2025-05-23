@@ -139,7 +139,7 @@ export default function Create() {
 
             {/* Title */}
             <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[80px]">
-                <h1 className="text-[16px] sm:text-xl md:text-3xl lg:text-4xl font-bold ">Set Manager</h1>
+                <h1 className="text-[20px] sm:text-[22px] md:text-3xl lg:text-4xl font-bold ">Set Manager</h1>
                 <p className="text-[12px] sm:text-md md:text-2xl lg:text-3xl pt-1 text-center">Create, organize, and manage your sets!</p>   
             </div>        
 
