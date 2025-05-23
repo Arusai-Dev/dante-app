@@ -21,7 +21,7 @@ export default function Navbar() {
             scrolled ? "bg-[#141414] shadow-md" : "bg-transparent"
         )}>
             <div className="flex items-center justify-between h-[50px] px-4 text-white border-b-1 border-b-[#828282]">
-                <div className="text-[16px] font-bold z-[999]">Dante</div>
+                <Link href="/" className="text-[16px] font-bold z-[999]">Dante</Link>
 
                 {/* Desktop Nav */}
                 <ul className="hidden md:flex gap-3 text-md">
@@ -48,8 +48,8 @@ export default function Navbar() {
             {/* Mobile Menu */}
             <div
                 className={clsx(
-                    "fixed top-0 left-0 w-full h-screen bg-[#141414] flex flex-col items-center justify-center gap-3 text-white text-md transform transition-transform duration-500 ease-in-out lg:hidden",
-                    responsive ? "translate-y-0" : "-translate-y-full pointer-events-none"
+                    "fixed top-0 left-[50%] w-[50%] h-screen bg-[#141414] border-l-1 border-l-[#828282] flex flex-col items-center justify-center gap-3 text-white text-md transform transition-transform duration-500 ease-in-out lg:hidden",
+                    responsive ? "translate-x-0" : "translate-x-full pointer-events-none"
                 )}
             >
                 <Link href="/flashcards/my-sets" onClick={() => setResponsive(false)}>

@@ -53,6 +53,7 @@ export default function SetSelectionSection() {
         clearNewSetForm();
     }
 
+
     return (
         <>
         {/* Set Selection / Description */}
@@ -60,8 +61,8 @@ export default function SetSelectionSection() {
         <div className="flex flex-col-reverse md:flex-row w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:justify-between h-[100px] md:h-[150px] bg-[#D9D9D9]/3 py-2 px-2 md:px-3 rounded-[10px] gap-2">
             <div className="flex flex-col justify-between h-full">
                 <div>
-                    <h2 className="font-bold text-[14px] pb-1 lg:text-2xl truncate">{currentSet.title == "" ? 'No Set Selected' : currentSet.title}</h2>
-                    <p className="text-[12px] md:text-xl truncate">{currentSet.title == "" ? '' : currentSet.description}</p>
+                    <h2 className="font-bold text-[14px] pb-1 md:text-xl lg:text-2xl truncate">{currentSet.title == "" ? 'No Set Selected' : currentSet.title}</h2>
+                    <p className="text-[12px] md:text-lg lg:text-xl truncate">{currentSet.title == "" ? '' : currentSet.description}</p>
                 </div>
                 {currentSet.description && (
                     <div>
@@ -77,9 +78,9 @@ export default function SetSelectionSection() {
                 gap-[5px] md:gap-[11px] 
                 w-[calc(100vw-20px)] md:w-fit 
                 max-w-[400px] md:max-w-[1150px] 
-                absolute md:static 
+                relative md:static 
                 left-1/2 md:left-auto 
-                top-[145px] sm:top-[165px]
+                top-[145px] sm:top-[10px]
                 -translate-x-1/2 md:translate-x-0 
                 justify-center md:justify-between
             ">
@@ -87,11 +88,11 @@ export default function SetSelectionSection() {
                 {/* Select Set Drop Down */}
                 <div className="select-set-dd basis-[70%] max-w-[68%] grow">
                     <button 
-                        className="flex justify-between cursor-pointer items-center w-full gap-[3px] md:gap-2 h-[25px] md:w-[250px] md:h-[40px] whitespace-nowrap py-1 pl-[8px] pr-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
+                        className="flex justify-between cursor-pointer items-center w-full gap-[3px] md:gap-2 h-[25px] md:w-[250px] md:h-[40px] whitespace-nowrap sm:pr-[2px] sm:pl-[4px] py-1 pl-[8px] pr-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
                         onClick={toggleDropDown}
                         >
 
-                        <div className="truncate font-semibold text-[12px] md:text-lg">{currentSet.title ? currentSet.title : "Select A Set"} </div>
+                        <div className="truncate font-semibold text-[12px] md:text-[16px]">{currentSet.title ? currentSet.title : "Select A Set"} </div>
                         <div className="flex items-center justify-center">
                             <ArrowDown className="h-[16px] md:h-[20px] md:w-[20px]"/>
                         </div>
@@ -130,7 +131,7 @@ export default function SetSelectionSection() {
                 {/* New Set Button */}
                 <div className="new-set-btn basis-[30%]">
                     <button 
-                        className="flex cursor-pointer justify-between items-center font-semibold  w-full gap-1 md:w-[130px] h-[25px] md:h-[40px] text-[12px] md:text-lg whitespace-nowrap py-1 pr-[8px] pl-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                        className="flex cursor-pointer justify-between items-center font-semibold md:text-[16px] w-full gap-1 md:w-[130px] h-[25px] md:h-[40px] text-[12px] md:text-lg whitespace-nowrap py-1 pr-[8px] pl-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
                         onClick={toggleNewSetUI}
                     >
                         <div className="flex items-center justify-center">
@@ -206,7 +207,19 @@ export default function SetSelectionSection() {
 
                             <button 
                                 className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                onClick={onNewSetSubmit}
+                                onClick={() => {
+
+                                    if (newSetTitle == "") {
+                                        toast('Please enter a Title')
+                                    } 
+
+
+                                    else { 
+                                        onNewSetSubmit()
+                                    }
+
+
+                                }}
                             >Save</button>
                         </div>
                     </div>

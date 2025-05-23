@@ -2,7 +2,7 @@
 
 
 # Flashcards Creation
-- Set Manager Page
+- Set Manager Page                  
     - [ ] - Locally save flashcard creation progress
     - [ ] - Auto card creation from given data eg: (front, back, category)
     
@@ -17,20 +17,23 @@
         - [ ] - Upload set to database with corresponding user (change userid to clerk current user)
         - [x] - Card Count needs to update on new card and when you retrieve a card
         - [ ] - Allow images to be input as questions or answers. (Set up an s3 bucket and handle image processing)
+        - [ ] - Allow the option to edit the image: should contain basic image editing functions
     
 - My Sets Page
     - [ ] - Display all user sets with option to view, edit, or delete
 
-- View[id] Page
+- View[id] Page     
     - [ ] - Display all cards in selected set with option to delete and manage. On click of a card, play the set starting on clicked card
-
+    
 - Play[id] Page
     - [ ] - Randomly shuffle cards and display each card.
     - [ ] - Functions: reshuffle, know, don't know, close
     - [ ] - End of set show statistics and ask to retry with unknown cards or reset fully
 
 - Practice[id] Page
-
+    
 - Practice[id]
 
-- [ ] - Ability to review a user created flashcard set from 1 to 5 stars, allow users to have a user review rating and verified accounts
+- Search Page
+    - [ ] - Show all sets in certain categories like geography, languages, math, etc..
+    - [ ] - Ability to review a user created flashcard set from 1 to 5 stars, allow users to have a user review rating and verified accounts

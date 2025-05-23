@@ -4,7 +4,6 @@
 
 @plugin "tailwindcss-animate";
 
-@plugin "daisyui";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -12,7 +11,7 @@
   --font-inter: 'Inter', sans-serif;
   --breakpoint-lg: 820px;
   --breakpoint-md: 540px;
-  --breakpoint-sm: 320px;
+  --breakpoint-sm: 321px;
 }
 
 :root {
@@ -132,7 +131,7 @@
 }
 
 body {
-  background-color: #141414;
+  background-color: #141414 !important;
   color: #e9e9e9;
   overflow-x: hidden !important;
   overflow-y: scroll;
@@ -197,9 +196,3 @@ body {
   }
 }
 
-
-@media (max-width: 320px) {
-  * {
-
-  }
-}

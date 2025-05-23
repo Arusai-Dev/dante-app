@@ -172,7 +172,7 @@ export default function Create() {
 
             {/* Create Flashcard / Preview Section */}
             {active == "create" && (
-                <div className="flex md:flex-row flex-col mt-3 md:mt-4 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-fit">
+                <div className="flex md:flex-row flex-col mt-3 md:mt-4 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] ">
                     <div className="md:w-[565px] bg-[#D9D9D9]/3 rounded md:rounded-[5px] py-3 px-4
                     ">
                         <h1 className="font-bold text-[16px] md:text-2xl pb-3 md:pb-4">Create New Card</h1>
@@ -227,7 +227,11 @@ export default function Create() {
                     </div>
 
                     {/* Preview */}
-                    <div className="hidden md:block w-[565px] h-[565px] pl-4">
+                    <div className="
+                        hidden md:block 
+                        w-[580px] 
+                        md:h-[565px] sm:h-[300px]
+                        pl-4">
                         <h1 className="font-bold text-2xl pb-3">Preview</h1>
 
                         <div className={`relative w-full h-[255px] transition-transform duration-500 flip-inner cursor-pointer ${!showFront ? 'flipped' : ''}`} onClick={flipCard}>
@@ -276,8 +280,6 @@ export default function Create() {
                                     className="w-full h-fit md:h-[140px] bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col"
                                 >
 
-
-                                    
                                     <div className="h-full flex flex-col">
                                         <div className="flex justify-between pt-2 px-2">
                                             <h1 className="text-[8px] md:text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
