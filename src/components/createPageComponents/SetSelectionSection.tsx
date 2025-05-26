@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowDown, Check, PlusCircle, Eye, EyeOff } from "lucide-react";
 import { createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 
 export default function SetSelectionSection() {
 
@@ -56,8 +56,7 @@ export default function SetSelectionSection() {
     return (
         <>
         {/* Set Selection / Description */}
-        <Toaster />
-        <div className="flex flex-col-reverse md:flex-row w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:justify-between h-[100px] md:h-[150px] bg-[#D9D9D9]/3 py-2 px-2 md:px-3 rounded-[10px] gap-2">
+        <div className="flex flex-col-reverse relative md:flex-row w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:justify-between h-[100px] md:h-[150px] bg-[#D9D9D9]/3 py-2 px-2 md:px-3 rounded-[10px] gap-2">
             <div className="flex flex-col justify-between h-full">
                 <div>
                     <h2 className="font-bold text-[14px] pb-1 md:text-xl lg:text-2xl truncate">{currentSet.title == "" ? 'No Set Selected' : currentSet.title}</h2>
@@ -73,14 +72,13 @@ export default function SetSelectionSection() {
             {/* Select Set Drop Down / New Set Button */} 
             {/* mobile/desktop tailwind */}
             <div className="
-                flex
-                gap-[5px] md:gap-[11px] 
+                absolute md:static 
+                left-1/2 md:left-auto 
+                top-[-35px] md:top-auto 
+                -translate-x-1/2 md:translate-x-0
+                flex gap-[5px] md:gap-[11px] 
                 w-[calc(100vw-20px)] md:w-fit 
                 max-w-[400px] md:max-w-[1150px] 
-                relative md:static 
-                left-1/2 md:left-auto 
-                top-[-45px] 
-                -translate-x-1/2 md:translate-x-0 
                 justify-center md:justify-between
             ">
 
@@ -98,6 +96,7 @@ export default function SetSelectionSection() {
                     </button>
 
                     {/* Drop Drown Content */} 
+                    {/* TODO: Change drop down text and box size for medium screens */}
                     {dropDownIsOpen && (
                         <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
                             {sets.map((set, index:number) => (
@@ -144,52 +143,54 @@ export default function SetSelectionSection() {
             </div>
         </div>
 
-
+        {/* Make mobile responsive-ness for pop-up */}
         {newSetIsOpen && (
             <>
             <div className="absolute bg-black/3 backdrop-blur-sm z-40" onClick={toggleNewSetUI}></div>
 
-            <div className="fixed inset-0 z-40 flex items-center justify-center">
-                <div className="new-set-btn-pop-up z-50 px-7 py-6 flex flex-col gap-8 rounded-md md:w-fit bg-[#1e1e1e] transition-all duration-[0.2s]">
+            <div className="fixed inset-0 z-40 flex items-center mt-7 justify-center">
+                <div className="new-set-btn-pop-up z-50 flex flex-col gap-8 rounded-sm md:rounded-md w-[calc(100vw-10%)] md:w-[555px] h-[calc(100vh-20%)] md:h-fit bg-[#1e1e1e] transition-all duration-[0.2s]">
+                    <div className="px-7 pt-6 flex flex-col gap-4 md:gap-8">
+                        <div>
+                            <h1 className="text-lg lg:text-2xl font-bold">Create New Set</h1>
+                            <p className="text-[#8c8c8c] text-md lg:text-xl">Create a new set to organize your flashcards.</p>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            <h2 className="text-sm lg:text-2xl">Set Title</h2>
+                            <input 
+                                className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                                onChange={(e) => setNewSetTitle(e.target.value)}
+                            ></input>
+                        </div>
+
+                        <div>
+                            <h2 className="pb-2 text-sm lg:text-2xl">Set Description (optional)</h2>
+                            <textarea 
+                                className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                                value={newSetDescription}
+                                onChange={(e) => {
+                                    setNewSetDescription(e.target.value)
+                                }}
+                            ></textarea>
+                        </div>
+                    </div>
+
                     
-                    <div>
-                        <h1 className="text-2xl font-bold">Create New Set</h1>
-                        <p className="text-[#8c8c8c]">Create a new set to organize your flashcards.</p>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                        <h2>Set Title</h2>
-                        <input 
-                            className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                            onChange={(e) => setNewSetTitle(e.target.value)}
-                        ></input>
-                    </div>
-
-                    <div>
-                        <h2 className="pb-2">Set Description (optional)</h2>
-                        <textarea 
-                            className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                            value={newSetDescription}
-                            onChange={(e) => {
-                                setNewSetDescription(e.target.value)
-                            }}
-                        ></textarea>
-                    </div>
-
-                    <div className="flex gap-3 justify-between items-center">
+                    <div className="flex gap-3 justify-between w-full px-5 items-center pb-6">
                         <div className="flex items-center">
-                            <h1 className="font-semibold pr-2">Visibility:</h1>
+                            <h1 className="font-semibold pr-2 text-sm lg:text-xl">Visibility:</h1>
                             <button 
-                                className="flex justify-center cursor-pointer items-center w-[50px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                className="flex justify-center cursor-pointer items-center w-[50] md:w-[50px] h-[35px] md:h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
                                 onClick={() => {setIsPrivate(!isPrivate); toast(`Set is now ${isPrivate ? "private" : "public"}`)}}
                             >
                                 {isPrivate ? 
                                     <div className="flex items-center justify-center">
-                                        <Eye className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                                        <Eye className="h-[16px] w-[16px] md:h-[20px] md:w-[20px]"/>
                                     </div> 
                                     : 
                                     <div className="flex items-center justify-center">
-                                        <EyeOff className="h-[16px] md:h-[20px] md:w-[20px]"/>
+                                        <EyeOff className="h-[16px] w-[16px] md:h-[20px] md:w-[20px]"/>
                                     </div>
                                 }
                             </button>
@@ -197,7 +198,7 @@ export default function SetSelectionSection() {
 
                         <div className="flex gap-3">
                             <button 
-                                className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
+                                className="flex justify-center cursor-pointer items-center w-[95px] md:w-[125px] h-[35px] md:h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
                                 onClick={() => {
                                     toggleNewSetUI();
                                     clearNewSetForm();
@@ -205,7 +206,7 @@ export default function SetSelectionSection() {
                             >Cancel</button>
 
                             <button 
-                                className="flex justify-center cursor-pointer items-center w-[125px] h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
+                                className="flex justify-center cursor-pointer items-center w-[95px] md:w-[125px] h-[35px] md:h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
                                 onClick={() => {
 
                                     if (newSetTitle == "") {

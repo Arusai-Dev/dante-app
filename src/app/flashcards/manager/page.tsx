@@ -5,6 +5,29 @@ import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp } from "lucide-react"
+import { toast as sonnerToast } from 'sonner';
+
+function toast(toast: Omit<ToastProps, 'id'>) {
+    return sonnerToast.custom((id) => (
+      <Toast
+        title={toast.title}
+      />
+    ));
+  }
+
+function Toast(props: ToastProps) {
+    const { title } = props;
+   
+    return (
+      <div className="flex rounded-lg bg-white shadow-lg ring-1 ring-black/5 w-full md:max-w-[364px] items-center p-4">
+        <div className="flex flex-1 items-center">
+          <div className="w-full">
+            <p className="text-sm font-medium text-gray-900">{title}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
 export default function Create() {
     const { 
@@ -132,6 +155,7 @@ export default function Create() {
         clearCurrentCardData()
         updateCurrentSet(setId)
     }
+    
 
     return (
 
@@ -205,7 +229,12 @@ export default function Create() {
                                     if (updatingCard) {
                                         handleUpdateCard(currentCardData)
                                     } else {
-                                        handleAddCard(currentCardData)
+                                        if (currentCardData[3] == "Front") {
+                                            toast({title: "Enter a value for the front of the card."})
+                                        }
+                                        else if (currentCardData[4] == "Back") {
+                                                toast({title:  "Enter a value for the back of the card."})
+                                        } else {handleAddCard(currentCardData)} 
                                     }
                                 }}
                                 >
@@ -217,10 +246,18 @@ export default function Create() {
 
                             <button 
                                 className="flex justify-center cursor-pointer items-center grow-[165] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation border-1 border-[#8c8c8c]"
-                                onClick={() => clearCurrentCardData()}
+                                onClick={() => {
+                                    if (updatingCard) {
+                                        setUpdatingCard(false);
+                                        clearCurrentCardData();
+                                      } else {
+                                        clearCurrentCardData();
+                                      }
+                                }}
                                 >
             
-                                {`Clear`} 
+                                {updatingCard ? "Cancel" : "Clear"}
+
                             </button>
                         </div>
                         
