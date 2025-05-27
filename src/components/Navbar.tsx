@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 import { SignedIn, SignedOut, SignUpButton, UserButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -15,6 +16,13 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+
+
+    const pathname = usePathname()
+
+    const hideNavbar = pathname?.startsWith('/flashcards/practice/') || pathname?.startsWith('/flashcards/play/')
+
+    if (hideNavbar) return null
     return (
         <nav className={clsx(
             "fixed top-0 left-0 w-full z-50 transition-transform duration-300",
