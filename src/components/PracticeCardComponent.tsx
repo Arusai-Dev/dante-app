@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Album,  PanelLeft, Target, MessageSquare, Image, ArrowUp } from "lucide-react";
+import { Album,  PanelLeft, Target, MessageSquare, Image, ArrowUp, ArrowRight, ArrowLeft, Home } from "lucide-react";
 import { Toaster } from 'sonner'
 import { Sm2PatchAction, FsrsPatchAction } from "@/actions/patchAction";
 import { getSetById } from "@/lib/dbFunctions";
 import { fsrs } from "ts-fsrs";
 import ChatBubble from "./chatBubble";
+import { Button } from "./ui/button";
+import Link from "next/link";
 
 export default function CardButton({ jsonCards, number_cards, setId, set }) {
     const [currentCard, setCurrentCard] = useState(0);
@@ -133,9 +135,12 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     };
     
     return (
+        
         <>
-            <Toaster />
             
+            <Toaster />
+
+
             <div 
                 ref={sidebarRef}
                 className={`fixed left-0 top-0 h-full bg-neutral-900 shadow-2xl transition-all duration-300 ease-in-out z-50 flex flex-col ${
@@ -143,6 +148,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 }`}
                 style={{ width: showSidebar ? `${sidebarWidth}px` : '60px' }}
             >
+                
                 <div className="flex items-center justify-between p-4 border-b border-neutral-700 bg-neutral-800">
                     <div className="flex items-center space-x-2">
                         {showSidebar && (
@@ -151,6 +157,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                             </>
                         )}
                     </div>
+                    
                     <button 
                         onClick={handleSidebar}
                         className="p-2 rounded-lg hover:bg-neutral-600 transition-colors duration-200"
@@ -193,7 +200,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                                     <ArrowUp />
                                 </button>
                                 <button
-                                className="float-right bg-white hover:bg-neutral-300 text-black font-medium py-2 px-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-600"
+                                className="disabled:bg-neutral-400 float-right bg-white hover:bg-neutral-300 text-black font-medium py-2 px-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-600"
                                     disabled    
                                     >
                                     <Image />
@@ -221,20 +228,24 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 </button>
             )}
 
+        
+            
             {showSidebar && (
                 <div 
                     className="fixed inset-0 bg-black bg-opacity-30 z-40 lg:hidden"
                     onClick={handleSidebar}
                 />
             )}
-
+            
             <div 
-                className="h-screen w-auto flex items-center justify-center transition-all duration-300"
+                className="h-screen w-auto flex items-center justify-center transition-all duration-300 relative"
                 style={{ 
                     marginLeft: showSidebar ? `${sidebarWidth}px` : '0px',
                     paddingLeft: showSidebar ? '0' : '80px'
                 }}
             >
+
+
                 <div className={`absolute w-1/2 h-1/2 transition-transform duration-500 flip-inner cursor-pointer ${!showFront ? 'flipped' : ''}`} onClick={flipCard} >
 
                     <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px] hover-animation">
@@ -245,15 +256,89 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
 
                         
                     <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded-[10px] hover-animation">
+                    
                         <h2 className="pl-3 py-2"><Album className="inline-block mr-1" /> {jsonCards[currentCard].category}</h2>
                         <div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">{jsonCards[currentCard].back}</div>
 
-                        <div className="flex justify-center items-center gap-6">
-                            <input onChange={handleQualityScoreClick} checked={qualityScore == "1"} className="w-7 h-7 border-2 rounded-full" type="radio" id="1" name="quality_score" value="1" />
-                            <input onChange={handleQualityScoreClick} checked={qualityScore == "2"} className="w-7 h-7 border-2 rounded-full" type="radio" id="2" name="quality_score" value="2" />
-                            <input onChange={handleQualityScoreClick} checked={qualityScore == "3"} className="w-7 h-7 border-2 rounded-full" type="radio" id="3" name="quality_score" value="3" />
-                            <input onChange={handleQualityScoreClick} checked={qualityScore == "4"} className="w-7 h-7 border-2 rounded-full" type="radio" id="4" name="quality_score" value="4" />
+                        <div className="flex justify-center items-center gap-4 mb-4" onClick={(e) => e.stopPropagation()}>
+                            <label className="flex items-center cursor-pointer group">
+                                <input 
+                                    onChange={handleQualityScoreClick} 
+                                    checked={qualityScore == "1"} 
+                                    className="sr-only" 
+                                    type="radio" 
+                                    id="1" 
+                                    name="quality_score" 
+                                    value="1" 
+                                />
+                                <div className={`w-8 h-8 rounded-full border-2 transition-all duration-200 flex items-center justify-center
+                                    ${qualityScore == "1" 
+                                        ? 'border-blue-500 bg-blue-500 shadow-lg' 
+                                        : 'border-gray-400 hover:border-blue-400 hover:shadow-md'
+                                    }`}>
+                                </div>
+                                <span className="ml-2 text-sm font-medium text-gray-700">1</span>
+                            </label>
+                            
+                            <label className="flex items-center cursor-pointer group">
+                                <input 
+                                    onChange={handleQualityScoreClick} 
+                                    checked={qualityScore == "2"} 
+                                    className="sr-only" 
+                                    type="radio" 
+                                    id="2" 
+                                    name="quality_score" 
+                                    value="2" 
+                                />
+                                <div className={`w-8 h-8 rounded-full border-2 transition-all duration-200 flex items-center justify-center
+                                    ${qualityScore == "2" 
+                                        ? 'border-green-500 bg-green-500 shadow-lg' 
+                                        : 'border-gray-400 hover:border-green-400 hover:shadow-md'
+                                    }`}>
+                                </div>
+                                <span className="ml-2 text-sm font-medium text-gray-700">2</span>
+                            </label>
+                            
+                            <label className="flex items-center cursor-pointer group">
+                                <input 
+                                    onChange={handleQualityScoreClick} 
+                                    checked={qualityScore == "3"} 
+                                    className="sr-only" 
+                                    type="radio" 
+                                    id="3" 
+                                    name="quality_score" 
+                                    value="3" 
+                                />
+                                <div className={`w-8 h-8 rounded-full border-2 transition-all duration-200 flex items-center justify-center
+                                    ${qualityScore == "3" 
+                                        ? 'border-yellow-500 bg-yellow-500 shadow-lg' 
+                                        : 'border-gray-400 hover:border-yellow-400 hover:shadow-md'
+                                    }`}>
+                                </div>
+                                <span className="ml-2 text-sm font-medium text-gray-700">3</span>
+                            </label>
+                            
+                            <label className="flex items-center cursor-pointer group">
+                                <input 
+                                    onChange={handleQualityScoreClick} 
+                                    checked={qualityScore == "4"} 
+                                    className="sr-only" 
+                                    type="radio" 
+                                    id="4" 
+                                    name="quality_score" 
+                                    value="4" 
+                                />
+                                <div className={`w-8 h-8 rounded-full border-2 transition-all duration-200 flex items-center justify-center
+                                    ${qualityScore == "4" 
+                                        ? 'border-red-500 bg-red-500 shadow-lg' 
+                                        : 'border-gray-400 hover:border-red-400 hover:shadow-md'
+                                    }`}>
+
+                                </div>
+                                <span className="ml-2 text-sm font-medium text-gray-700">4</span>
+                            </label>
                         </div>
+                        
 
                         <h2 className="absolute right-0 bottom-0 m-2">back</h2>
 
@@ -262,19 +347,31 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 
                 <div className="top-0 absolute lg:p-50 sm:p-10 ">
                     <Target className="inline-block mr-4 top-0" /><h1 className="top-0 inline-block">Practice Mode.</h1>
+                    
                 </div>
 
+                
+                <Link href="/flashcards/my-sets">
+                    <Button className="rounded-full right-0 top-5 absolute bg-white hover:bg-gray-300">
+                        <Home className="text-black" />
+                    </Button>          
+                
+                </Link>
+                <Button 
+                    className="absolute right-8 top-1/2 transform -translate-y-1/2 rounded-full border border-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 p-3 shadow-lg hover:shadow-xl"
+                    onClick={nextCard}
+                >
+                    <ArrowRight className="w-6 h-6 text-white" />
+                </Button>
+
+                <Button 
+                    className="absolute left-8 top-1/2 transform -translate-y-1/2 rounded-full border border-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 p-3 shadow-lg hover:shadow-xl"
+                    onClick={prevCard}
+                >
+                    <ArrowLeft className="w-6 h-6 text-white" />
+                </Button>
+                
             </div>
-{/* 
-            <Button className="rounded-4xl border absolute border-white  hover-animation" onClick={nextCard}>
-                <ArrowRight />
-            </Button>
-
-
-            <Button className="rounded-4xl border absolute border-white hover-animation" onClick={prevCard}>
-                <ArrowLeft />
-            </Button> */}
-
         </>
     );
 }

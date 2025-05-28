@@ -34,7 +34,7 @@ export default async function ViewSet({ params }) {
                             <Target className="mr-3 inline-block"/>
                             <h1 className="inline-block">Practice Mode </h1> 
 
-                            <div className="tooltip ml-3" data-tip="Practice mode implements specialized algorithms to optimize your learning.">
+                            <div className=" ml-3" data-tip="Practice mode implements specialized algorithms to optimize your learning.">
                                 <CircleHelp className="size-4"/>
                             </div>
 
