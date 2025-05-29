@@ -6,6 +6,7 @@ import { useCreateStore } from "@/app/stores/createStores"
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp } from "lucide-react"
 import { toast as sonnerToast } from 'sonner';
+import Navbar from "@/components/Navbar"
 
 function toast(toast: Omit<ToastProps, 'id'>) {
     return sonnerToast.custom((id) => (
@@ -90,7 +91,6 @@ export default function Create() {
         };
     }, []);
 
-
     const handleAddCard = async (data: [number, number, string, string, string]) => {
         const [
             ,
@@ -156,9 +156,7 @@ export default function Create() {
         updateCurrentSet(setId)
     }
     
-
     return (
-
         <section className="flex flex-col items-center pt-[35px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
             {/* Title */}

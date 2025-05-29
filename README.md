@@ -18,6 +18,7 @@
         - [x] - Card Count needs to update on new card and when you retrieve a card
         - [ ] - Allow images to be input as questions or answers. (Set up an s3 bucket and handle image processing)
         - [ ] - Allow the option to edit the image: should contain basic image editing functions
+        - [ ] - Auto recommend images for back side
     
 - My Sets Page
     - [ ] - Display all user sets with option to view, edit, or delete
@@ -29,11 +30,11 @@
     - [ ] - Randomly shuffle cards and display each card.
     - [ ] - Functions: reshuffle, know, don't know, close
     - [ ] - End of set show statistics and ask to retry with unknown cards or reset fully
+    - [ ] - Start cards with back
+    - [ ] - Shuffle what face of card will be viewed first
 
 - Practice[id] Page
     
-- Practice[id]
-
 - Search Page
     - [ ] - Show all sets in certain categories like geography, languages, math, etc..
     - [ ] - Ability to review a user created flashcard set from 1 to 5 stars, allow users to have a user review rating and verified accounts
