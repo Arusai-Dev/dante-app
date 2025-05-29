@@ -25,32 +25,3 @@ export default async function Sm2PatchAction(qualityScore, easeFactor, repetitio
     return dueDate
 
 }
-
-export async function FsrsPatchAction(card, rating, setId) {
-
-    const emptyCard = createEmptyCard();
-    const f: FSRS = new FSRS();
-    const now = new Date();
-    const schedulingCards: RecordLog = f.repeat(emptyCard, now);
-
-    const fsrsCard = { ...card, ...schedulingCards[parseInt(rating)].card };
-
-    const res = await fetch(`http://localhost:3000/api/fsrs-update/${setId}/${card.indv_card_id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" },
-        body: JSON.stringify({
-            due: fsrsCard.due,
-            stability: fsrsCard.stability,
-            difficulty: fsrsCard.difficulty,
-            elapsed_days: fsrsCard.elapsed_days,
-            scheduled_days: fsrsCard.scheduled_days,
-            reps: fsrsCard.reps,
-            lapses: fsrsCard.lapses,
-            state: fsrsCard.state,
-            last_review: fsrsCard.last_review,
-        })
-    })
-    
-    return fsrsCard;
-
-}
