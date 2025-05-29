@@ -7,6 +7,7 @@ import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCar
 import { Trash2, Edit, PlusCircle, Save, ArrowUp } from "lucide-react"
 import { toast as sonnerToast } from 'sonner';
 import Navbar from "@/components/Navbar"
+import CardImageUploadForm from "@/components/CardImageUploadForm"
 
 function toast(toast: Omit<ToastProps, 'id'>) {
     return sonnerToast.custom((id) => (
@@ -200,26 +201,42 @@ export default function Create() {
                         <h1 className="font-bold text-[16px] md:text-2xl pb-3 md:pb-4">Create New Card</h1>
 
 
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2">Category (optional)</h2>
-                        <input className="px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Category (optional)</h2>
+                        <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             value={currentCardData[2] == "Category" ? '' : currentCardData[2]}
                             onChange={(e) => updateCard(2, e.target.value)}
+                            placeholder="e.g., Vocab, Grammar, Math, Science, etc..."
                         ></input>
 
                         
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2">Front Side</h2>
-                        <textarea className=" mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Front Side</h2>
+                        <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
                             value={currentCardData[3] == "Front" ? '' : currentCardData[3]}
                             onChange={(e) => updateCard(3, e.target.value)}
+                            placeholder="Enter a question or term"
                         ></textarea>
 
                         
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2">Back Side</h2>
-                        <textarea className=" mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Back Side</h2>
+                        <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
                             value={currentCardData[4] == "Back" ? '' : currentCardData[4]}
                             onChange={(e) => updateCard(4, e.target.value)}
+                            placeholder="Enter a question or term"
                         ></textarea>
+
                         
+                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Back Side Image (Optional)</h2>
+                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-1">Image URL:</h2>
+                        <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                            placeholder="https://example.com/image.jpg"
+                        ></input>
+
+
+                        <div className="flex items-center">
+                            <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-1">or</h2>
+                            <CardImageUploadForm/>
+                        </div>
+
                         <div className="flex gap-2 w-full max-w-[600px] mb-1">
                             <button 
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
@@ -345,13 +362,9 @@ export default function Create() {
                                     </div>
 
 
-
                                     <div className="w-full h-auto py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
                                         <h1 className="text-[12px] md:text-lg font-semibold whitespace-nowrap w-full truncate text-[#474747] pl-2">{card.back}</h1>
                                     </div>
-
-
-
                                 </div>
                             ))}
 
