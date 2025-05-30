@@ -1,0 +1,198 @@
+"use client"
+
+import { useState, useMemo } from "react"
+import { Search, Star, Users, BookOpen, Filter } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+const fetchPublicSets = async () => {
+  
+}
+
+const flashcardSets = [
+  
+]
+
+const categories = ["All", "Languages", "Science", "Technology", "History", "Medicine", "Arts"]
+
+export default function Explore() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("All")
+
+  const filteredSets = useMemo(() => {
+    return flashcardSets.filter((set) => {
+      const matchesSearch =
+        set.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        set.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        set.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        set.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+
+      const matchesCategory = selectedCategory === "All" || set.category === selectedCategory
+
+      return matchesSearch && matchesCategory
+    })
+  }, [searchQuery, selectedCategory])
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${
+          i < Math.floor(rating)
+            ? "fill-yellow-400 text-yellow-400"
+            : i < rating
+              ? "fill-yellow-400/50 text-yellow-400"
+              : "text-gray-300"
+        }`}
+      />
+    ))
+  }
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-black">Explore Flashcard Sets</h1>
+                <p className="text-muted-foreground">
+                  Discover and study from thousands of flashcard sets created by the community
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="w-4 h-4" />
+                <span>{flashcardSets.length} sets available</span>
+              </div>
+            </div>
+
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search flashcard sets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-6">
+        <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-gray-500">Filter by category:</span>
+          </div>
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 h-auto">
+            {categories.map((category) => (
+              <TabsTrigger key={category} value={category} className="text-xs sm:text-sm">
+                {category}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+
+        {/* Results Count */}
+        <div className="mb-6">
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredSets.length} of {flashcardSets.length} flashcard sets
+            {searchQuery && ` for "${searchQuery}"`}
+            {selectedCategory !== "All" && ` in ${selectedCategory}`}
+          </p>
+        </div>
+
+        {/* Flashcard Sets Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredSets.map((set) => (
+            <Card key={set.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between gap-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {set.category}
+                  </Badge>
+                  <div className="flex items-center gap-1">
+                    {renderStars(set.rating)}
+                    <span className="text-sm font-medium ml-1">{set.rating}</span>
+                  </div>
+                </div>
+                <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                  {set.title}
+                </CardTitle>
+                <CardDescription className="line-clamp-3 text-sm">{set.description}</CardDescription>
+              </CardHeader>
+
+              <CardContent className="pt-0">
+                <div className="space-y-4">
+                  {/* Author */}
+                  <div className="flex items-center gap-2">
+                    <Avatar className="w-6 h-6">
+                      <AvatarImage src={set.authorAvatar || "/placeholder.svg"} alt={set.author} />
+                      <AvatarFallback className="text-xs">
+                        {set.author
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm text-muted-foreground truncate">{set.author}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <BookOpen className="w-3 h-3" />
+                      <span>{set.cardCount} cards</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      <span>{set.studyCount.toLocaleString()} studied</span>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground">{set.reviewCount} reviews</div>
+
+                  <div className="flex flex-wrap gap-1">
+                    {set.tags.slice(0, 3).map((tag) => (
+                      <Badge key={tag} variant="outline" className="text-xs px-2 py-0">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  <Button className="w-full" size="sm">
+                    Start Studying
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredSets.length === 0 && (
+          <div className="text-center py-12">
+            <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No flashcard sets found</h3>
+            <p className="text-muted-foreground mb-4">
+              Try adjusting your search terms or filters to find what you&apos;re looking for.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchQuery("")
+                setSelectedCategory("All")
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
