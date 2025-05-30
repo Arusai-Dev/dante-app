@@ -93,6 +93,7 @@ export async function addOneCardToSet(
     category: string,
     front: string,
     back: string,
+    fileName: string,
 ) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
@@ -101,7 +102,7 @@ export async function addOneCardToSet(
             `UPDATE flashcards
              SET cards = cards::jsonb || $1::jsonb
              WHERE id = $2`,
-            [JSON.stringify([{ cardId, category, front, back}]), currentSetId]
+            [JSON.stringify([{ cardId, category, front, back, fileName}]), currentSetId]
         ); 
     } catch (error) {
         console.log(error);
@@ -124,7 +125,7 @@ export async function updateCardCount(id: number, cardCnt: number) {
     }
 }
 
-export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string) {
+export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string, fileName: string) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
     try {
@@ -134,10 +135,11 @@ export async function updateCardData(setId: number, cardId: number, category: st
         );
 
         const currentCards = result[0]?.cards;
+        console.log(currentCards)
 
         const updatedCards = currentCards.map((card) => {
             if (card.cardId === cardId) {
-                return { ...card, category, front, back };
+                return { ...card, category, front, back, fileName };
             }
             return card;
         });

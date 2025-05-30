@@ -42,6 +42,9 @@ export default function Create() {
         setDropDownIsOpen, 
     } = useCreateStore()
 
+    const [file, setFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+
     useEffect(() => {
         const fetchData = async () => {
             const res = await fetch("http://localhost:3000/api/my-sets", {
@@ -56,7 +59,7 @@ export default function Create() {
     }, []);
     
     // Current Card Data
-    const [currentCardData, setCurrentCardData] = useState([1, 0, 'Category', 'Front', 'Back']);
+    const [currentCardData, setCurrentCardData] = useState([1, 0, 'Category', 'Front', 'Back', '']);
     const updateCard = (index: number, value: string) => {
         const updatedCard = [...currentCardData]
         updatedCard[index] = value;
@@ -91,16 +94,18 @@ export default function Create() {
         };
     }, []);
 
-    const handleAddCard = async (data: [number, number, string, string, string]) => {
+    const handleAddCard = async (data: [number, number, string, string, string, string]) => {
         const [
             ,
             ,
             category, 
             front, 
             back, 
+            ,
         ] = data;
 
         updateCurrentSet(currentSet.id)
+        const fileName = file.name
         const currentSetId = currentSet.id
         const cardId = currentSet.cards.length
         
@@ -109,6 +114,7 @@ export default function Create() {
         currentCardData[2] = "Category"
         currentCardData[3] = "Front"
         currentCardData[4] = "Back"
+        currentCardData[4] = ""
         
         if (!currentSetId) {
             console.warn("No set selected.");
@@ -121,6 +127,7 @@ export default function Create() {
             category, 
             front, 
             back, 
+            fileName,
         );
         
         const updatedSet = await getSetById(currentSetId);
@@ -135,7 +142,7 @@ export default function Create() {
         formData.append("file", file);
 
         try {
-            const response = await fetch(`/api/upload?setID=${currentSetId}&cardID=${cardId}`, {
+            const response = await fetch(`/api/image-upload?setID=${currentSetId}&cardID=${cardId}`, {
                 method: "POST",
                 body: formData,
             })
@@ -145,6 +152,8 @@ export default function Create() {
         } catch(error) {
             console.log(error)
         }
+
+        clearCurrentImage()
     };   
 
     const updateCurrentSet = async (id: number) => {
@@ -152,29 +161,40 @@ export default function Create() {
         setCurrentSet(updatedSet[0])
     }
 
-    const handleCardDelete = async (setId, cardId) => {
+    const handleCardDelete = async (setId: number, cardId: number) => {
         await deleteCardById(setId, cardId)
         updateCurrentSet(setId)
     }
 
-    const handleEditCardBtnPress = (setId: number, cardId: number, category: string, front: string, back: string) => {  
-        setCurrentCardData([setId, cardId, category, front, back])
+    const handleEditCardBtnPress = async (setId: number, cardId: number, category: string, front: string, back: string, fileName: string) => {  
+        setCurrentCardData([setId, cardId, category, front, back, fileName])
+        console.log(fileName)
         setActive("create")
         setUpdatingCard(true)
+        if (fileName) {
+            const imageUrl = await fetchSignedImageUrl(setId, cardId, fileName)
+            setImagePreview(imageUrl)
+        } else {
+            setImagePreview(null)
+        }
     }
 
-    const handleUpdateCard = async (data: [number, number, string, string, string]) => {
-        const [setId, cardId, category, front, back] = data 
+    const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
+        const res = await fetch(`/api/get-image?setId=${setId}&cardId=${cardId}&fileName=${fileName}`);
+        const data = await res.json();
+        return data.url;
+    };
 
-        await updateCardData(setId, cardId, category, front, back)
+    const handleUpdateCard = async (data: [number, number, string, string, string, string]) => {
+        const [setId, cardId, category, front, back, fileName] = data 
+
+        await updateCardData(setId, cardId, category, front, back, fileName)
         setUpdatingCard(false)
         setActive("manage")
         clearCurrentCardData()
         updateCurrentSet(setId)
     }
 
-    const [file, setFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
 
     const handleFileChange = (e) => {
         const selectedImage = e.target.files[0]
@@ -182,7 +202,7 @@ export default function Create() {
             setFile(selectedImage)
             const imageURL = URL.createObjectURL(selectedImage);
             setImagePreview(imageURL)
-            console.log(imagePreview)
+            console.log("monkey:", imagePreview)
         }
     };
 
@@ -284,8 +304,8 @@ export default function Create() {
                                 <Image
                                     src={imagePreview}
                                     alt="Preview"
-                                    width={0}
-                                    height={0}
+                                    width={200}
+                                    height={200}
                                     className="w-full max-w-xs h-40 object-cover rounded border-1 border-[#8c8c8c]"
                                 />
 
@@ -356,15 +376,15 @@ export default function Create() {
                             {/* back */}
                             <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded md:rounded-[5px] hover-animation">
                                 <h2 className="pl-3 py-2">{currentCardData[2] == "" ? "Category" : currentCardData[2]}</h2>
-                                <div className="flex justify-center items-center h-[calc(100%-80px)]">
-                                    <div className="w-[50%]">{currentCardData[4]}</div>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)] gap-[16px] text-sm lg:text-lg">
+                                    <div className="w-[50%] flex justify-center">{currentCardData[4]}</div>
                                     {imagePreview && (
                                         <div className="flex justify-center items-center">  
                                             <Image
                                                 src={imagePreview}
                                                 alt="Preview"
-                                                width={0}
-                                                height={0}
+                                                width={200}
+                                                height={200}
                                                 className="w-full md:max-w-[100px] md:h-[100px] lg:max-w-[160px] lg:h-[160px] object-cover rounded border-1 border-[#8c8c8c]"
                                             />
                                         </div>
@@ -415,7 +435,7 @@ export default function Create() {
                                                     <Edit 
                                                         className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
                                                         onClick={() => {
-                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back)
+                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back, card.fileName)
                                                         }}
                                                     />
                                                 </div>
