@@ -10,13 +10,14 @@ const s3Client = new S3Client({
 })
 
 
-async function uploadFileToS3(file, fileName) {
+async function uploadFileToS3(file, fileName, setId, cardId) {
+    const key = `${setId}/${cardId}/${fileName}`
+
     const fileBuffer = file;
-    console.log(fileName)
 
     const params = {
         Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
-        Key: `${fileName}`,
+        Key: key,
         Body: fileBuffer,
         ContentType: "image/png"
     }
@@ -37,10 +38,18 @@ export async function POST(request) {
             return NextResponse.json({ error: "File is required." }, { status: 400 })
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const fileName = await uploadFileToS3(buffer, file.name);
+        const { searchParams } = new URL(request.url);
+        const setId = searchParams.get("setID");
+        const cardId = searchParams.get("cardID");
 
-        return NextResponse.json({ success: true, fileName })
+        if (!setId || !cardId) {
+            return NextResponse.json({ error: "Missing setID or cardID" }, { status: 400 } )
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const s3Key = await uploadFileToS3(buffer, file.name, setId, cardId);
+
+        return NextResponse.json({ success: true, key: s3Key })
     } catch(error) {
         console.error("Upload error:", error)
         return NextResponse.json({ error: "Error uploading file" })

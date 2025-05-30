@@ -4,32 +4,31 @@ import SetSelectionSection from "@/components/createPageComponents/SetSelectionS
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
-import { Trash2, Edit, PlusCircle, Save, ArrowUp } from "lucide-react"
+import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
 import { toast as sonnerToast } from 'sonner';
-import Navbar from "@/components/Navbar"
-import CardImageUploadForm from "@/components/CardImageUploadForm"
+import Image from "next/image"
 
 function toast(toast: Omit<ToastProps, 'id'>) {
     return sonnerToast.custom((id) => (
-      <Toast
-        title={toast.title}
-      />
+        <Toast
+            title={toast.title}
+        />
     ));
-  }
+}
 
 function Toast(props: ToastProps) {
     const { title } = props;
    
     return (
-      <div className="flex rounded-lg bg-white shadow-lg ring-1 ring-black/5 w-full md:max-w-[364px] items-center p-4">
-        <div className="flex flex-1 items-center">
-          <div className="w-full">
-            <p className="text-sm font-medium text-gray-900">{title}</p>
-          </div>
+        <div className="flex rounded-lg bg-white shadow-lg ring-1 ring-black/5 w-full md:max-w-[364px] items-center p-4">
+            <div className="flex flex-1 items-center">
+                <div className="w-full">
+                    <p className="text-sm font-medium text-gray-900">{title}</p>
+                </div>
+            </div>
         </div>
-      </div>
     );
-  }
+}
 
 export default function Create() {
     const { 
@@ -129,6 +128,23 @@ export default function Create() {
 
         await updateCardCount(currentSetId, updatedSet[0].cards.length)
         await updateCurrentSet(currentSetId)
+
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch(`/api/upload?setID=${currentSetId}&cardID=${cardId}`, {
+                method: "POST",
+                body: formData,
+            })
+
+            const data = await response.json()
+            console.log(data)
+        } catch(error) {
+            console.log(error)
+        }
     };   
 
     const updateCurrentSet = async (id: number) => {
@@ -156,6 +172,24 @@ export default function Create() {
         clearCurrentCardData()
         updateCurrentSet(setId)
     }
+
+    const [file, setFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+
+    const handleFileChange = (e) => {
+        const selectedImage = e.target.files[0]
+        if (selectedImage) {
+            setFile(selectedImage)
+            const imageURL = URL.createObjectURL(selectedImage);
+            setImagePreview(imageURL)
+            console.log(imagePreview)
+        }
+    };
+
+    const clearCurrentImage = () => {
+        setImagePreview(null);
+        setFile(null)
+    }
     
     return (
         <section className="flex flex-col items-center pt-[35px] pb-[65px] font-(family-name:inter) force-scrollbar">
@@ -164,7 +198,7 @@ export default function Create() {
             <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[80px]">
                 <h1 className="text-[20px] sm:text-[22px] md:text-3xl lg:text-4xl font-bold ">Set Manager</h1>
                 <p className="text-[12px] sm:text-md md:text-2xl lg:text-3xl pt-1 text-center">Create, organize, and manage your sets!</p>   
-            </div>        
+            </div>      
 
 
             <SetSelectionSection/>
@@ -225,19 +259,45 @@ export default function Create() {
                         ></textarea>
 
                         
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Back Side Image (Optional)</h2>
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-1">Image URL:</h2>
+                        <h2 className="text-[12px] md:text-[16px] pb-1 font-semibold">Back Side Image (Optional)</h2>
+                        <h2 className="text-[12px] md:text-[16px] pb-1 ">Image URL:</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             placeholder="https://example.com/image.jpg"
                         ></input>
 
 
-                        <div className="flex items-center">
-                            <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-1">or</h2>
-                            <CardImageUploadForm/>
+                        <div className="flex items-center h-fit  gap-2">
+                            <h2 className="text-[12px] md:text-[16px]">or</h2>
+                            <label htmlFor="imageFile" className="inline-block px-3 py-1 bg-[#D9D9D9] text-sm font-semibold text-[#0F0F0F] rounded-[5px] cursor-pointer hover:bg-[#cbb88a] transition-colors duration-200">
+                                <input
+                                    id="imageFile"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                    className="hidden"
+                                /> Upload Image
+                            </label>
                         </div>
 
-                        <div className="flex gap-2 w-full max-w-[600px] mb-1">
+                        {imagePreview && (
+                            <div className="flex justify-between mt-4">  
+                                <Image
+                                    src={imagePreview}
+                                    alt="Preview"
+                                    width={0}
+                                    height={0}
+                                    className="w-full max-w-xs h-40 object-cover rounded border-1 border-[#8c8c8c]"
+                                />
+
+                                <Trash2Icon 
+                                    className="bg-red-900 p-[8px] rounded-sm cursor-pointer" 
+                                    width={35} height={35}
+                                    onClick={clearCurrentImage}    
+                                />
+                            </div>
+                        )}
+
+                        <div className="flex gap-2 w-full max-w-[600px] mb-1 mt-4">
                             <button 
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
                                 onClick={() => {
@@ -246,9 +306,8 @@ export default function Create() {
                                     } else {
                                         if (currentCardData[3] == "Front") {
                                             toast({title: "Enter a value for the front of the card."})
-                                        }
-                                        else if (currentCardData[4] == "Back") {
-                                                toast({title:  "Enter a value for the back of the card."})
+                                        } else if (currentCardData[4] == "Back") {
+                                            toast({title:  "Enter a value for the back of the card."})
                                         } else {handleAddCard(currentCardData)} 
                                     }
                                 }}
@@ -297,7 +356,21 @@ export default function Create() {
                             {/* back */}
                             <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded md:rounded-[5px] hover-animation">
                                 <h2 className="pl-3 py-2">{currentCardData[2] == "" ? "Category" : currentCardData[2]}</h2>
-                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData[4]}</div>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)]">
+                                    <div className="w-[50%]">{currentCardData[4]}</div>
+                                    {imagePreview && (
+                                        <div className="flex justify-center items-center">  
+                                            <Image
+                                                src={imagePreview}
+                                                alt="Preview"
+                                                width={0}
+                                                height={0}
+                                                className="w-full md:max-w-[100px] md:h-[100px] lg:max-w-[160px] lg:h-[160px] object-cover rounded border-1 border-[#8c8c8c]"
+                                            />
+                                        </div>
+                                    )}                               
+                                </div>                                
+
                             </div>
                             
                         </div>
