@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Album, PanelLeft, Target, MessageSquare, Image, ArrowUp, ArrowRight, ArrowLeft, Home } from "lucide-react";
+import { Album, PanelLeft, Target, MessageSquare, Image, ArrowUp, ArrowRight, ArrowLeft, Home, CheckCircle } from "lucide-react";
 import { Toaster } from 'sonner'
 import { fsrs, Card, Rating, State, createEmptyCard } from "ts-fsrs";
 import ChatBubble from "./chatBubble";
@@ -21,16 +21,17 @@ type Message = {
 }
 
 export default function CardButton({ jsonCards, number_cards, setId, set }) {
-    const [currentCard, setCurrentCard] = useState(0);
+    const [currentCardIndex, setCurrentCardIndex] = useState(0);
     const [showFront, setShowFront] = useState(true);
     const [qualityScore, setQualityScore] = useState<Rating | null>(null);
     const [cards, setCards] = useState<FlashCard[]>([]);
+    const [dueCards, setDueCards] = useState<FlashCard[]>([]);
     const [showSidebar, setShowSidebar] = useState(false);
     const [message, setMessage] = useState('');
     const [sidebarWidth, setSidebarWidth] = useState(320);
     const [allMessages, setAllMessages] = useState<Message[]>([]);
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-
+    const [studyComplete, setStudyComplete] = useState(false);
 
     const f = fsrs();
     
@@ -70,17 +71,27 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
             });
             
             setCards(initializedCards);
+            
+   
+            const now = new Date();
+            const due = initializedCards.filter(card => {
+                if (!card.due) return true; 
+                return new Date(card.due) <= now;
+            });
+            
+            setDueCards(due);
+            setStudyComplete(due.length === 0);
         };
         
         initializeCards();
     }, [jsonCards]);
     
     const getCurrentCard = useCallback(() => {
-        return cards[currentCard];
-    }, [cards, currentCard]);
+        return dueCards[currentCardIndex];
+    }, [dueCards, currentCardIndex]);
 
     const submitReview = async (rating: Rating) => {
-        if (isSubmittingReview || cards.length === 0) return;
+        if (isSubmittingReview || dueCards.length === 0) return;
         
         setIsSubmittingReview(true);
         
@@ -114,15 +125,35 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 throw new Error(`Failed to update card: ${response.status} - ${errorData.error || 'Unknown error'}`);
             }
 
+ 
             setCards(prevCards => 
-                prevCards.map((c, index) => 
-                    index === currentCard 
+                prevCards.map(c => 
+                    c.cardId === card.cardId 
                         ? { ...c, ...updatedCard }
                         : c
                 )
             );
 
-            nextCard();
+       
+            setDueCards(prevDueCards => {
+                const newDueCards = prevDueCards.filter((_, index) => index !== currentCardIndex);
+                
+      
+                if (newDueCards.length === 0) {
+                    setStudyComplete(true);
+                } else {
+        
+                    if (currentCardIndex >= newDueCards.length) {
+                        setCurrentCardIndex(0);
+                    }
+                }
+                
+                return newDueCards;
+            });
+
+
+            setShowFront(true);
+            setQualityScore(null);
             
         } catch (error) {
             console.error('Error submitting review:', error);
@@ -132,13 +163,15 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     };
 
     const nextCard = () => {
-        setCurrentCard(prev => (prev + 1) % number_cards);
+        if (dueCards.length === 0) return;
+        setCurrentCardIndex(prev => (prev + 1) % dueCards.length);
         setShowFront(true);
         setQualityScore(null);
     };
 
     const prevCard = () => {
-        setCurrentCard(prev => prev === 0 ? number_cards - 1 : prev - 1);
+        if (dueCards.length === 0) return;
+        setCurrentCardIndex(prev => prev === 0 ? dueCards.length - 1 : prev - 1);
         setShowFront(true);
         setQualityScore(null);
     };
@@ -154,7 +187,8 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     
     useEffect(() => {
         const sessionId = crypto.randomUUID();
-    }, []);
+    }, 
+    []);
     
     const handleSidebar = () => {
         setShowSidebar(prev => !prev);
@@ -196,6 +230,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
             setMessage("");
         }        
     };
+
     const handleMouseDown = (e) => {
         e.preventDefault();
         isResizing.current = true;
@@ -220,16 +255,36 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
         document.removeEventListener('mouseup', handleMouseUp);
     };
 
-    const getDueCardsCount = () => {
-        const now = new Date();
-        return cards.filter(card => {
-            if (!card.due) return true; 
-            return new Date(card.due) <= now;
-        }).length;
-    };
-
     if (cards.length === 0) {
         return <div>Loading cards...</div>;
+    }
+
+    if (studyComplete) {
+        return (
+            <>
+                <Toaster />
+                <div className="h-screen w-full flex items-center justify-center">
+                    <div className="text-center p-8 bg-neutral rounded-xl shadow-lg max-w-md">
+                        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                        <h1 className="text-2xl font-bold text-white mb-2">Great job!</h1>
+                        <p className="text-white mb-6">
+                            You&apos;ve completed all your practice cards for today. Come back tomorrow for more practice!
+                        </p>
+                        <p className="text-white mb-6">
+                            Want to practice more? <Link href={"#"} className="underline">Change your settings</Link>
+                        </p>
+                        <div className="space-y-3">
+                            <Link href="/flashcards/my-sets">
+                                <Button className="w-full bg-gray-200 hover:bg-gray-300 text-neutral-900">
+                                    <Home className="w-4 h-4 mr-2" />
+                                    Back to My Sets
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </>
+        );
     }
     
     return (
@@ -248,7 +303,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                         {showSidebar && (
                             <>
                                 <MessageSquare className="w-5 h-5 text-white" />
-                                <span className="text-white text-sm">Due: {getDueCardsCount()}</span>
+                                
                             </>
                         )}
                     </div>
@@ -337,20 +392,20 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 <div className={`absolute w-1/2 h-1/2 transition-transform duration-200 flip-inner cursor-pointer ${!showFront ? 'flipped' : ''}`} onClick={flipCard}>
                     <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px] hover-animation">
                         <h2 className="pl-3 py-2">
-                            <Album className="inline-block mr-1" /> {cards[currentCard]?.category}
+                            <Album className="inline-block mr-1" /> {getCurrentCard()?.category}
                         </h2>
                         <div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">
-                            {cards[currentCard]?.front}
+                            {getCurrentCard()?.front}
                         </div>
                         <h2 className="absolute right-0 bottom-0 m-2">front</h2>
                     </div>
 
                     <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded-[10px] hover-animation">
                         <h2 className="pl-3 py-2">
-                            <Album className="inline-block mr-1" /> {cards[currentCard]?.category}
+                            <Album className="inline-block mr-1" /> {getCurrentCard()?.category}
                         </h2>
                         <div className="flex justify-center items-center h-[calc(100%-120px)] text-2xl">
-                            {cards[currentCard]?.back}
+                            {getCurrentCard()?.back}
                         </div>
 
                         <div className="flex justify-center items-center gap-4 mb-4" onClick={(e) => e.stopPropagation()}>
@@ -381,7 +436,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 
                 <div className="top-0 absolute lg:p-50 sm:p-10">
                     <Target className="inline-block mr-4 top-0" />
-                    <h1 className="top-0 inline-block">Practice Mode - {currentCard + 1}/{number_cards}</h1>
+                    <h1 className="top-0 inline-block">Practice Mode - {currentCardIndex + 1}/{dueCards.length} due</h1>
                 </div>
 
                 <Link href="/flashcards/my-sets">
@@ -390,19 +445,23 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                     </Button>          
                 </Link>
 
-                <Button 
-                    className="absolute right-8 top-1/2 transform -translate-y-1/2 rounded-full border border-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 p-3 shadow-lg hover:shadow-xl"
-                    onClick={nextCard}
-                >
-                    <ArrowRight className="w-6 h-6 text-white" />
-                </Button>
+                {dueCards.length > 1 && (
+                    <>
+                        <Button 
+                            className="absolute right-8 top-1/2 transform -translate-y-1/2 rounded-full border border-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 p-3 shadow-lg hover:shadow-xl"
+                            onClick={nextCard}
+                        >
+                            <ArrowRight className="w-6 h-6 text-white" />
+                        </Button>
 
-                <Button 
-                    className="absolute left-8 top-1/2 transform -translate-y-1/2 rounded-full border border-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 p-3 shadow-lg hover:shadow-xl"
-                    onClick={prevCard}
-                >
-                    <ArrowLeft className="w-6 h-6 text-white" />
-                </Button>
+                        <Button 
+                            className="absolute left-8 top-1/2 transform -translate-y-1/2 rounded-full border border-white bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-200 p-3 shadow-lg hover:shadow-xl"
+                            onClick={prevCard}
+                        >
+                            <ArrowLeft className="w-6 h-6 text-white" />
+                        </Button>
+                    </>
+                )}
             </div>
         </>
     );
