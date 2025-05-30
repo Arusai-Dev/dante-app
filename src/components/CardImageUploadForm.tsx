@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function CardImageUploadForm() {
+export default function CardImageUploadForm(setId, cardId) {
     const [file, setFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
 
@@ -19,13 +19,13 @@ export default function CardImageUploadForm() {
         formData.append("file", file);
 
         try {
-            const response = await fetch("api/s3-upload", {
+            const response = await fetch("/api/image-upload", {
                 method: "POST",
                 body: formData,
             })
 
             const data = await response.json()
-            console.log(data.status)
+            console.log(data)
             setIsUploading(false)
         } catch(error) {
             console.log(error)

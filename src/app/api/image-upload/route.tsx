@@ -15,10 +15,10 @@ async function uploadFileToS3(file, fileName) {
     console.log(fileName)
 
     const params = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
         Key: `${fileName}`,
         Body: fileBuffer,
-        ContentType: "image/jpg"
+        ContentType: "image/png"
     }
 
     const command = new PutObjectCommand(params)
@@ -40,9 +40,9 @@ export async function POST(request) {
         const buffer = Buffer.from(await file.arrayBuffer());
         const fileName = await uploadFileToS3(buffer, file.name);
 
-
         return NextResponse.json({ success: true, fileName })
     } catch(error) {
+        console.error("Upload error:", error)
         return NextResponse.json({ error: "Error uploading file" })
     }
 }
