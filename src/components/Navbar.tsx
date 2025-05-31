@@ -35,6 +35,8 @@ export default function Navbar() {
                 <ul className="hidden md:flex gap-3 text-md">
                     <Link href="/flashcards/my-sets">My Sets</Link>
                     <Link href="/flashcards/manager">Set Manager</Link>
+                    <Link href="/explore">Explore</Link>
+
                     {/* <Link href="/contact">Pricing</Link> */}
                 </ul>
 
@@ -65,6 +67,9 @@ export default function Navbar() {
                 </Link>
                 <Link href="/flashcards/manager" onClick={() => setResponsive(false)}>
                     Set Manager
+                </Link>
+                <Link href="/explore" onClick={() => setResponsive(false)}>
+                    Explore
                 </Link>
                 {/* <Link href="/contact" onClick={() => setResponsive(false)}>
                     Pricing
