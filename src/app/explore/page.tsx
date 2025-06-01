@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect } from "react"
-import { Search, Star, Users, BookOpen, Filter, Circle } from "lucide-react"
+import { Search, Users, BookOpen, Filter, Circle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -43,7 +43,7 @@ export default function Explore() {
         set.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
         set.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
 
-      const matchesCategory = selectedCategory === "All" || set.tags === selectedCategory
+      const matchesCategory = selectedCategory === "All" || set.category === selectedCategory
 
       return matchesSearch && matchesCategory
     })
