@@ -1,18 +1,21 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Album, PanelLeft, Target, MessageSquare, Image, ArrowUp, ArrowRight, ArrowLeft, Home, CheckCircle } from "lucide-react";
+import { Album, PanelLeft, Target, MessageSquare, ImageIcon, ArrowUp, ArrowRight, ArrowLeft, Home, CheckCircle } from "lucide-react";
 import { Toaster } from 'sonner'
 import { fsrs, Card, Rating, State, createEmptyCard } from "ts-fsrs";
 import ChatBubble from "./chatBubble";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { getSetById } from "@/lib/dbFunctions";
+import Image from 'next/image'
 
 interface FlashCard extends Card {
     cardId: number;
     front: string;
     back: string;
     category: string;
+    fileName: string;
 }
 
 type Message = {
@@ -32,6 +35,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     const [allMessages, setAllMessages] = useState<Message[]>([]);
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [studyComplete, setStudyComplete] = useState(false);
+    const [allCardImages, setAllCardImages] = useState({})
 
     const f = fsrs();
     
@@ -67,6 +71,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                     front: card.front,
                     back: card.back,
                     category: card.category,
+                    fileName: card.fileName,
                 } as FlashCard;
             });
             
@@ -81,11 +86,39 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
             
             setDueCards(due);
             setStudyComplete(due.length === 0);
+
+            const retrieveCardImages = async () => {
+                const res = await getSetById(setId)
+                const currentSetCards = res[0]?.cards || []
+                
+                const imagePromises = currentSetCards.map(async (card) => {
+                    const imageUrl = await fetchSignedImageUrl(setId, card.cardId, card.fileName)
+                    return [
+                        card.cardId,
+                        imageUrl,
+                    ]
+                })
+        
+                const entries = await Promise.all(imagePromises)
+                const cardImagesMap = Object.fromEntries(entries)
+        
+                setAllCardImages(cardImagesMap)
+            }
+        
+            const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
+                const res = await fetch(`/api/get-image?setId=${setId}&cardId=${cardId}&fileName=${fileName}`);
+                const data = await res.json();
+                return data.url;
+            };
+
+            retrieveCardImages()
         };
         
         initializeCards();
     }, [jsonCards]);
     
+    console.log(allCardImages)
+
     const getCurrentCard = useCallback(() => {
         return dueCards[currentCardIndex];
     }, [dueCards, currentCardIndex]);
@@ -286,7 +319,8 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
             </>
         );
     }
-    
+
+
     return (
         <>
             <Toaster />
@@ -351,7 +385,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                                     className="disabled:bg-neutral-400 float-right bg-white hover:bg-neutral-300 text-black font-medium py-2 px-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neutral-600"
                                     disabled    
                                 >
-                                    <Image />
+                                    <ImageIcon />
                                 </button>
                             </div>
                         </div>
@@ -406,6 +440,20 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                         </h2>
                         <div className="flex justify-center items-center h-[calc(100%-120px)] text-2xl">
                             {getCurrentCard()?.back}
+                            {
+                                allCardImages[getCurrentCard().cardId] ? (
+                                    <Image
+                                        src={allCardImages[getCurrentCard().cardId]}
+                                        alt={getCurrentCard()?.fileName}
+                                        width={200}
+                                        height={200}
+                                        className="w-full max-w-xs h-40 object-cover rounded border-1 border-[#8c8c8c]"
+                                    />
+                                ) : (
+                                    ""
+                                )
+
+                            }
                         </div>
 
                         <div className="flex justify-center items-center gap-4 mb-4" onClick={(e) => e.stopPropagation()}>

@@ -228,7 +228,7 @@ export default function Create() {
             <div className="
                 flex items-center gap-2  p-2 
                 mt-3 md:mt-4 
-                w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px] bg-[#D9D9D9]/3 rounded md:rounded-[5px]">
+                w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px]    rounded md:rounded-[5px]">
                 <button 
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={() => setActive("create")}
