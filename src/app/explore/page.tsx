@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { getPublicCards } from "@/lib/dbFunctions"
+import Link from "next/link"
+import { redirect } from "next/navigation"
 
 
 const categories = ["All", "Languages", "Science", "Technology", "History", "Medicine", "Arts"]
@@ -99,7 +101,7 @@ export default function Explore() {
           </div>
           <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 h-auto bg-neutral-800">
             {categories.map((category) => (
-              <TabsTrigger key={category} value={category} className=" bg-neutral-800 text-white data-[state=active]:text-neutral-900 text-xs sm:text-sm">
+              <TabsTrigger key={category} value={category} className="bg-neutral-800 text-white data-[state=active]:text-neutral-900 text-xs sm:text-sm">
                 {category}
               </TabsTrigger>
             ))}
@@ -116,6 +118,8 @@ export default function Explore() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredSets.map((set) => (
+            <Link key={set.id} href={`/flashcards/preview/${set.id}`}>
+            
             <Card key={set.id} className="border-2 border-neutral-800 group hover:shadow-lg transition-all duration-200 cursor-pointer bg-[#D9D9D9]/3">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
@@ -167,12 +171,13 @@ export default function Explore() {
                       </Badge>
                     ))}
                   </div>
-                  <Button className="w-full bg-white text-neutral-800 hover:bg-gray-200" size="sm">
-                    Start Studying
-                  </Button>
+                    <Button onClick={() => redirect(`/flashcards/practice/${set.id}`)} className="w-full bg-white text-neutral-800 hover:bg-gray-200 cursor-pointer" size="sm">
+                      Start Studying
+                    </Button>
                 </div>
               </CardContent>
             </Card>
+            </Link>
           ))}
         </div>
 
