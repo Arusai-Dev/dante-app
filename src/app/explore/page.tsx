@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Search, Star, Users, BookOpen, Filter } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -8,34 +8,46 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { getPublicCards } from "@/lib/dbFunctions"
 
-const fetchPublicSets = async () => {
-  
-}
-
-const flashcardSets = [
-  
-]
 
 const categories = ["All", "Languages", "Science", "Technology", "History", "Medicine", "Arts"]
 
 export default function Explore() {
+  
+  
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("All")
+  const [flashcardSets, setFlashcardSets] = useState([])
+  
+  const fetchPublicSets = async () => {
+    const cards = await getPublicCards();
+    return cards;
+  }
+
+  useEffect(() => {
+    async function getCards() {
+      const result = await fetchPublicSets();
+      setFlashcardSets(result)
+    }
+    getCards();
+  }, []);
+  
 
   const filteredSets = useMemo(() => {
     return flashcardSets.filter((set) => {
+      
       const matchesSearch =
         set.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         set.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        set.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        set.user.toLowerCase().includes(searchQuery.toLowerCase()) ||
         set.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
 
-      const matchesCategory = selectedCategory === "All" || set.category === selectedCategory
+      const matchesCategory = selectedCategory === "All" || set.tags === selectedCategory
 
       return matchesSearch && matchesCategory
     })
-  }, [searchQuery, selectedCategory])
+  }, [flashcardSets, searchQuery, selectedCategory])
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
@@ -54,7 +66,6 @@ export default function Explore() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col gap-4">
@@ -99,7 +110,6 @@ export default function Explore() {
           </TabsList>
         </Tabs>
 
-        {/* Results Count */}
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
             Showing {filteredSets.length} of {flashcardSets.length} flashcard sets
@@ -108,7 +118,6 @@ export default function Explore() {
           </p>
         </div>
 
-        {/* Flashcard Sets Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredSets.map((set) => (
             <Card key={set.id} className="group hover:shadow-lg transition-all duration-200 cursor-pointer">
@@ -130,33 +139,31 @@ export default function Explore() {
 
               <CardContent className="pt-0">
                 <div className="space-y-4">
-                  {/* Author */}
                   <div className="flex items-center gap-2">
                     <Avatar className="w-6 h-6">
-                      <AvatarImage src={set.authorAvatar || "/placeholder.svg"} alt={set.author} />
+                      <AvatarImage src={set.authorAvatar || "/placeholder.svg"} alt={set.user} />
                       <AvatarFallback className="text-xs">
-                        {set.author
+                        {set.user
                           .split(" ")
                           .map((n) => n[0])
                           .join("")}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-muted-foreground truncate">{set.author}</span>
+                    <span className="text-sm text-muted-foreground truncate">{set.user}</span>
                   </div>
 
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <BookOpen className="w-3 h-3" />
-                      <span>{set.cardCount} cards</span>
+                      <span>{set.card_cnt} cards</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <Users className="w-3 h-3" />
-                      <span>{set.studyCount.toLocaleString()} studied</span>
+                      <span>{set.study_count.toLocaleString()} studied</span>
                     </div>
                   </div>
 
-                  <div className="text-xs text-muted-foreground">{set.reviewCount} reviews</div>
-
+                  <div className="text-xs text-muted-foreground">{set.review_count} reviews</div>
                   <div className="flex flex-wrap gap-1">
                     {set.tags.slice(0, 3).map((tag) => (
                       <Badge key={tag} variant="outline" className="text-xs px-2 py-0">
@@ -164,7 +171,6 @@ export default function Explore() {
                       </Badge>
                     ))}
                   </div>
-
                   <Button className="w-full" size="sm">
                     Start Studying
                   </Button>

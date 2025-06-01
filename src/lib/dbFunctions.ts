@@ -1,10 +1,9 @@
 import { useCreateStore } from "@/app/stores/createStores";
 import { neon } from "@neondatabase/serverless";
 
+const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
 
 export async function deleteSetById(id: number) {
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
-
     try {
         await sql('DELETE FROM flashcards WHERE "id"= $1', [id]);
     } catch (error) {
@@ -14,8 +13,6 @@ export async function deleteSetById(id: number) {
 
 export async function deleteCardById(setId: number, cardId: number) {
 
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
-    
     console.log("setId: ", setId, "cardId: ", cardId)
 
     try {
@@ -44,8 +41,6 @@ export async function deleteCardById(setId: number, cardId: number) {
 }
 
 export async function getSetById(id: number) {
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
-
     try {
         return await sql('SELECT * FROM flashcards WHERE "id"= $1', [id]);
     } catch (error) {
@@ -56,8 +51,6 @@ export async function getSetById(id: number) {
 
 
 export async function getSetByTitle(user_id: string, title: string) {
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
-
     try {
         return await sql('SELECT * FROM flashcards WHERE "user"= $1 AND "title"=$2 LIMIT 1', [user_id, title]);
     } catch (error) {
@@ -74,8 +67,6 @@ export async function createNewSet(
     user_id: string,
     cards: any[]
 ) {
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
-
     try {
         return await sql(
             `INSERT INTO flashcards (cards, "user", is_private, description, date_created, title, card_cnt) 
@@ -95,8 +86,6 @@ export async function addOneCardToSet(
     back: string,
     fileName: string,
 ) {
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
-
     try {
         return await sql(
             `UPDATE flashcards
@@ -110,7 +99,6 @@ export async function addOneCardToSet(
 }
 
 export async function updateCardCount(id: number, cardCnt: number) {
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL)
 
     try {
         const update = await sql(
@@ -125,8 +113,12 @@ export async function updateCardCount(id: number, cardCnt: number) {
     }
 }
 
+<<<<<<< HEAD
 export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string, fileName: string) {
     const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
+=======
+export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string) {
+>>>>>>> 26516a45fed5ad36bcba6c60a58a973b8785dfc7
 
     try {
         const result = await sql<{ cards: any[] }>(
@@ -152,4 +144,14 @@ export async function updateCardData(setId: number, cardId: number, category: st
     } catch (error) {
         console.error("Failed to update card data:", error);
     }
+}
+
+export async function getPublicCards() {
+    try {
+        const result = await sql('SELECT * FROM flashcards where "is_private" = false');
+        return result;
+    } catch (error) {
+        console.error("Failed to fetch all public cards", error)
+    }
+
 }
