@@ -113,13 +113,7 @@ export async function updateCardCount(id: number, cardCnt: number) {
     }
 }
 
-<<<<<<< HEAD
 export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string, fileName: string) {
-    const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
-=======
-export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string) {
->>>>>>> 26516a45fed5ad36bcba6c60a58a973b8785dfc7
-
     try {
         const result = await sql<{ cards: any[] }>(
             'SELECT cards FROM flashcards WHERE id = $1',
