@@ -107,7 +107,7 @@ export default function Explore() {
             ))}
           </TabsList>
         </Tabs>
-
+        
         <div className="mb-6">
           <p className="text-sm text-muted-foreground">
             Showing {filteredSets.length} of {flashcardSets.length} flashcard sets

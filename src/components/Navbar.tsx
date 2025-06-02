@@ -16,8 +16,6 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-
-
     const pathname = usePathname()
 
     const hideNavbar = pathname?.startsWith('/flashcards/practice/') || pathname?.startsWith('/flashcards/play/')
@@ -32,12 +30,12 @@ export default function Navbar() {
                 <Link href="/" className="text-[16px] font-bold z-[999]">Dante</Link>
 
                 {/* Desktop Nav */}
-                <ul className="hidden md:flex gap-3 text-md">
-                    <Link href="/flashcards/my-sets">My Sets</Link>
-                    <Link href="/flashcards/manager">Set Manager</Link>
-                    <Link href="/explore">Explore</Link>
+                <ul className="hidden md:flex gap-6 text-md font-semibold">
+                    <Link className="hover-animation-text" href="/flashcards/my-sets">My Sets</Link>
+                    <Link className="hover-animation-text" href="/flashcards/manager">Set Manager</Link>
+                    <Link className="hover-animation-text" href="/explore">Explore</Link>
 
-                    {/* <Link href="/contact">Pricing</Link> */}
+                    {/* <Link className="hover-animation-text" href="/contact">Pricing</Link> */}
                 </ul>
 
                 {/* Mobile Toggle Button */}
