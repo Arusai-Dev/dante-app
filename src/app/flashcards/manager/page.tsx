@@ -7,6 +7,7 @@ import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCar
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
 import { toast as sonnerToast } from 'sonner';
 import Image from "next/image"
+import RetrieveCardImages from "@/components/functions/RetrieveImagesBySetId"
 
 function toast(toast: Omit<ToastProps, 'id'>) {
     return sonnerToast.custom((id) => (
@@ -32,18 +33,19 @@ function Toast(props: ToastProps) {
 
 export default function Create() {
     const { 
-        active, 
         updatingCard,
         setUpdatingCard,
         currentSet,
         setCurrentSet,
-        setActive, 
+        currentSetImages,
+        setCurrentSetImages,
         setSets, 
         setDropDownIsOpen, 
     } = useCreateStore()
 
     const [file, setFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
+    const [active, setActive] = useState("create");
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,13 +55,16 @@ export default function Create() {
             });
             const data = await res.json();
             setSets(data.Sets);
+
+            const map = await RetrieveCardImages(currentSet.id)
+            setCurrentSetImages(map["cardImagesMap"])
         }
 
         fetchData();
-    }, []);
+    }, [setCurrentSetImages, setSets, currentSet.id]);
     
     // Current Card Data
-    const [currentCardData, setCurrentCardData] = useState([1, 0, 'Category', 'Front', 'Back', '']);
+    const [currentCardData, setCurrentCardData] = useState([1, null, 'Category', 'Front', 'Back', '']);
     const updateCard = (index: number, value: string) => {
         const updatedCard = [...currentCardData]
         updatedCard[index] = value;
@@ -168,22 +173,9 @@ export default function Create() {
 
     const handleEditCardBtnPress = async (setId: number, cardId: number, category: string, front: string, back: string, fileName: string) => {  
         setCurrentCardData([setId, cardId, category, front, back, fileName])
-        console.log(fileName)
         setActive("create")
         setUpdatingCard(true)
-        if (fileName) {
-            const imageUrl = await fetchSignedImageUrl(setId, cardId, fileName)
-            setImagePreview(imageUrl)
-        } else {
-            setImagePreview(null)
-        }
     }
-
-    const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
-        const res = await fetch(`/api/get-image?setId=${setId}&cardId=${cardId}&fileName=${fileName}`);
-        const data = await res.json();
-        return data.url;
-    };
 
     const handleUpdateCard = async (data: [number, number, string, string, string, string]) => {
         const [setId, cardId, category, front, back, fileName] = data 
@@ -195,23 +187,27 @@ export default function Create() {
         updateCurrentSet(setId)
     }
 
-
     const handleFileChange = (e) => {
         const selectedImage = e.target.files[0]
         if (selectedImage) {
             setFile(selectedImage)
             const imageURL = URL.createObjectURL(selectedImage);
             setImagePreview(imageURL)
-            console.log("monkey:", imagePreview)
         }
     };
 
     const clearCurrentImage = () => {
         setImagePreview(null);
-        setFile(null)
-    }
-
+        setFile(null);
     
+        setCurrentSetImages(prevImages => {
+            const updated = { ...prevImages };
+            delete updated[currentCardData[1]];
+            return updated;
+        });
+    };
+    
+
     return (
         <section className="flex flex-col items-center pt-[35px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
@@ -300,16 +296,15 @@ export default function Create() {
                             </label>
                         </div>
 
-                        {imagePreview && (
-                            <div className="flex justify-between mt-4">  
+                        {(imagePreview || (updatingCard && currentSetImages[currentCardData[1]])) && (
+                            <div className="flex justify-between mt-4">
                                 <Image
-                                    src={imagePreview}
-                                    alt="Preview"
+                                    src={imagePreview || currentSetImages[currentCardData[1]]}
+                                    alt="Card preview"
                                     width={200}
                                     height={200}
-                                    className="w-full max-w-xs h-40 object-cover rounded border-1 border-[#8c8c8c]"
+                                    className="w-fit max-w-xs h-40 object-contain rounded border-1 border-[#8c8c8c]"
                                 />
-
                                 <Trash2Icon 
                                     className="bg-red-900 p-[8px] rounded-sm cursor-pointer" 
                                     width={35} height={35}
@@ -379,17 +374,15 @@ export default function Create() {
                                 <h2 className="pl-3 py-2">{currentCardData[2] == "" ? "Category" : currentCardData[2]}</h2>
                                 <div className="flex justify-center items-center h-[calc(100%-80px)] gap-[16px] text-sm lg:text-lg">
                                     <div className="w-[50%] flex justify-center">{currentCardData[4]}</div>
-                                    {imagePreview && (
-                                        <div className="flex justify-center items-center">  
-                                            <Image
-                                                src={imagePreview}
-                                                alt="Preview"
-                                                width={200}
-                                                height={200}
-                                                className="w-full md:max-w-[100px] md:h-[100px] lg:max-w-[160px] lg:h-[160px] object-cover rounded border-1 border-[#8c8c8c]"
-                                            />
-                                        </div>
-                                    )}                               
+                                    {(imagePreview || (updatingCard && currentSetImages[currentCardData[1]])) && (
+                                        <Image
+                                            src={imagePreview || currentSetImages[currentCardData[1]]}
+                                            alt="Card preview"
+                                            width={200}
+                                            height={200}
+                                            className="w-fit max-w-xs h-40 object-contain rounded border-1 border-[#8c8c8c]"
+                                        />
+                                    )}
                                 </div>                                
 
                             </div>
@@ -407,7 +400,7 @@ export default function Create() {
             
             {/* Manage Cards Section */}
             {active == "manage" && (
-                <div className="w-[calc(100vw-20px)] max-w-[1150px] min-h-[350px] mt-3 rounded md:rounded-[5px] border border-[#8c8c8c] mx-auto px-1">
+                <div className="w-[calc(100vw-20px)] max-w-[1150px] min-h-[fit] mt-3 rounded md:rounded-[5px] border border-[#8c8c8c] mx-auto px-1">
 
                     {currentSet.cards && currentSet.cards.length == 0 ? (
                         <div className="flex flex-col items-center justify-center">
@@ -419,11 +412,11 @@ export default function Create() {
                             ><PlusCircle height={18}/> Create Card</button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 md:gap-[15px] p-1 py-2 w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-[15px] p-1 py-2 h-fit">
                             {currentSet.cards && currentSet.cards.map((card, id: number) => (
                                 <div
                                     key={id}
-                                    className="w-full h-fit md:h-[140px] bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col"
+                                    className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col"
                                 >
 
                                     <div className="h-full flex flex-col">
@@ -450,14 +443,27 @@ export default function Create() {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="h-full flex pt-[20px] md:pt-[40px] pl-2">
+                                        <div className="h-full flex pt-[20px] md:pt-[30px] pl-2">
                                             <h1 className="text-[12px] md:text-lg font-semibold">{card.front}</h1>
                                         </div>
                                     </div>
 
 
-                                    <div className="w-full h-auto py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
-                                        <h1 className="text-[12px] md:text-lg font-semibold whitespace-nowrap w-full truncate text-[#474747] pl-2">{card.back}</h1>
+                                    <div className="w-full h-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
+                                        <h1 className="text-[12px] md:text-lg font-semibold whitespace-wrap w-full md:truncate text-[#474747] px-2">{card.back}</h1>
+                                        <div className="pr-1">
+                                            {
+                                                currentSetImages[card.cardId] ? (
+                                                    <Image
+                                                        src={currentSetImages[card.cardId]}
+                                                        alt={"es"}
+                                                        width={100}
+                                                        height={100}
+                                                        className="w-full h-full min-h-[120px] max-h-[150px] object-contain"
+                                                    />
+                                                ) : ("")   
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             ))}

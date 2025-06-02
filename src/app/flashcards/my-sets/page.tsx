@@ -27,37 +27,37 @@ export default async function MyFlashcards() {
                     //@ts-ignore
                     setData.map(async (set, index:number) => (
                     
-                    <Link key={index} href={`/flashcards/view/${set.id}`} >
-                        <div key={index} className="w-[512px]">
+                        <Link key={index} href={`/flashcards/view/${set.id}`} >
+                            <div key={index} className="w-[512px]">
 
 
-                            <h1 className="relative font-bold text-2xl">{set.title}</h1>
+                                <h1 className="relative font-bold text-2xl">{set.title}</h1>
 
-                            <div className="flex relative content-center items-center text-center h-64 w-full bg-neutral-900 rounded-2xl">
+                                <div className="flex relative content-center items-center text-center h-64 w-full bg-neutral-900 rounded-2xl">
 
-                                <div className="absolute top-0 right-0 m-2">
-                                    <EditButton id={set.id}
-                                        
-                                    />
-                                    <DeleteButton id={set.id}/>
-                                    {set.is_private ? ( <LockKeyhole className="inline-block m-1"/> ) : (<Globe className="inline-block m-1"/>) }
+                                    <div className="absolute top-0 right-0 m-2">
+                                        <EditButton id={set.id}
+                                            
+                                        />
+                                        <DeleteButton id={set.id}/>
+                                        {set.is_private ? ( <LockKeyhole className="inline-block m-1"/> ) : (<Globe className="inline-block m-1"/>) }
+                                    </div>
+
+                                    <div className="absolute bottom-0 right-0 m-2">
+                                        <p className="inline-block m-1">{set.card_cnt}</p>
+                                        <Layers2 className="inline-block m-1"/>
+
+                                    </div>
+
+                                    {/* TODO put a 50 word limit on description */}
+                                    <h1 className="text-center m-auto">{set.description}</h1>
+
                                 </div>
-
-                                <div className="absolute bottom-0 right-0 m-2">
-                                    <p className="inline-block m-1">{set.card_cnt}</p>
-                                    <Layers2 className="inline-block m-1"/>
-
-                                </div>
-
-                                {/* TODO put a 50 word limit on description */}
-                                <h1 className="text-center m-auto">{set.description}</h1>
 
                             </div>
+                        </Link>
 
-                        </div>
-                    </Link>
-
-                        ))
+                    ))
                     ) : (
                         <div>
                             No cards to display.
