@@ -157,6 +157,14 @@ body {
     background-color: #323232
   }
 
+  .hover-animation-text {
+    transition: 0.2s;
+  }
+
+  .hover-animation-text:hover {
+    color: rgb(122, 122, 122)
+  }
+
   .hover-animation-secondary {
     transition: 0.2s;
   }

@@ -210,6 +210,7 @@ export default function Create() {
         setImagePreview(null);
         setFile(null)
     }
+
     
     return (
         <section className="flex flex-col items-center pt-[35px] pb-[65px] font-(family-name:inter) force-scrollbar">

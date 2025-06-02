@@ -10,7 +10,6 @@ export default async function MyFlashcards() {
         method: "GET", 
     });
 
-
     const data = await res.json();
     const setData = data.Sets;
     return (
@@ -37,7 +36,9 @@ export default async function MyFlashcards() {
                             <div className="flex relative content-center items-center text-center h-64 w-full bg-neutral-900 rounded-2xl">
 
                                 <div className="absolute top-0 right-0 m-2">
-                                    <EditButton id={set.id}/>
+                                    <EditButton id={set.id}
+                                        
+                                    />
                                     <DeleteButton id={set.id}/>
                                     {set.is_private ? ( <LockKeyhole className="inline-block m-1"/> ) : (<Globe className="inline-block m-1"/>) }
                                 </div>
