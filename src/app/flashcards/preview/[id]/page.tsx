@@ -395,17 +395,17 @@ export default function Preview() {
           </div>
 
           <div className="space-y-6">
-            <Card className="">
+            <Card className="bg-neutral-800">
               <CardContent className="p-6 space-y-4">
-                <Button variant="" className="w-full" size="lg">
+                <Button variant="outline" className="w-full hover:bg-gray-200" size="lg">
                   <BookOpen className="w-4 h-4 mr-2" />
                   Start Studying
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full hover:bg-gray-200">
                   <Clock className="w-4 h-4 mr-2" />
                   Practice Test
                 </Button>
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full hover:bg-gray-200">
                   Add to Study Plan
                 </Button>
               </CardContent>
@@ -419,9 +419,9 @@ export default function Preview() {
                 {relatedSets.map((set) => (
                   <div
                     key={set.id}
-                    className="space-y-2 p-3 rounded-lg border hover:bg-muted/50 cursor-pointer transition-colors bg-white"
+                    className="space-y-2 p-3 rounded-lg border hover:bg-neutral-900/50 cursor-pointer transition-colors bg-[#D3D3D3/3] border-gray-500"
                   >
-                    <h4 className="font-medium text-sm text-black">{set.title}</h4>
+                    <h4 className="font-medium text-sm text-white">{set.title}</h4>
                     <div className="flex items-center justify-between text-xs text-gray-50">
                       <div className="flex items-center gap-1">
                         {renderStars(set.rating)}
@@ -435,7 +435,7 @@ export default function Preview() {
               </CardContent>
             </Card>
 
-            <Card className="">
+            <Card className="bg-neutral-800">
               <CardHeader>
                 <CardTitle className="text-lg text-white">Study Statistics</CardTitle>
               </CardHeader>
@@ -449,10 +449,10 @@ export default function Preview() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Average Score</span>
-                    <span className="font-medium">4.2/5</span>
+                    <span className="text-white">Average Score</span>
+                    <span className="font-medium text-white">4.2/5</span>
                   </div>
-                  <Progress value={84} />
+                  <Progress value={84} className="bg-white" />
                 </div>
                 <div className="text-xs text-muted-foreground">
                   Based on {(flashcardSet.study_count || 0).toLocaleString()} study sessions
