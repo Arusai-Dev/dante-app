@@ -5,14 +5,15 @@ const RetrieveCardImages = async (setId: number) => {
     const currentSetCards = res[0]?.cards || []
     
     const imagePromises = currentSetCards.map(async (card) => {
+        console.log(card.fileName)
         const imageUrl = await fetchSignedImageUrl(setId, card.cardId, card.fileName)
         return [card.cardId,imageUrl,]
     })
 
     const entries = await Promise.all(imagePromises)
     const cardImagesMap = Object.fromEntries(entries)
-    
-    return {cardImagesMap}
+    console.log(cardImagesMap)
+    return cardImagesMap
 }
 
 const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {

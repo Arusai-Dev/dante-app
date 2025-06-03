@@ -1,6 +1,6 @@
 'use client'
 
-import SetSelectionSection from "@/components/createPageComponents/SetSelectionSection"
+import SetSelectionSection from "@/components/SetSelectionSection"
 import { useEffect, useState } from "react"
 import { useCreateStore } from "@/app/stores/createStores"
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
@@ -37,14 +37,17 @@ export default function Create() {
         setUpdatingCard,
         currentSet,
         setCurrentSet,
+        currentSelectedImage,
+        setCurrentSelectedImage,
         currentSetImages,
         setCurrentSetImages,
+        currentCardData,
+        setCurrentCardData,
         setSets, 
         setDropDownIsOpen, 
     } = useCreateStore()
 
     const [file, setFile] = useState(null);
-    const [imagePreview, setImagePreview] = useState(null);
     const [active, setActive] = useState("create");
 
     useEffect(() => {
@@ -57,26 +60,17 @@ export default function Create() {
             setSets(data.Sets);
 
             const map = await RetrieveCardImages(currentSet.id)
-            setCurrentSetImages(map["cardImagesMap"])
+            setCurrentSetImages(map)
         }
 
         fetchData();
     }, [setCurrentSetImages, setSets, currentSet.id]);
-    
-    // Current Card Data
-    const [currentCardData, setCurrentCardData] = useState([1, null, 'Category', 'Front', 'Back', '']);
-    const updateCard = (index: number, value: string) => {
-        const updatedCard = [...currentCardData]
-        updatedCard[index] = value;
-        setCurrentCardData(updatedCard);
-    };
 
+    const updateCard = useCreateStore(state => state.updateCurrentCardData)
+    const clearCard = useCreateStore(state => state.clearCurrentCardData)
     const clearCurrentCardData = () => {
-        const updatedCard = [...currentCardData]
-        updatedCard[2] = 'Category';
-        updatedCard[3] = 'Front';
-        updatedCard[4] = 'Back';
-        setCurrentCardData(updatedCard);
+        clearCard()
+        console.log(currentCardData)
     }
 
     // Preview Card
@@ -99,33 +93,35 @@ export default function Create() {
         };
     }, []);
 
-    const handleAddCard = async (data: [number, number, string, string, string, string]) => {
-        const [
-            ,
-            ,
+    const handleAddCard = async () => {
+        const { 
             category, 
             front, 
-            back, 
-            ,
-        ] = data;
+            back,              
+            due,
+            reps,
+            state,
+            lapses,
+            stability,
+            difficulty,
+            elapsed_day,
+            scheduled_days,
+            last_review, 
+        } = useCreateStore.getState().currentCardData;
 
         updateCurrentSet(currentSet.id)
         const fileName = file.name
-        const currentSetId = currentSet.id
-        const cardId = currentSet.cards.length
-        
-        currentCardData[0] = currentSetId
-        currentCardData[1] = cardId
-        currentCardData[2] = "Category"
-        currentCardData[3] = "Front"
-        currentCardData[4] = "Back"
-        currentCardData[4] = ""
+        const currentSetId = currentSet?.id
         
         if (!currentSetId) {
             console.warn("No set selected.");
             return;
         }
-        
+
+        const cardId = currentSet.cards.length
+
+        clearCurrentCardData()
+
         await addOneCardToSet(
             currentSetId,
             cardId,
@@ -133,6 +129,15 @@ export default function Create() {
             front, 
             back, 
             fileName,
+            due,
+            reps,
+            state,
+            lapses,
+            stability,
+            difficulty,
+            elapsed_day,
+            scheduled_days,
+            last_review,
         );
         
         const updatedSet = await getSetById(currentSetId);
@@ -141,22 +146,22 @@ export default function Create() {
         await updateCardCount(currentSetId, updatedSet[0].cards.length)
         await updateCurrentSet(currentSetId)
 
-        if (!file) return;
+        if (file) {;
+            const formData = new FormData();
+            formData.append("file", file);
 
-        const formData = new FormData();
-        formData.append("file", file);
+            try {
+                const response = await fetch(`/api/image-upload?setID=${currentSetId}&cardID=${cardId}`, {
+                    method: "POST",
+                    body: formData,
+                })
 
-        try {
-            const response = await fetch(`/api/image-upload?setID=${currentSetId}&cardID=${cardId}`, {
-                method: "POST",
-                body: formData,
-            })
-
-            const data = await response.json()
-            console.log(data)
-        } catch(error) {
-            console.log(error)
-        }
+                const data = await response.json()
+                console.log(data)
+            } catch(error) {
+                console.log(error)
+            }
+        }   
 
         clearCurrentImage()
     };   
@@ -202,12 +207,11 @@ export default function Create() {
         if (selectedImage) {
             setFile(selectedImage)
             const imageURL = URL.createObjectURL(selectedImage);
-            setImagePreview(imageURL)
+            setCurrentSelectedImage(imageURL)
         }
     };
-
     const clearCurrentImage = () => {
-        setImagePreview(null);
+        setCurrentSelectedImage(null);
         setFile(null);
     
         setCurrentSetImages(prevImages => {
@@ -217,14 +221,13 @@ export default function Create() {
         });
     };
     
-
     return (
-        <section className="flex flex-col items-center pt-[35px] pb-[65px] font-(family-name:inter) force-scrollbar">
+        <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
             {/* Title */}
-            <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[80px]">
-                <h1 className="text-[20px] sm:text-[22px] md:text-3xl lg:text-4xl font-bold ">Set Manager</h1>
-                <p className="text-[12px] sm:text-md md:text-2xl lg:text-3xl pt-1 text-center">Create, organize, and manage your sets!</p>   
+            <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[70px]">
+                <h1 className="text-[20px] sm:text-lg md:text-2xl lg:text-3xl font-bold ">Set Manager</h1>
+                <p className="text-[12px] sm:text-md md:text-xl lg:text-2xl pt-1 text-center">Create, organize, and manage your sets!</p>   
             </div>      
 
 
@@ -245,7 +248,10 @@ export default function Create() {
                 
                 <button 
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
-                    onClick={() => setActive("manage")}
+                    onClick={() => {
+                        setActive("manage")
+                        RetrieveCardImages(currentSet.id)
+                    }}
                     >
 
                     Manage Cards
@@ -257,31 +263,30 @@ export default function Create() {
             {/* Create Flashcard / Preview Section */}
             {active == "create" && (
                 <div className="flex md:flex-row flex-col mt-3 md:mt-4 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] ">
-                    <div className="md:w-[565px] bg-[#D9D9D9]/3 rounded md:rounded-[5px] py-3 px-4
-                    ">
+                    <div className="md:w-[565px] bg-[#D9D9D9]/3 rounded md:rounded-[5px] py-3 px-4">
                         <h1 className="font-bold text-[16px] md:text-2xl pb-3 md:pb-4">Create New Card</h1>
 
 
                         <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Category (optional)</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                            value={currentCardData[2] == "Category" ? '' : currentCardData[2]}
-                            onChange={(e) => updateCard(2, e.target.value)}
+                            value={currentCardData["category"] == "Category" ? '' : currentCardData["category"]}
+                            onChange={(e) => updateCard("category" ,e.target.value)}
                             placeholder="e.g., Vocab, Grammar, Math, Science, etc..."
                         ></input>
 
                         
                         <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Front Side</h2>
                         <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                            value={currentCardData[3] == "Front" ? '' : currentCardData[3]}
-                            onChange={(e) => updateCard(3, e.target.value)}
+                            value={currentCardData["front"] == "Front" ? '' : currentCardData["front"]}
+                            onChange={(e) => updateCard("front" ,e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
 
                         
                         <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Back Side</h2>
                         <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                            value={currentCardData[4] == "Back" ? '' : currentCardData[4]}
-                            onChange={(e) => updateCard(4, e.target.value)}
+                            value={currentCardData["back"] == "Back" ? '' : currentCardData["back"]}
+                            onChange={(e) => updateCard("back" ,e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
 
@@ -306,10 +311,10 @@ export default function Create() {
                             </label>
                         </div>
 
-                        {(imagePreview || (updatingCard && currentSetImages[currentCardData[1]])) && (
+                        {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                             <div className="flex justify-between mt-4">
                                 <Image
-                                    src={imagePreview || currentSetImages[currentCardData[1]]}
+                                    src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
                                     alt="Card preview"
                                     width={200}
                                     height={200}
@@ -330,9 +335,9 @@ export default function Create() {
                                     if (updatingCard) {
                                         handleUpdateCard(currentCardData)
                                     } else {
-                                        if (currentCardData[3] == "Front") {
+                                        if (currentCardData["front"] == "Front") {
                                             toast({title: "Enter a value for the front of the card."})
-                                        } else if (currentCardData[4] == "Back") {
+                                        } else if (currentCardData["back"] == "Back") {
                                             toast({title:  "Enter a value for the back of the card."})
                                         } else {handleAddCard(currentCardData)} 
                                     }
@@ -375,18 +380,18 @@ export default function Create() {
                             
                             {/* front */}
                             <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded md:rounded-[5px] hover-animation">
-                                <h2 className="pl-3 py-2">{currentCardData[2] == "" ? "Category" : currentCardData[2]}</h2>
-                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData[3]}</div>
+                                <h2 className="pl-3 py-2">{currentCardData["category"] == "" ? "Category" : currentCardData["category"]}</h2>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData["front"]}</div>
                             </div>
 
                             {/* back */}
                             <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded md:rounded-[5px] hover-animation">
-                                <h2 className="pl-3 py-2">{currentCardData[2] == "" ? "Category" : currentCardData[2]}</h2>
+                                <h2 className="pl-3 py-2">{currentCardData["category"] == "" ? "Category" : currentCardData["category"]}</h2>
                                 <div className="flex justify-center items-center h-[calc(100%-80px)] gap-[16px] text-sm lg:text-lg">
-                                    <div className="w-[50%] flex justify-center">{currentCardData[4]}</div>
-                                    {(imagePreview || (updatingCard && currentSetImages[currentCardData[1]])) && (
+                                    <div className="w-[50%] flex justify-center">{currentCardData["back"]}</div>
+                                    {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                                         <Image
-                                            src={imagePreview || currentSetImages[currentCardData[1]]}
+                                            src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
                                             alt="Card preview"
                                             width={200}
                                             height={200}
@@ -413,7 +418,7 @@ export default function Create() {
                 <div className="w-[calc(100vw-20px)] max-w-[1150px] min-h-[fit] mt-3 rounded md:rounded-[5px] border border-[#8c8c8c] mx-auto px-1">
 
                     {currentSet.cards && currentSet.cards.length == 0 ? (
-                        <div className="flex flex-col items-center justify-center">
+                        <div className="flex flex-col items-center justify-center p-4">
                             <h1 className="pb-2 text-2xl font-bold">No cards in this set yet</h1>
                             <h1 className="pb-5 text-xl">Create your first card to begin</h1>
                             <button 
@@ -466,7 +471,7 @@ export default function Create() {
                                                 currentSetImages[card.cardId] ? (
                                                     <Image
                                                         src={currentSetImages[card.cardId]}
-                                                        alt={"es"}
+                                                        alt={card.fileName}
                                                         width={100}
                                                         height={100}
                                                         className="w-full h-full min-h-[120px] max-h-[150px] object-contain"

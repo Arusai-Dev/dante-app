@@ -85,13 +85,37 @@ export async function addOneCardToSet(
     front: string,
     back: string,
     fileName: string,
+    due: number,
+    reps: number,
+    state: number,
+    lapses: number,
+    stability: number,
+    difficulty: number,
+    elapsed_day: number,
+    scheduled_days: number,
+    last_review: string | null,
 ) {
     try {
         return await sql(
             `UPDATE flashcards
              SET cards = cards::jsonb || $1::jsonb
              WHERE id = $2`,
-            [JSON.stringify([{ cardId, category, front, back, fileName}]), currentSetId]
+            [JSON.stringify([{ 
+                cardId, 
+                category, 
+                front, 
+                back, 
+                fileName,
+                due,
+                reps,
+                state,
+                lapses,
+                stability,
+                difficulty,
+                elapsed_day,
+                scheduled_days,
+                last_review,
+            }]), currentSetId]
         ); 
     } catch (error) {
         console.log(error);
