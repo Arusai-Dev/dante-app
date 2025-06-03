@@ -7,59 +7,109 @@ type createStoreState = {
     sets: any[]
     currentSet: any
     dropDownIsOpen: boolean
+    currentSelectedImage: any
     currentSetImages: any
+    currentCardData: {
+        setId: number | null
+        cardId: number | null
+        category: string
+        front: string
+        back: string
+        fileName: string
+        due: number,
+        reps: number,
+        state: number,
+        lapses: number,
+        stability: number,
+        difficulty: number,
+        elapsed_day: number,
+        scheduled_days: number,
+        last_review: string | null,
+    }
     setActive: (mode: string) => void
     setUpdatingCard: (mode: boolean) => void
     setSets: (data: any[]) => void
     setCurrentSet: (data: any) => void
     setDropDownIsOpen: (mode: boolean) => void
+    setCurrentSelectedImage: (mode: any) => void
     setCurrentSetImages: (data: any) => void
+    setCurrentCardData: (data: any) => void
+    updateCurrentCardData: (key: string, value: any) => void
+    clearCurrentCardData: () => void
 }
 
 export const useCreateStore = create(
     persist<createStoreState>(
-        (set) => ({
-        active: 'create',
-        updatingCard: false,
-        sets: [],
-        currentSet: [],
-        dropDownIsOpen: false,
-        currentSetImages: [],
-        setActive: (mode) => set({ active: mode }),
-        setUpdatingCard: (mode) => set({ updatingCard: mode }),
-        setSets: (data) => set({ sets: data }),
-        setCurrentSet: (data) => set({ currentSet: data }),
-        setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
-        setCurrentSetImages: (data) => set({ currentSetImages: data }),
-    }),
-    {
-        name: 'create-storage', 
-        storage: createJSONStorage(() => localStorage), 
-    },
-))
-
-// active or manage
-// current user
-// current set id
-// current set data
-// current title
-// current description
-// current cnt of cards
-// all user sets
-
-// const { 
-//     active, 
-//     sets, 
-//     dropDownIsOpen, 
-//     selectedSet, 
-//     selectedSetTitle, 
-//     selectedSetDescription, 
-//     selectedSetCardCnt, 
-//     setActive, 
-//     setSets, 
-//     setDropDownIsOpen, 
-//     setSelectedSet, 
-//     setSelectedSetTitle,
-//     setSelectedSetDescription,
-//     setSelectedSetCardCnt,
-// } = useCreateStore()
+        (set, get) => ({
+            active: 'create',
+            updatingCard: false,
+            sets: [],
+            currentSet: [],
+            dropDownIsOpen: false,
+<<<<<<< Updated upstream
+            currentSelectedImage: "",
+=======
+>>>>>>> Stashed changes
+            currentSetImages: [],
+            currentCardData: {
+                setId: null, 
+                cardId: null, 
+                category: 'Category', 
+                front: 'Front', 
+                back: 'Back', 
+                fileName: '',
+                due: 0,
+                reps: 0,
+                state: 0,
+                lapses: 0,
+                stability: 0,
+                difficulty: 0,
+                elapsed_day: 0,
+                scheduled_days: 0,
+                last_review: null,
+            },
+            setActive: (mode) => set({ active: mode }),
+            setUpdatingCard: (mode) => set({ updatingCard: mode }),
+            setSets: (data) => set({ sets: data }),
+            setCurrentSet: (data) => set({ currentSet: data }),
+            setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
+<<<<<<< Updated upstream
+            setCurrentSelectedImage: (mode) => set({ currentSelectedImage: mode }),
+=======
+>>>>>>> Stashed changes
+            setCurrentSetImages: (data) => set({ currentSetImages: data }),
+            setCurrentCardData: (data) => set({ currentCardData: data }),
+            updateCurrentCardData: (key, value) => set({
+                currentCardData: {
+                    ...get().currentCardData,
+                    [key]: value
+                }
+            }),
+            clearCurrentCardData: () => {
+                set({
+                    currentCardData: {
+                        setId: null,
+                        cardId: null,
+                        category: 'Category',
+                        front: 'Front',
+                        back: 'Back',
+                        fileName: '',
+                        due: 0,
+                        reps: 0,
+                        state: 0,
+                        lapses: 0,
+                        stability: 0,
+                        difficulty: 0,
+                        elapsed_day: 0,
+                        scheduled_days: 0,
+                        last_review: null,
+                    }
+                })
+            }
+        }),
+        {
+            name: 'create-storage', 
+            storage: createJSONStorage(() => localStorage), 
+        },
+    )
+)
