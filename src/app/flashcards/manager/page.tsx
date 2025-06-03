@@ -166,9 +166,19 @@ export default function Create() {
         setCurrentSet(updatedSet[0])
     }
 
-    const handleCardDelete = async (setId: number, cardId: number) => {
+    const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {
         await deleteCardById(setId, cardId)
-        updateCurrentSet(setId)
+        const key = `${setId}/${cardId}/${fileName}`
+        handleImageDelete(key)
+        await updateCurrentSet(setId)
+    }
+
+    const handleImageDelete = async (key) => {
+        console.log("first")
+        await fetch(`/api/delete-image?key=${key}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" }
+        })
     }
 
     const handleEditCardBtnPress = async (setId: number, cardId: number, category: string, front: string, back: string, fileName: string) => {  
@@ -437,7 +447,7 @@ export default function Create() {
                                                     <Trash2 
                                                         className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
                                                         onClick={() => {
-                                                            handleCardDelete(currentSet.id, card.cardId)
+                                                            handleCardDelete(currentSet.id, card.cardId, card.fileName)
                                                         }}
                                                     />
                                                 </div>

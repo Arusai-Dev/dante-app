@@ -3,7 +3,7 @@
 
 # Flashcards Creation
 - Set Manager Page                  
-    - [ ] - Locally save flashcard creation progress
+    - [x] - Locally save flashcard creation progress
     - [ ] - Auto card creation from given data eg: (front, back, category)
     
     - Manage Cards Section
@@ -16,7 +16,7 @@
         - [x] - Creating a new set causes selected set == new set
         - [ ] - Upload set to database with corresponding user (change userid to clerk current user)
         - [x] - Card Count needs to update on new card and when you retrieve a card
-        - [ ] - Allow images to be input as questions or answers. (Set up an s3 bucket and handle image processing)
+        - [x] - Allow images to be input as questions or answers. (Set up an s3 bucket and handle image processing)
         - [ ] - Allow the option to edit the image: should contain basic image editing functions
         - [ ] - Auto recommend images for back side
     
