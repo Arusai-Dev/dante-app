@@ -70,7 +70,7 @@ export default function Create() {
     const clearCard = useCreateStore(state => state.clearCurrentCardData)
     const clearCurrentCardData = () => {
         clearCard()
-        console.log(currentCardData)
+        setCurrentSelectedImage("")
     }
 
     // Preview Card
@@ -186,16 +186,80 @@ export default function Create() {
         })
     }
 
-    const handleEditCardBtnPress = async (setId: number, cardId: number, category: string, front: string, back: string, fileName: string) => {  
-        setCurrentCardData([setId, cardId, category, front, back, fileName])
+    const handleEditCardBtnPress = async (
+        setId: number,
+        cardId: number,
+        category: string,
+        front: string,
+        back: string,
+        fileName: string,
+        due: number,
+        reps: number,
+        state: number,
+        lapses: number,
+        stability: number,
+        difficulty: number,
+        elapsed_day: number,
+        scheduled_days: number,
+        last_review: string | null,
+    ) => {  
+        setCurrentCardData({
+            setId: setId,
+            cardId: cardId,
+            category: category,
+            front: front,
+            back: back,
+            fileName: fileName,
+            due: due,
+            reps: reps,
+            state: state,
+            lapses: lapses,
+            stability: stability,
+            difficulty: difficulty,
+            elapsed_day: elapsed_day,
+            scheduled_days: scheduled_days,
+            last_review: last_review,
+        })
+
         setActive("create")
+        setCurrentSelectedImage(currentSetImages[cardId])
         setUpdatingCard(true)
     }
 
-    const handleUpdateCard = async (data: [number, number, string, string, string, string]) => {
-        const [setId, cardId, category, front, back, fileName] = data 
-
-        await updateCardData(setId, cardId, category, front, back, fileName)
+    const handleUpdateCard = async (
+        setId: number,
+        cardId: number,
+        category: string,
+        front: string,
+        back: string,
+        fileName: string,
+        due: number,
+        reps: number,
+        state: number,
+        lapses: number,
+        stability: number,
+        difficulty: number,
+        elapsed_day: number,
+        scheduled_days: number,
+        last_review: string | null,
+    ) => {
+        await updateCardData(
+            setId, 
+            cardId, 
+            category, 
+            front, 
+            back, 
+            fileName,
+            due,
+            reps,
+            state,
+            lapses,
+            stability,
+            difficulty,
+            elapsed_day,
+            scheduled_days,
+            last_review,
+        )
         setUpdatingCard(false)
         setActive("manage")
         clearCurrentCardData()
@@ -210,6 +274,7 @@ export default function Create() {
             setCurrentSelectedImage(imageURL)
         }
     };
+
     const clearCurrentImage = () => {
         setCurrentSelectedImage(null);
         setFile(null);
@@ -220,7 +285,9 @@ export default function Create() {
             return updated;
         });
     };
-    
+
+    console.log(currentSetImages)
+
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
@@ -236,9 +303,9 @@ export default function Create() {
 
             {/* Nav -> Create Card / Manage Cards */}
             <div className="
-                flex items-center gap-2  p-2 
+                flex items-center gap-2  py-2 
                 mt-3 md:mt-4 
-                w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px]    rounded md:rounded-[5px]">
+                w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px] rounded md:rounded-[5px]">
                 <button 
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={() => setActive("create")}
@@ -248,9 +315,10 @@ export default function Create() {
                 
                 <button 
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
-                    onClick={() => {
+                    onClick={async () =>  {
                         setActive("manage")
-                        RetrieveCardImages(currentSet.id)
+                        const map = await RetrieveCardImages(currentSet.id)
+                        setCurrentSetImages(map)
                     }}
                     >
 
@@ -270,7 +338,7 @@ export default function Create() {
                         <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Category (optional)</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             value={currentCardData["category"] == "Category" ? '' : currentCardData["category"]}
-                            onChange={(e) => updateCard("category" ,e.target.value)}
+                            onChange={(e) => updateCard("category", e.target.value)}
                             placeholder="e.g., Vocab, Grammar, Math, Science, etc..."
                         ></input>
 
@@ -278,7 +346,7 @@ export default function Create() {
                         <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Front Side</h2>
                         <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
                             value={currentCardData["front"] == "Front" ? '' : currentCardData["front"]}
-                            onChange={(e) => updateCard("front" ,e.target.value)}
+                            onChange={(e) => updateCard("front", e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
 
@@ -286,7 +354,7 @@ export default function Create() {
                         <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Back Side</h2>
                         <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
                             value={currentCardData["back"] == "Back" ? '' : currentCardData["back"]}
-                            onChange={(e) => updateCard("back" ,e.target.value)}
+                            onChange={(e) => updateCard("back", e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
 
@@ -474,9 +542,11 @@ export default function Create() {
                                                         alt={card.fileName}
                                                         width={100}
                                                         height={100}
-                                                        className="w-full h-full min-h-[120px] max-h-[150px] object-contain"
+                                                        className="w-full h-full min-h-[120px] max-h-[150px] object-cover border border-[#b1b1b1] rounded-[5px]"
                                                     />
-                                                ) : ("")   
+                                                ) : (
+                                                    <div className="w-[100px] h-[120px] rounded-[5px]"/>
+                                                )
                                             }
                                         </div>
                                     </div>

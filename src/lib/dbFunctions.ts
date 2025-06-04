@@ -137,7 +137,23 @@ export async function updateCardCount(id: number, cardCnt: number) {
     }
 }
 
-export async function updateCardData(setId: number, cardId: number, category: string, front: string, back: string, fileName: string) {
+export async function updateCardData(
+    setId: number,
+    cardId: number,
+    category: string,
+    front: string,
+    back: string,
+    fileName: string,
+    due: number,
+    reps: number,
+    state: number,
+    lapses: number,
+    stability: number,
+    difficulty: number,
+    elapsed_day: number,
+    scheduled_days: number,
+    last_review: string | null,
+) {
     try {
         const result = await sql<{ cards: any[] }>(
             'SELECT cards FROM flashcards WHERE id = $1',
@@ -149,7 +165,7 @@ export async function updateCardData(setId: number, cardId: number, category: st
 
         const updatedCards = currentCards.map((card) => {
             if (card.cardId === cardId) {
-                return { ...card, category, front, back, fileName };
+                return { ...card, category, front, back, fileName, due, reps, state, lapses, stability, difficulty, elapsed_day, scheduled_days, last_review };
             }
             return card;
         });

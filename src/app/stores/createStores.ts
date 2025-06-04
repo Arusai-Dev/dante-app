@@ -46,10 +46,7 @@ export const useCreateStore = create(
             sets: [],
             currentSet: [],
             dropDownIsOpen: false,
-<<<<<<< Updated upstream
             currentSelectedImage: "",
-=======
->>>>>>> Stashed changes
             currentSetImages: [],
             currentCardData: {
                 setId: null, 
@@ -73,10 +70,7 @@ export const useCreateStore = create(
             setSets: (data) => set({ sets: data }),
             setCurrentSet: (data) => set({ currentSet: data }),
             setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
-<<<<<<< Updated upstream
             setCurrentSelectedImage: (mode) => set({ currentSelectedImage: mode }),
-=======
->>>>>>> Stashed changes
             setCurrentSetImages: (data) => set({ currentSetImages: data }),
             setCurrentCardData: (data) => set({ currentCardData: data }),
             updateCurrentCardData: (key, value) => set({
