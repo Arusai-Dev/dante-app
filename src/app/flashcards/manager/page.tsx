@@ -290,6 +290,7 @@ export default function Create() {
         updateCurrentSet(setId)
     }
 
+
     const handleFileChange = (e) => {
         const selectedImage = e.target.files[0]
         if (selectedImage) {
@@ -314,10 +315,10 @@ export default function Create() {
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
             {/* Title */}
-            <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[70px]">
+            {/* <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[70px]">
                 <h1 className="text-[20px] sm:text-lg md:text-2xl lg:text-3xl font-bold ">Set Manager</h1>
                 <p className="text-[12px] sm:text-md md:text-xl lg:text-2xl pt-1 text-center">Create, organize, and manage your sets!</p>   
-            </div>      
+            </div>       */}
 
 
             <SetSelectionSection/>
@@ -389,6 +390,7 @@ export default function Create() {
                         <h2 className="text-[12px] md:text-[16px] pb-1 ">Image URL:</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             placeholder="https://example.com/image.jpg"
+                            onChange={(e) => handleImageUrlInput(e.target.value)}
                         ></input>
 
 
@@ -487,7 +489,6 @@ export default function Create() {
                                         <NextImage
                                             src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
                                             alt="Card preview"
-                                            placeholder={"blur"}
                                             width={200}
                                             height={200}
                                             className="w-fit max-w-xs h-40 object-contain rounded border-1 border-[#8c8c8c]"
@@ -507,6 +508,7 @@ export default function Create() {
                 </div>
             )}
             
+
             
             {/* Manage Cards Section */}
             {active == "manage" && (

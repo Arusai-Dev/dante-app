@@ -65,13 +65,18 @@ export async function createNewSet(
     date_created: Date, 
     number_cards: number, 
     user_id: string,
-    cards: any[]
+    cards: any[],
+    tags: any[],
+    category: string,
+    study_count: number,
+    rating: number,
+    review_count: number,
 ) {
     try {
         return await sql(
-            `INSERT INTO flashcards (cards, "user", is_private, description, date_created, title, card_cnt) 
-            values ($1, $2, $3, $4, $5, $6, $7)`, 
-            [JSON.stringify(cards), user_id, is_private, description, date_created, title, number_cards]
+            `INSERT INTO flashcards (cards, "user", is_private, description, date_created, title, card_cnt, tags, category, study_count, rating, review_count) 
+            values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`, 
+            [JSON.stringify(cards), user_id, is_private, description, date_created, title, number_cards, tags, category, study_count, rating, review_count]
         );
     } catch (error) {
         console.log(error);

@@ -22,7 +22,6 @@ export default function SetSelectionSection() {
         setDropDownIsOpen(!dropDownIsOpen);
     }
 
-    
     // New Set
     const [newSetIsOpen, setNewSetIsOpen] = useState(false);
     const toggleNewSetUI = () => {
@@ -42,9 +41,27 @@ export default function SetSelectionSection() {
     const cards = [];
     const date_created = new Date();
     const number_cards = 0;
+    const tags = []
+    const category = ""
+    const study_count = 0
+    const rating = 0
+    const review_count = 0
 
     const onNewSetSubmit = async () => {
-        await createNewSet(newSetTitle, newSetDescription, isPrivate, date_created, number_cards, newSetUserId, cards);
+        await createNewSet(
+            newSetTitle, 
+            newSetDescription, 
+            isPrivate, 
+            date_created, 
+            number_cards, 
+            newSetUserId, 
+            cards,
+            tags,
+            category,
+            study_count,
+            rating,
+            review_count
+        );
         console.log(date_created)
         const result = await getSetByTitle(newSetUserId, newSetTitle)
         setCurrentSet(result?.[0])
@@ -56,10 +73,10 @@ export default function SetSelectionSection() {
     return (
         <>
         {/* Set Selection / Description */}
-        <div className="flex flex-col-reverse relative md:flex-row w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:justify-between h-[100px] md:h-[150px] bg-[#D9D9D9]/3 py-2 px-2 md:px-3 rounded-[10px] gap-2">
+        <div className="mt-10 flex flex-col-reverse relative md:flex-row w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:justify-between h-[100px] md:h-[150px] bg-[#D9D9D9]/3 py-2 px-2 md:px-3 rounded-[10px] gap-2">
             <div className="flex flex-col justify-between h-full">
                 <div>
-                    <h2 className="font-bold text-[14px] pb-1 md:text-xl lg:text-2xl truncate">{currentSet.title == "" ? 'No Set Selected' : currentSet.title}</h2>
+                    <h2 className="font-bold text-[14px] pb-1 md:text-xl lg:text-2xl truncate">{currentSet.title == null ? "No set selected..." : currentSet.title}</h2>
                     <p className="text-[12px] md:text-lg lg:text-xl truncate">{currentSet.title == "" ? '' : currentSet.description}</p>
                 </div>
                 {currentSet.description && (
@@ -89,20 +106,19 @@ export default function SetSelectionSection() {
                         onClick={toggleDropDown}
                         >
 
-                        <div className="truncate font-semibold text-[12px] lg:text-[18px] md:text-[14px]">{currentSet.title ? currentSet.title : "Select A Set"} </div>
+                        <div className="truncate font-semibold text-[12px] lg:text-[18px] md:text-[14px]">{currentSet.title == null ? "Select A Set" : currentSet.title}</div>
                         <div className="flex items-center justify-center">
                             <ArrowDown className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
                         </div>
                     </button>
 
                     {/* Drop Drown Content */} 
-                    {/* TODO: Change drop down text and box size for medium screens */}
                     {dropDownIsOpen && (
                         <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
                             {sets.map((set, index:number) => (
                                 <div 
                                     key={index} 
-                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] md:pl-1 gap-x-1 mx-1 md:mx-2 hover-animation whitespace-nowrap "
+                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] md:pl-1 gap-x-1 mx-1 md:mr-2 hover-animation whitespace-nowrap "
                                     
                                     onClick={() => {
                                         setCurrentSet(set)
@@ -114,7 +130,7 @@ export default function SetSelectionSection() {
                                 >
                                     <div className="flex items-center justify-center">
                                         {currentSet.title == set.title && (
-                                            <Check className="h-[16px] md:h-[20px] md:w-[36px]"/>
+                                            <Check className="h-[16px] md:h-[20px] md:w-[20px] mx-1"/>
                                         )}
                                     </div>
                                     
@@ -143,7 +159,6 @@ export default function SetSelectionSection() {
             </div>
         </div>
 
-        {/* Make mobile responsive-ness for pop-up */}
         {newSetIsOpen && (
             <>
             <div className="absolute bg-black/3 backdrop-blur-sm z-40" onClick={toggleNewSetUI}></div>

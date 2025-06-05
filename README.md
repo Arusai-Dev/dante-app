@@ -4,6 +4,8 @@
 # Flashcards Creation
 - Set Manager Page                  
     - [x] - Locally save flashcard creation progress
+    - [ ] - Change updated_at whenever user makes any change to set
+    - [ ] - Update estimated time whenever user adds new card
     - [ ] - Auto card creation from given data eg: (front, back, category)
     
     - Manage Cards Section
@@ -19,7 +21,8 @@
         - [x] - Allow images to be input as questions or answers. (Set up an s3 bucket and handle image processing)
         - [ ] - Allow the option to edit the image: should contain basic image editing functions
         - [ ] - Auto recommend images for back side
-    
+        - [ ] - Add image through URL
+
 - My Sets Page
     - [ ] - Display all user sets with option to view, edit, or delete
 
