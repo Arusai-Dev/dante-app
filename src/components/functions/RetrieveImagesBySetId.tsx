@@ -34,10 +34,20 @@ const RetrieveCardImages = async (setId: number) => {
 
     const entries = await Promise.all(imagePromises)
 
-    const filteredEntries = entries.filter(([, url]) => url !== null)
-    const cardImagesMap = Object.fromEntries(filteredEntries)
-    return cardImagesMap
+    const filteredEntries = entries.filter(Boolean);
+    filteredEntries
+        .sort((a, b) => a[0] - b[0])
+        .forEach(([, url]) => {
+            if (url) preloadImage(url);
+        });
+
+    return Object.fromEntries(filteredEntries);
 }
+
+const preloadImage = (src: string) => {
+    const img = new Image();
+    img.src = src;
+};
 
 export default RetrieveCardImages
 

@@ -6,7 +6,7 @@ import { useCreateStore } from "@/app/stores/createStores"
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
 import { toast as sonnerToast } from 'sonner';
-import Image from "next/image"
+import NextImage from "next/image"
 import RetrieveCardImages from "@/components/functions/RetrieveImagesBySetId"
 
 function toast(toast: Omit<ToastProps, 'id'>) {
@@ -49,6 +49,7 @@ export default function Create() {
 
     const [file, setFile] = useState(null);
     const [active, setActive] = useState("create");
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,11 +61,22 @@ export default function Create() {
             setSets(data.Sets);
 
             const map = await RetrieveCardImages(currentSet.id)
+
+            for (const [cardId, imageUrl] of Object.entries(map)) {
+                preloadImage(imageUrl);
+                console.log(imageUrl, "Loaded")
+            }
+            
             setCurrentSetImages(map)
         }
 
         fetchData();
     }, [setCurrentSetImages, setSets, currentSet.id]);
+
+    const preloadImage = (src: string) => {
+        const img = new Image()
+        img.src = src
+    }
 
     const updateCard = useCreateStore(state => state.updateCurrentCardData)
     const clearCard = useCreateStore(state => state.clearCurrentCardData)
@@ -318,7 +330,10 @@ export default function Create() {
                 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px] rounded md:rounded-[5px]">
                 <button 
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
-                    onClick={() => setActive("create")}
+                    onClick={() => {
+                        setActive("create")
+                        setLoading(true)
+                    }}
                     >
                     Create Card
                 </button>
@@ -327,6 +342,7 @@ export default function Create() {
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={async () =>  {
                         setActive("manage")
+                        setLoading(false)
                         const map = await RetrieveCardImages(currentSet.id)
                         setCurrentSetImages(map)
                     }}
@@ -391,7 +407,7 @@ export default function Create() {
 
                         {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                             <div className="flex justify-between mt-4">
-                                <Image
+                                <NextImage
                                     src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
                                     alt="Card preview"
                                     width={200}
@@ -468,9 +484,10 @@ export default function Create() {
                                 <div className="flex justify-center items-center h-[calc(100%-80px)] gap-[16px] text-sm lg:text-lg">
                                     <div className="w-[50%] flex justify-center">{currentCardData["back"]}</div>
                                     {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
-                                        <Image
+                                        <NextImage
                                             src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
                                             alt="Card preview"
+                                            placeholder={"blur"}
                                             width={200}
                                             height={200}
                                             className="w-fit max-w-xs h-40 object-contain rounded border-1 border-[#8c8c8c]"
@@ -547,12 +564,13 @@ export default function Create() {
                                         <div className="pr-1">
                                             {
                                                 currentSetImages[card.cardId] ? (
-                                                    <Image
+                                                    // eslint-disable-next-line @next/next/no-img-element
+                                                    <img
                                                         src={currentSetImages[card.cardId]}
                                                         alt={card.fileName}
                                                         width={100}
                                                         height={100}
-                                                        className="w-full h-full min-h-[120px] max-h-[150px] object-cover border border-[#b1b1b1] rounded-[5px]"
+                                                        className={`w-full h-full min-h-[120px] max-h-[150px] object-cover border border-[#b1b1b1] rounded-[5px] ${loading == true ? "hidden" : ""}`}
                                                     />
                                                 ) : (
                                                     <div className="w-[100px] h-[120px] rounded-[5px]"/>
