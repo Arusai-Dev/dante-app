@@ -10,7 +10,7 @@ const checkImageExists = (url: string): Promise<boolean> => {
 }  
 
 const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
-    const res = await fetch(`/api/get-image?setId=${setId}&cardId=${cardId}&fileName=${fileName}`)
+    const res = await fetch(`/api/S3/retrieve?setId=${setId}&cardId=${cardId}&fileName=${fileName}`)
     const data = await res.json()
     return data.url
 }

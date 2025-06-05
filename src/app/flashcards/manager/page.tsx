@@ -110,7 +110,8 @@ export default function Create() {
         } = useCreateStore.getState().currentCardData;
 
         updateCurrentSet(currentSet.id)
-        const fileName = file.name
+        console.log(file)
+        const fileName = file.name == null ? "" : file.name;
         const currentSetId = currentSet?.id
         
         if (!currentSetId) {
@@ -118,7 +119,7 @@ export default function Create() {
             return;
         }
 
-        const cardId = currentSet.cards.length
+        const cardId = generateUniqueCardId(currentSet.cards.map(card => card.cardId))
 
         clearCurrentCardData()
 
@@ -146,12 +147,12 @@ export default function Create() {
         await updateCardCount(currentSetId, updatedSet[0].cards.length)
         await updateCurrentSet(currentSetId)
 
-        if (file) {;
+        if (file) {
             const formData = new FormData();
             formData.append("file", file);
 
             try {
-                const response = await fetch(`/api/image-upload?setID=${currentSetId}&cardID=${cardId}`, {
+                const response = await fetch(`/api/S3/upload?setId=${currentSetId}&cardId=${cardId}`, {
                     method: "POST",
                     body: formData,
                 })
@@ -165,6 +166,17 @@ export default function Create() {
 
         clearCurrentImage()
     };   
+
+    const generateUniqueCardId = (existingIds: number[], max = 100000): number => {
+        let cardId;
+        const usedIds = new Set(existingIds);
+    
+        do {
+            cardId = Math.floor(Math.random() * max) + 1;
+        } while (usedIds.has(cardId));
+    
+        return cardId;
+    }
 
     const updateCurrentSet = async (id: number) => {
         const updatedSet = await getSetById(id)
@@ -180,7 +192,7 @@ export default function Create() {
 
     const handleImageDelete = async (key) => {
         console.log("first")
-        await fetch(`/api/delete-image?key=${key}`, {
+        await fetch(`/api/S3/delete?key=${key}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" }
         })
@@ -285,8 +297,6 @@ export default function Create() {
             return updated;
         });
     };
-
-    console.log(currentSetImages)
 
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
