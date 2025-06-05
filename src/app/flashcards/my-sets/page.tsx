@@ -1,19 +1,39 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+'use client'
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Layers2, Globe, LockKeyhole, BookOpenIcon } from "lucide-react"
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function MyFlashcards() {
+export default function MyFlashcards() {
 
-    const res = await fetch("http://localhost:3000/api/my-sets", {
-        method: "GET", 
-    });
+    const [searchTerm, setSearchTerm] = useState("")
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const [cardsData, setCardsData] = useState([]);
 
+    useEffect(() => {
+
+        async function getSets() {
+            
+            const res = await fetch("http://localhost:3000/api/my-sets", {
+                method: "GET", 
+            });
+            
+            const data = await res.json();
+            setCardsData(data.Sets);
+        }
+
+        getSets();
+
+    }, [])
+
+
+  
     const categories = [
         "All",
-        "Languages",
+        "Language",
         "Science",
         "Technology",
         "History",
@@ -21,8 +41,19 @@ export default async function MyFlashcards() {
         "Arts",
     ];
 
-    const data = await res.json();
-    const setData = data.Sets;
+
+    const filteredSets = cardsData.filter((set) => {
+        const matchesSearch = 
+            set.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            set.description.toLowerCase().includes(searchTerm.toLowerCase())
+        
+        const matchesCategory = selectedCategory === "All" || set.category === selectedCategory
+
+        return matchesSearch && matchesCategory
+    } )
+
+
+
     return (
 
         <section className="flex flex-col items-center pt-[40px] font-(family-name:inter) h-screen w-screen">
@@ -34,17 +65,18 @@ export default async function MyFlashcards() {
 
             </div>   
 
-            <div className="flex flex-col gap-4">
-                <div className="relative flex-1">
-                    <Input className="my-10 " placeholder="Search flashcard sets..."></Input>
+            <div className="flex flex-row ">
+                <div className="flex-1 mr-3 relative">
+                    <Input className="my-10 w-200" placeholder="Search flashcard sets..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}></Input>
                 </div>
 
-
-                <select id="category-select" className="rounded-md bg-neutral-800 p-2">
-                    {categories.map((category) => (
-                        <option className="bg-neutral-800 text-white" key={category}>{category}</option>
-                    ))}
-                </select>   
+                <span className="mt-10">
+                    <select id="category-select" value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="flex-1 rounded-md bg-neutral-800 p-2">
+                        {categories.map((category) => (
+                            <option className="bg-neutral-800 text-white" key={category} value={category}>{category}</option>
+                        ))}
+                    </select>   
+                </span>
 
 
 
@@ -52,9 +84,9 @@ export default async function MyFlashcards() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-8 h-full 2xl:grid-cols-3">
 
-                {setData != "No Sets" ? (
+                {filteredSets.length != 0 ? (
                     //@ts-ignore
-                    setData.map(async (set, index:number) => (
+                    filteredSets.map((set, index:number) => (
                             <div key={index} className="w-[512px]">
 
                                 <div className="h-80 w-[80%] bg-neutral-900 rounded-2xl">

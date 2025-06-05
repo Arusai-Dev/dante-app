@@ -48,7 +48,6 @@ export default function Explore() {
         getCards();
     }, []);
 
-    console.log(flashcardSets);
 
     const filteredSets = useMemo(() => {
         return flashcardSets.filter((set) => {
@@ -128,7 +127,7 @@ export default function Explore() {
                             <span className="text-sm font-medium text-white">
                                 Filter by category:
                             </span>
-                        </div>
+                        </div>d
                         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 h-auto bg-neutral-800">
                             {categories.map((category) => (
                                 <TabsTrigger
