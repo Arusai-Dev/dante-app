@@ -150,22 +150,24 @@ export default function Explore() {
                                 ` in ${selectedCategory}`}
                         </p>
                     </div>
+
+                
                     {Object.keys(flashcardSets).length === 0 ? 
                     (   
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-                        <div className="flex flex-col space-y-3">
-                            <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                        </div>
-                        <div className="flex flex-col space-y-3">
-                            <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                        </div>
-                        <div className="flex flex-col space-y-3">
-                            <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                        </div>
-                        <div className="flex flex-col space-y-3">
-                            <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                        </div>
+                            <div className="flex flex-col space-y-3">
+                                <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
+                            </div>
+                            <div className="flex flex-col space-y-3">
+                                <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
+                            </div>
+                            <div className="flex flex-col space-y-3">
+                                <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
+                            </div>
+                            <div className="flex flex-col space-y-3">
+                                <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
+                            </div>
                        
                         </div>
 
@@ -300,6 +302,8 @@ export default function Explore() {
                             </Button>
                         </div>
                     )}
+
+
                 </div>
             </div>
         </>
