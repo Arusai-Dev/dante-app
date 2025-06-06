@@ -10,6 +10,9 @@ import {
     LockKeyhole,
     BookOpenIcon,
     BookOpen,
+    PlusCircle,
+    PlusSquare,
+    Search,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -65,7 +68,7 @@ export default function MyFlashcards() {
             <div className="flex flex-row ">
                 <div className="flex-1 mr-3 relative">
                     <Input
-                        className="my-10 w-200"
+                        className="my-10 w-200 p-5"
                         placeholder="Search flashcard sets..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -77,7 +80,7 @@ export default function MyFlashcards() {
                         id="category-select"
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="flex-1 rounded-md bg-neutral-800 p-2"
+                        className="flex-1 rounded-md bg-neutral-800 pt-3 pb-2 px-3 "
                     >
                         {categories.map((category) => (
                             <option
@@ -133,12 +136,12 @@ export default function MyFlashcards() {
                     </div>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 gap-8 h-full 2xl:grid-cols-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-4 gap-3 h-full 2xl:grid-cols-4">
                     {
                         //@ts-ignore
                         filteredSets.map((set, index: number) => (
                             <div key={index} className="w-[512px]">
-                                <div className="h-80 w-[80%] bg-neutral-900 rounded-2xl">
+                                <div className="h-80 w-[80%] bg-neutral-900 rounded-2xl ml-5 mt-8">
                                     <div className="">
                                         <h1 className="inline-block text-left px-5 pt-5 font-bold text-2xl">
                                             {set.title}
@@ -171,15 +174,25 @@ export default function MyFlashcards() {
                                     </div>
 
                                     <div className="flex mt-20  items-center justify-center">
-                                        <Button
+                                            <Button
+                                                variant="secondary"
+                                                className="mr-2 w-1/2"
+                                            >
+                                                <Link href={`practice/${set.id}`}
+                                                className="px-12 py-3"
+                                                >
+                                                Start Studying
+                                                </Link>
+                                            </Button>
+                                        
+                                            <Button className="bg-neutral-800 text-white hover:bg-neutral-700"
                                             variant="secondary"
-                                            className="mr-2 w-1/2"
-                                        >
-                                            Start Studying
-                                        </Button>
-                                        <Button className="bg-neutral-800">
-                                            Review
-                                        </Button>
+                                            >
+                                                <Link href={`play/${set.id}`}>
+                                                Review
+                                                </Link>
+                                            </Button>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -188,6 +201,13 @@ export default function MyFlashcards() {
                 </div>
 
             )}
+            
+            
+            <div className="flex bottom-10 right-10 bg-white rounded-full size-15 items-center justify-center hover:bg-gray-300 fixed">
+                <Link href={`manager`} className="px-8 py-8">
+                    <PlusSquare className="text-black float-center size-8" />
+                </Link>
+            </div>
 
         </section>
     );
