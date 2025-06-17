@@ -35,20 +35,23 @@ export default function MyFlashcards() {
         getSets();
     }, []);
 
-    const categories = [
-        "All",
-        "Languages",
-        "Science",
-        "Technology",
-        "History",
-        "Medicine",
-        "Arts",
-    ];
+    let categories = ["All"];
+
+    cardsData.forEach((set => {
+        categories.push(set.category)
+    }))
+
+    categories = [...new Set(categories)]
+
+
+
+
 
     const filteredSets = cardsData.filter((set) => {
         const matchesSearch =
             set.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            set.description.toLowerCase().includes(searchTerm.toLowerCase());
+            set.description.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            set.category.toLowerCase().includes(searchTerm.toLowerCase());
 
         const matchesCategory =
             selectedCategory === "All" || set.category === selectedCategory;
@@ -141,7 +144,7 @@ export default function MyFlashcards() {
                         //@ts-ignore
                         filteredSets.map((set, index: number) => (
                             <div key={index} className="w-[512px]">
-                                <div className="h-80 w-[80%] bg-neutral-900 rounded-2xl ml-5 mt-8">
+                                <div className="h-80 w-[80%] bg-neutral-900 rounded-2xl ml-5 mt-8z3">
                                     <div className="">
                                         <h1 className="inline-block text-left px-5 pt-5 font-bold text-2xl">
                                             {set.title}
