@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
+import DeleteButton from "@/components/DeleteButton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ export default function MyFlashcards() {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [cardsData, setCardsData] = useState([]);
+    const [manageCards, setManageCards] = useState(false);
 
     useEffect(() => {
         async function getSets() {
@@ -42,9 +44,6 @@ export default function MyFlashcards() {
     }))
 
     categories = [...new Set(categories)]
-
-
-
 
 
     const filteredSets = cardsData.filter((set) => {
@@ -96,6 +95,12 @@ export default function MyFlashcards() {
                         ))}
                     </select>
                 </span>
+
+                <Button className={`mt-10 p-5 ml-3 bg-neutral-800 hover:bg-neutral-700 ${manageCards ? "bg-neutral-600 animate-pulse" : ""}`}
+                    onClick={(e) => setManageCards(!manageCards)}
+                >
+                    Manage
+                </Button>
             </div>
 
             {filteredSets.length === 0 &&
@@ -143,8 +148,8 @@ export default function MyFlashcards() {
                     {
                         //@ts-ignore
                         filteredSets.map((set, index: number) => (
-                            <div key={index} className="w-[512px]">
-                                <div className="h-80 w-[80%] bg-neutral-900 rounded-2xl ml-5 mt-8z3">
+                            <div key={index} className="w-[560px]">
+                                <div className="h-80 w-[80%] bg-neutral-900 rounded-2xl ml-5 mt-5">
                                     <div className="">
                                         <h1 className="inline-block text-left px-5 pt-5 font-bold text-2xl">
                                             {set.title}
@@ -175,28 +180,51 @@ export default function MyFlashcards() {
                                             Due: 0
                                         </p>
                                     </div>
+                                    { manageCards ? 
+                                        <div className="flex mt-20  items-center justify-center">
 
-                                    <div className="flex mt-20  items-center justify-center">
-                                            <Button
+                                                <DeleteButton id={set.id} />
+
+                                            
+                                                <Button className="bg-neutral-800 text-white hover:bg-neutral-700"
                                                 variant="secondary"
-                                                className="mr-2 w-1/2"
-                                            >
-                                                <Link href={`practice/${set.id}`}
-                                                className="px-12 py-3"
                                                 >
-                                                Start Studying
-                                                </Link>
-                                            </Button>
+                                                    <Link href={`manager`}>
+                                                    Edit and Delete cards
+                                                    </Link>
+                                                </Button>
+                                            
+                                        </div>
                                         
-                                            <Button className="bg-neutral-800 text-white hover:bg-neutral-700"
-                                            variant="secondary"
-                                            >
-                                                <Link href={`play/${set.id}`}>
-                                                Review
-                                                </Link>
-                                            </Button>
                                         
-                                    </div>
+                                        :
+
+
+                                        <div className="flex mt-20  items-center justify-center">
+                                                <Button
+                                                    variant="secondary"
+                                                    className="mr-2 w-1/2"
+                                                >
+                                                    <Link href={`practice/${set.id}`}
+                                                    className="px-12 py-3"
+                                                    >
+                                                    Start Studying
+                                                    </Link>
+                                                </Button>
+                                            
+                                                <Button className="bg-neutral-800 text-white hover:bg-neutral-700"
+                                                variant="secondary"
+                                                >
+                                                    <Link href={`play/${set.id}`}>
+                                                    Review
+                                                    </Link>
+                                                </Button>
+                                            
+                                        </div>
+                                         
+
+
+                                    }
                                 </div>
                             </div>
                         ))
