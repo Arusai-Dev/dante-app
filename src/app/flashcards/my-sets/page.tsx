@@ -183,7 +183,7 @@ export default function MyFlashcards() {
                                     { manageCards ? 
                                         <div className="flex mt-20  items-center justify-center">
 
-                                                <DeleteButton id={set.id} />
+                                                <DeleteButton id={set.id} title={set.title} />
 
                                             
                                                 <Button className="bg-neutral-800 text-white hover:bg-neutral-700"
