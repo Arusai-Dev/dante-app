@@ -239,7 +239,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
             setAllMessages((prev) => [...prev, userMessage]);
             
             try {
-                const res = await fetch("/api/chat", {
+                const res = await fetch("/api/chat/gptnano-response", {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({

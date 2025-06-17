@@ -127,7 +127,7 @@ export default function Explore() {
                             <span className="text-sm font-medium text-white">
                                 Filter by category:
                             </span>
-                        </div>d
+                        </div>
                         <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7 h-auto bg-neutral-800">
                             {categories.map((category) => (
                                 <TabsTrigger
