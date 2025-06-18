@@ -90,17 +90,18 @@ export async function addOneCardToSet(
     front: string,
     back: string,
     fileName: string,
-    due: number,
-    reps: number,
-    state: number,
-    lapses: number,
-    stability: number,
-    difficulty: number,
-    elapsed_day: number,
-    scheduled_days: number,
-    last_review: string | null,
 ) {
     try {
+        const due = 0
+        const reps = 0
+        const state = 0
+        const lapses = 0
+        const stability = 0
+        const difficulty = 0
+        const elapsed_day = 0
+        const scheduled_days = 0
+        const last_review = null
+
         return await sql(
             `UPDATE flashcards
              SET cards = cards::jsonb || $1::jsonb
@@ -149,15 +150,6 @@ export async function updateCardData(
     front: string,
     back: string,
     fileName: string,
-    due: number,
-    reps: number,
-    state: number,
-    lapses: number,
-    stability: number,
-    difficulty: number,
-    elapsed_day: number,
-    scheduled_days: number,
-    last_review: string | null,
 ) {
     try {
         const result = await sql<{ cards: any[] }>(
@@ -170,7 +162,7 @@ export async function updateCardData(
 
         const updatedCards = currentCards.map((card) => {
             if (card.cardId === cardId) {
-                return { ...card, category, front, back, fileName, due, reps, state, lapses, stability, difficulty, elapsed_day, scheduled_days, last_review };
+                return { ...card, category, front, back, fileName };
             }
             return card;
         });

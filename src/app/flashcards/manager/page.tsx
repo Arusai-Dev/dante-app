@@ -109,26 +109,30 @@ export default function Create() {
         const { 
             category, 
             front, 
-            back,              
-            due,
-            reps,
-            state,
-            lapses,
-            stability,
-            difficulty,
-            elapsed_day,
-            scheduled_days,
-            last_review, 
+            back,
         } = useCreateStore.getState().currentCardData;
 
-        updateCurrentSet(currentSet.id)
-        console.log(file)
-        const fileName = file.name == null ? "" : file.name;
         const currentSetId = currentSet?.id
+        console.log(currentSetId)
+        const fileName = file.name == null ? "" : file.name;
+        console.log(file)
+
+        await updateCurrentSet(currentSet.id)        
         
         if (!currentSetId) {
             console.warn("No set selected.");
             return;
+        }
+
+        const generateUniqueCardId = (existingIds: number[], max = 100000): number => {
+            let cardId;
+            const usedIds = new Set(existingIds);
+        
+            do {
+                cardId = Math.floor(Math.random() * max) + 1;
+            } while (usedIds.has(cardId));
+        
+            return cardId;
         }
 
         const cardId = generateUniqueCardId(currentSet.cards.map(card => card.cardId))
@@ -142,15 +146,6 @@ export default function Create() {
             front, 
             back, 
             fileName,
-            due,
-            reps,
-            state,
-            lapses,
-            stability,
-            difficulty,
-            elapsed_day,
-            scheduled_days,
-            last_review,
         );
         
         const updatedSet = await getSetById(currentSetId);
@@ -179,17 +174,6 @@ export default function Create() {
         clearCurrentImage()
     };   
 
-    const generateUniqueCardId = (existingIds: number[], max = 100000): number => {
-        let cardId;
-        const usedIds = new Set(existingIds);
-    
-        do {
-            cardId = Math.floor(Math.random() * max) + 1;
-        } while (usedIds.has(cardId));
-    
-        return cardId;
-    }
-
     const updateCurrentSet = async (id: number) => {
         const updatedSet = await getSetById(id)
         setCurrentSet(updatedSet[0])
@@ -217,15 +201,6 @@ export default function Create() {
         front: string,
         back: string,
         fileName: string,
-        due: number,
-        reps: number,
-        state: number,
-        lapses: number,
-        stability: number,
-        difficulty: number,
-        elapsed_day: number,
-        scheduled_days: number,
-        last_review: string | null,
     ) => {  
         setCurrentCardData({
             setId: setId,
@@ -234,15 +209,6 @@ export default function Create() {
             front: front,
             back: back,
             fileName: fileName,
-            due: due,
-            reps: reps,
-            state: state,
-            lapses: lapses,
-            stability: stability,
-            difficulty: difficulty,
-            elapsed_day: elapsed_day,
-            scheduled_days: scheduled_days,
-            last_review: last_review,
         })
 
         setActive("create")
@@ -250,46 +216,53 @@ export default function Create() {
         setUpdatingCard(true)
     }
 
-    const handleUpdateCard = async (
-        setId: number,
-        cardId: number,
-        category: string,
-        front: string,
-        back: string,
-        fileName: string,
-        due: number,
-        reps: number,
-        state: number,
-        lapses: number,
-        stability: number,
-        difficulty: number,
-        elapsed_day: number,
-        scheduled_days: number,
-        last_review: string | null,
-    ) => {
+    const handleUpdateCard = async ({
+        setId,
+        cardId,
+        category,
+        front,
+        back,
+        fileName
+    }) => {
+        if (file) {
+            if (fileName) {
+                const key = `${setId}/${cardId}/${fileName}`
+                console.log("key: ", key)
+                await handleImageDelete(key)
+            }
+
+            const formData = new FormData()
+            formData.append("file", file)
+
+            try {
+                const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}`, {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json()
+                console.log("New image uploaded:", data)
+            } catch (error) {
+                console.error("Failed to upload new image:", error)
+            }
+        }
         await updateCardData(
             setId, 
             cardId, 
             category, 
             front, 
             back, 
-            fileName,
-            due,
-            reps,
-            state,
-            lapses,
-            stability,
-            difficulty,
-            elapsed_day,
-            scheduled_days,
-            last_review,
+            fileName
         )
+
         setUpdatingCard(false)
         setActive("manage")
         clearCurrentCardData()
-        updateCurrentSet(setId)
+        await updateCurrentSet(setId)
     }
 
+    const handleImageUrlInput = (e) => {
+        const inputtedUrl = e.target.value
+    }
 
     const handleFileChange = (e) => {
         const selectedImage = e.target.files[0]
@@ -297,6 +270,7 @@ export default function Create() {
             setFile(selectedImage)
             const imageURL = URL.createObjectURL(selectedImage);
             setCurrentSelectedImage(imageURL)
+            setCurrentCardData(currentCardData["fileName"] = selectedImage.name)
         }
     };
 
@@ -315,10 +289,10 @@ export default function Create() {
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
             {/* Title */}
-            {/* <div className="flex flex-col items-center pt-[40px] pb-15 md:px-[60px] md:pt-[70px]">
-                <h1 className="text-[20px] sm:text-lg md:text-2xl lg:text-3xl font-bold ">Set Manager</h1>
-                <p className="text-[12px] sm:text-md md:text-xl lg:text-2xl pt-1 text-center">Create, organize, and manage your sets!</p>   
-            </div>       */}
+            <div className="flex flex-col w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] items-left pt-[40px]">
+                <h1 className="text-[20px] sm:text-lg md:text-2xl lg:text-3xl font-bold">Set Manager</h1>
+                <p className="text-[12px] sm:text-md md:text-xl lg:text-2xl pt-1">Create, organize, and manage your sets!</p>   
+            </div>      
 
 
             <SetSelectionSection/>
@@ -326,7 +300,9 @@ export default function Create() {
 
             {/* Nav -> Create Card / Manage Cards */}
             <div className="
-                flex items-center gap-2  py-2 
+                flex items-center py-2 bg-[#D9D9D9]/3 
+                gap-1 md:gap-2
+                px-1 md:px-2
                 mt-3 md:mt-4 
                 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px] rounded md:rounded-[5px]">
                 <button 

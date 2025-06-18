@@ -1,12 +1,13 @@
-## TO DO
+# TO DO
 
-# Flashcards Creation
+## Flashcards Creation
 - Set Manager Page                  
     - [x] - Locally save flashcard creation progress
     - [ ] - Change updated_at whenever user makes any change to set
     - [ ] - Update estimated time whenever user adds new card
     - [ ] - Auto card creation from given data eg: (front, back, category)
     
+
     - Manage Cards Section
         - [x] - When you click edit on a card in the manage section it should open up the cards info on the form and the add card button changes to save card
         - [x] - Clicking delete will delete card from database, pop up verify user choice -> option to not show again
@@ -22,12 +23,15 @@
         - [ ] - Auto recommend images for back side
         - [ ] - Add image through URL
 
+
 - My Sets Page
     - [ ] - Display all user sets with option to view, edit, or delete
+
 
 - View[id] Page     
     - [ ] - Display all cards in selected set with option to delete and manage. On click of a card, play the set starting on clicked card
     
+
 - Play[id] Page
     - [ ] - Randomly shuffle cards and display each card.
     - [ ] - Functions: reshuffle, know, don't know, close
@@ -35,8 +39,10 @@
     - [ ] - Start cards with back
     - [ ] - Shuffle what face of card will be viewed first
 
+
 - Practice[id] Page
     
+
 - Search Page
     - [ ] - Show all sets in certain categories like geography, languages, math, etc..
     - [ ] - Ability to review a user created flashcard set from 1 to 5 stars, allow users to have a user review rating and verified accounts
