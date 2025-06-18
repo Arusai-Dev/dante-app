@@ -25,16 +25,16 @@
 
 
 - My Sets Page
-    - [ ] - Display all user sets with option to view, edit, or delete
+    - [x] - Display all user sets with option to view, edit, or delete
 
 
 - View[id] Page     
-    - [ ] - Display all cards in selected set with option to delete and manage. On click of a card, play the set starting on clicked card
+    - [x] - Display all cards in selected set with option to delete and manage. On click of a card, play the set starting on clicked card
     
 
 - Play[id] Page
-    - [ ] - Randomly shuffle cards and display each card.
-    - [ ] - Functions: reshuffle, know, don't know, close
+    - [x] - Randomly shuffle cards and display each card.
+    - [x] - Functions: reshuffle, know, don't know, close
     - [ ] - End of set show statistics and ask to retry with unknown cards or reset fully
     - [ ] - Start cards with back
     - [ ] - Shuffle what face of card will be viewed first
@@ -44,5 +44,5 @@
     
 
 - Search Page
-    - [ ] - Show all sets in certain categories like geography, languages, math, etc..
+    - [x] - Show all sets in certain categories like geography, languages, math, etc..
     - [ ] - Ability to review a user created flashcard set from 1 to 5 stars, allow users to have a user review rating and verified accounts
