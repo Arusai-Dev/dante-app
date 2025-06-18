@@ -238,6 +238,8 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
             
             setAllMessages((prev) => [...prev, userMessage]);
             
+            setMessage("");
+            
             try {
                 const res = await fetch("/api/chat/gptnano-response", {
                     method: "POST",
@@ -260,7 +262,6 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 console.error('Chat error:', error);
             }
             
-            setMessage("");
         }        
     };
 
