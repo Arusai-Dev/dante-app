@@ -3,7 +3,6 @@
 import { useState, useCallback } from 'react'
 import Cropper from 'react-easy-crop'
 import getCroppedImg from './functions/getCroppedImage' 
-import { urlToDataURL } from './functions/UrlToDataUrl'
 import * as Slider from "@radix-ui/react-slider";
 import { useCreateStore } from '@/app/stores/createStores';
 
@@ -41,13 +40,14 @@ export default function ImageEditor() {
             {imageCropUi && (
                 <>
                     <div
-                        className="absolute bg-black/3 backdrop-blur-sm z-40"
+                        className="fixed inset-0 bg-black/3 backdrop-blur-sm z-40"
                         onClick={() => setImageCropUI(!imageCropUi)}
                     ></div>
 
                     <div className="fixed inset-0 flex items-center justify-center z-40">
-                        <div className="relative w-[300px] h-[300px] flex flex-col-reverse">
+                        <div className="relative w-[300px] h-[300px] flex flex-col">
                             <Cropper
+                                className="w-full"
                                 image={currentSelectedImage}
                                 crop={crop}
                                 zoom={zoom}

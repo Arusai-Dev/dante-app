@@ -19,9 +19,12 @@
         - [ ] - Upload set to database with corresponding user (change userid to clerk current user)
         - [x] - Card Count needs to update on new card and when you retrieve a card
         - [x] - Allow images to be input as questions or answers. (handle image processing, upload, delete, and update)
-        - [ ] - Allow the option to edit the image: should contain basic image editing functions
+        - [x] - Allow the option to edit the image: should contain basic image editing functions (crop, zoom)
+        - [ ] - Save original image after cropping to allow recropping from the original, not the cropped version
         - [ ] - Auto recommend images for back side
-        - [ ] - Add image through URL
+        - [x] - Add image through URL
+    - Minor Changes for QOL
+      - [ ] - On deletion of img; clear url text field aswell
 
 
 - My Sets Page

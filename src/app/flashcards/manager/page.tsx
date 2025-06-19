@@ -39,6 +39,16 @@ function generateUniqueFilename() {
 }
 
 export default function Create() {
+
+    // Todo:
+    // 1. when crop is pressed check if originalImgUrl exists
+    // 2. If not: store current url 
+    // 3. then: create new blob url of cropped img
+    // 4. when card is added or updated, pass originalImgUrl and croppedImgUrl to card json
+    // 5. upload originalImg and croppedImg to s3 for storing
+    // 6. whenever a card is being edited and edit img btn is pressed, show originalImgUrl instead of croppedImgUrl
+
+
     const { 
         updatingCard,
         setUpdatingCard,
@@ -57,10 +67,12 @@ export default function Create() {
         setSets, 
         setDropDownIsOpen, 
     } = useCreateStore()
-    const [active, setActive] = useState("create");
-    const [loading, setLoading] = useState(true);
+    const [active, setActive] = useState<string>("create");
+    const [loading, setLoading] = useState<boolean>(true);
     const [previousFileName, setPreviousFileName] = useState<string | null>(null);
-    const [containsImages, setContainImages] = useState(false);
+    const [containsImages, setContainImages] = useState<boolean>(false);
+    const [originalImgUrl, setOriginalImgUrl] = useState<string>("")
+    const [croppedImgUrl, setCroppedImgUrl] = useState<string>("")
 
      
     const handleSettingCurrentSetImages = async (id: number) => {
@@ -317,6 +329,7 @@ export default function Create() {
         if (selectedImage) {
             setFile(selectedImage)
             const imageURL = URL.createObjectURL(selectedImage);
+            setOriginalImgUrl(imageURL)
             setCurrentSelectedImage(imageURL)
             setCurrentCardData({
                 ...currentCardData,
@@ -324,6 +337,7 @@ export default function Create() {
             });
         }
     };
+
 
     const clearCurrentImage = () => {
         setCurrentSelectedImage(null);
