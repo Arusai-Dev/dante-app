@@ -16,10 +16,10 @@ const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: stri
 }
 
 const RetrieveCardImages = async (setId: number) => {
-    const res = await getSetById(setId)
-    const currentSetCards = res[0]?.cards || []
+    const set = await getSetById(setId)
+    const currentSetCardsWithImages = set[0]?.cards.filter(card => card.fileName && card.fileName.trim() !== "")
     
-    const imagePromises = currentSetCards.map(async (card) => {
+    const imagePromises = currentSetCardsWithImages.map(async (card) => {
         const imageUrl = await fetchSignedImageUrl(setId, card.cardId, card.fileName)
 
         const exists = await checkImageExists(imageUrl)

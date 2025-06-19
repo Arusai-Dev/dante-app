@@ -26,6 +26,8 @@ type createStoreState = {
         // scheduled_days: number
         // last_review: number | null
     }
+    imageCropUi: boolean
+    file: any
     setActive: (mode: string) => void
     setUpdatingCard: (mode: boolean) => void
     setSets: (data: any[]) => void
@@ -34,6 +36,8 @@ type createStoreState = {
     setCurrentSelectedImage: (mode: any) => void
     setCurrentSetImages: (data: any) => void
     setCurrentCardData: (data: any) => void
+    setImageCropUI: (mode: boolean) => void 
+    setFile: (data: any) => void
     updateCurrentCardData: (key: string, value: any) => void
     clearCurrentCardData: () => void
 }
@@ -65,6 +69,8 @@ export const useCreateStore = create(
                 // scheduled_days: 0,
                 // last_review: null,
             },
+            imageCropUi: false,
+            file: {},
             setActive: (mode) => set({ active: mode }),
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
             setSets: (data) => set({ sets: data }),
@@ -73,6 +79,8 @@ export const useCreateStore = create(
             setCurrentSelectedImage: (mode) => set({ currentSelectedImage: mode }),
             setCurrentSetImages: (data) => set({ currentSetImages: data }),
             setCurrentCardData: (data) => set({ currentCardData: data }),
+            setImageCropUI: (mode) => set({ imageCropUi: mode}),
+            setFile: (data) => set({ file: data }),
             updateCurrentCardData: (key, value) => set({
                 currentCardData: {
                     ...get().currentCardData,

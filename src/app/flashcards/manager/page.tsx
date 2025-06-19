@@ -8,6 +8,7 @@ import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-reac
 import { toast as sonnerToast } from 'sonner';
 import NextImage from "next/image"
 import RetrieveCardImages from "@/components/functions/RetrieveImagesBySetId"
+import ImageResizeComponent from "@/components/ImageResizeComponent"
 
 function toast(toast: Omit<ToastProps, 'id'>) {
     return sonnerToast.custom((id) => (
@@ -49,14 +50,37 @@ export default function Create() {
         setCurrentSetImages,
         currentCardData,
         setCurrentCardData,
+        imageCropUi,
+        setImageCropUI,
+        file,
+        setFile,
         setSets, 
         setDropDownIsOpen, 
     } = useCreateStore()
-
-    const [file, setFile] = useState(null);
     const [active, setActive] = useState("create");
     const [loading, setLoading] = useState(true);
     const [previousFileName, setPreviousFileName] = useState<string | null>(null);
+    const [containsImages, setContainImages] = useState(false);
+
+     
+    const handleSettingCurrentSetImages = async (id: number) => {
+        const set = await getSetById(id);
+        const cardsWithImages = set[0]?.cards.filter(card => card.fileName && card.fileName.trim() !== "");
+        console.log(cardsWithImages)
+        if (cardsWithImages.length === 0) {
+            setContainImages(false);
+            console.log("No images to fetch");
+            return;
+        }
+
+        setContainImages(true);
+        const map = await RetrieveCardImages(id);
+        for (const [, imageUrl] of Object.entries(map)) {
+            preloadImage(imageUrl);
+            console.log(imageUrl, "Loaded");
+        }
+        setCurrentSetImages(map);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -67,18 +91,13 @@ export default function Create() {
             const data = await res.json();
             setSets(data.Sets);
 
-            const map = await RetrieveCardImages(currentSet.id)
-
-            for (const [cardId, imageUrl] of Object.entries(map)) {
-                preloadImage(imageUrl);
-                console.log(imageUrl, "Loaded")
-            }
-            
-            setCurrentSetImages(map)
+            await handleSettingCurrentSetImages(currentSet.id)
         }
 
         fetchData();
-    }, [setCurrentSetImages, setSets, currentSet.id]);
+    }, []);
+
+
 
     const preloadImage = (src: string) => {
         const img = new Image()
@@ -159,7 +178,7 @@ export default function Create() {
 
         const currentSetId = currentSet?.id
         console.log(currentSetId)
-        const fileName = file.name == null ? "" : file.name;
+        const fileName = file == null ? "" : file.name;
         console.log(file)
 
         await updateCurrentSet(currentSet.id)        
@@ -216,9 +235,9 @@ export default function Create() {
             } catch(error) {
                 console.log(error)
             }
+            handleSettingCurrentSetImages(currentSet.id)
+            clearCurrentImage()
         }   
-
-        clearCurrentImage()
     };   
 
 
@@ -250,12 +269,14 @@ export default function Create() {
             }
         }
         await updateCardData(setId, cardId, category, front, back, fileName)
+        await handleSettingCurrentSetImages(currentSet.id)
         setUpdatingCard(false)
         setActive("manage")
         clearCurrentCardData()
         setPreviousFileName(null)
         await updateCurrentSet(setId)
-    }
+    };
+
 
     const handleImageDelete = async (key: string) => {
         console.log("Deleting given image...")
@@ -263,7 +284,7 @@ export default function Create() {
             method: "DELETE",
             headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" }
         })
-    }
+    };
 
     const handleImageUrlInput = (e) => {
         const inputtedUrl = e.target.value;
@@ -306,6 +327,8 @@ export default function Create() {
         });
     };
 
+    console.log(imageCropUi)
+
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
@@ -341,8 +364,7 @@ export default function Create() {
                     onClick={async () =>  {
                         setActive("manage")
                         setLoading(false)
-                        const map = await RetrieveCardImages(currentSet.id)
-                        setCurrentSetImages(map)
+                        handleSettingCurrentSetImages(currentSet.id)
                     }}
                     >
 
@@ -404,6 +426,8 @@ export default function Create() {
                             </label>
                         </div>
 
+                        <ImageResizeComponent/>
+
                         {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                             <div className="flex justify-between mt-4">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -414,11 +438,18 @@ export default function Create() {
                                     height={200}
                                     className="w-fit max-w-xs h-40 object-contain rounded border-1 border-[#8c8c8c]"
                                 />
-                                <Trash2Icon 
-                                    className="bg-red-900 p-[8px] rounded-sm cursor-pointer" 
-                                    width={35} height={35}
-                                    onClick={clearCurrentImage}    
-                                />
+                                <div className="flex gap-2">
+                                    <Edit 
+                                        className="bg-white text-black p-[8px] rounded-sm cursor-pointer" 
+                                        width={35} height={35}
+                                        onClick={() => setImageCropUI(true)}   
+                                    />
+                                    <Trash2Icon 
+                                        className="bg-red-900 p-[8px] rounded-sm cursor-pointer" 
+                                        width={35} height={35}
+                                        onClick={clearCurrentImage}    
+                                    />
+                                </div>
                             </div>
                         )}
 
@@ -560,9 +591,9 @@ export default function Create() {
                                     </div>
 
 
-                                    <div className="w-full h-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
-                                        <h1 className="text-[12px] md:text-lg font-semibold whitespace-wrap w-full md:truncate text-[#474747] px-2">{card.back}</h1>
-                                        <div className="pr-1">
+                                    <div className="w-full max-h-[160px] py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
+                                        <h1 className={`text-[12px] md:text-lg font-semibold truncate w-full text-[#474747] px-2`}>{card.back}</h1>
+                                        <div className="pr-1 h-[150px]">
                                             {
                                                 currentSetImages[card.cardId] ? (
                                                     // eslint-disable-next-line @next/next/no-img-element
@@ -571,10 +602,10 @@ export default function Create() {
                                                         alt={card.fileName}
                                                         width={100}
                                                         height={100}
-                                                        className={`w-full h-full min-h-[120px] max-h-[150px] object-cover border border-[#b1b1b1] rounded-[5px] ${loading == true ? "hidden" : ""}`}
+                                                        className={`w-full h-full md:min-h-[120px] md:max-h-[150px] object-contain border border-[#b1b1b1] rounded-[5px] ${loading == true ? "hidden" : ""}`}
                                                     />
                                                 ) : (
-                                                    <div className="w-[100px] h-[120px] rounded-[5px]"/>
+                                                    <div/>
                                                 )
                                             }
                                         </div>
