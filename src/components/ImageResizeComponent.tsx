@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from 'react'
 import Cropper from 'react-easy-crop'
-import getCroppedImg from './functions/CropImageHelper' 
+import getCroppedImg from './functions/getCroppedImage' 
+import { urlToDataURL } from './functions/UrlToDataUrl'
 import * as Slider from "@radix-ui/react-slider";
 import { useCreateStore } from '@/app/stores/createStores';
 
@@ -24,22 +25,27 @@ export default function ImageEditor() {
     }, [])
 
     const handleCrop = async () => {
-        const croppedImage = await getCroppedImg(currentSelectedImage, croppedAreaPixels)
-        setImageCropUI(false)
-        setFile(croppedImage)
-        setCurrentSelectedImage(croppedImage)
-    }
+        const croppedImage = await getCroppedImg(currentSelectedImage, croppedAreaPixels);
+
+        setImageCropUI(false);
+        setCurrentSelectedImage(croppedImage);
+
+        const res = await fetch(croppedImage);
+        const blob = await res.blob();
+        const file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+        setFile(file);
+    };
 
     return (
         <div>
             {imageCropUi && (
                 <>
                     <div
-                        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-0"
-                        onClick={() => setImageCropUI(false)}
+                        className="absolute bg-black/3 backdrop-blur-sm z-40"
+                        onClick={() => setImageCropUI(!imageCropUi)}
                     ></div>
 
-                    <div className="fixed inset-0 flex items-center justify-center">
+                    <div className="fixed inset-0 flex items-center justify-center z-40">
                         <div className="relative w-[300px] h-[300px] flex flex-col-reverse">
                             <Cropper
                                 image={currentSelectedImage}
@@ -77,22 +83,10 @@ export default function ImageEditor() {
                                 />
                             </Slider.Root>
                         </div>
-                        <button onClick={handleCrop}>Crop</button>
+                        <button className=' cursor-pointer hover-animation' onClick={handleCrop}>Crop</button>
                     </div>
                 </>
             )}
         </div>
     )
 }
-
-async function urlToDataURL(url: string): Promise<string> {
-  const res = await fetch(url, { mode: 'cors' });
-  const blob = await res.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-

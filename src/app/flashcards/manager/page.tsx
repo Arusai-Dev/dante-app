@@ -286,21 +286,27 @@ export default function Create() {
         })
     };
 
-    const handleImageUrlInput = (e) => {
+    const handleImageUrlInput = async (e) => {
         const inputtedUrl = e.target.value;
-
         const uniqueName = generateUniqueFilename()
 
-        setCurrentCardData(prev => ({
-            ...prev,
-            fileName: inputtedUrl,
-        }));
 
+        try {
+            const res = await fetch(inputtedUrl, { mode: 'cors'})
+            const blob = await res.blob()
+            
+            const fileFromUrl = new File([blob], uniqueName, { type: blob.type })
+
+            setFile(fileFromUrl)
+            setCurrentSelectedImage(URL.createObjectURL(blob));
+            setCurrentCardData(prev => ({
+                ...prev,
+                fileName: uniqueName,
+            }));
+        } catch (err) {
+            console.error("Failed to fetch image from URL:", err)
+        }
         
-        setFile({
-            name: uniqueName 
-        })
-        setCurrentSelectedImage(inputtedUrl);
     };
 
     const handleFileChange = (e) => {
@@ -327,7 +333,6 @@ export default function Create() {
         });
     };
 
-    console.log(imageCropUi)
 
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">

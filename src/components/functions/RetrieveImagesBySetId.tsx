@@ -25,7 +25,10 @@ const RetrieveCardImages = async (setId: number) => {
         const exists = await checkImageExists(imageUrl)
         console.log(exists)
         if (exists) {
-            return [card.cardId,imageUrl,]
+            const isExternal = imageUrl.startsWith("https://") || imageUrl.startsWith("http://")
+            const proxiedUrl = isExternal ? `/api/proxy/image?url=${encodeURIComponent(imageUrl)}` : imageUrl
+
+            return [card.cardId,proxiedUrl,]
         } else {
             console.warn(`Image not found or not accessible:`, card.fileName)
             return [card.cardId, null]
