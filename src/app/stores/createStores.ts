@@ -16,6 +16,15 @@ type createStoreState = {
         front: string
         back: string
         fileName: string
+        // due: number
+        // reps: number
+        // state: number
+        // lapses: number
+        // stability: number
+        // difficulty: number
+        // elapsed_day: number
+        // scheduled_days: number
+        // last_review: number | null
     }
     setActive: (mode: string) => void
     setUpdatingCard: (mode: boolean) => void
@@ -46,6 +55,15 @@ export const useCreateStore = create(
                 front: 'Front', 
                 back: 'Back', 
                 fileName: '',
+                // due: 0,
+                // reps: 0,
+                // state: 0,
+                // lapses: 0,
+                // stability: 0,
+                // difficulty: 0,
+                // elapsed_day: 0,
+                // scheduled_days: 0,
+                // last_review: null,
             },
             setActive: (mode) => set({ active: mode }),
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
@@ -70,6 +88,15 @@ export const useCreateStore = create(
                         front: 'Front',
                         back: 'Back',
                         fileName: '',
+                        // due: 0,
+                        // reps: 0,
+                        // state: 0,
+                        // lapses: 0,
+                        // stability: 0,
+                        // difficulty: 0,
+                        // elapsed_day: 0,
+                        // scheduled_days: 0,
+                        // last_review: null,
                     }
                 })
             }

@@ -50,6 +50,7 @@ export default function Create() {
     const [file, setFile] = useState(null);
     const [active, setActive] = useState("create");
     const [loading, setLoading] = useState(true);
+    const [previousFileName, setPreviousFileName] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -105,6 +106,44 @@ export default function Create() {
         };
     }, []);
 
+
+    const updateCurrentSet = async (id: number) => {
+        const updatedSet = await getSetById(id)
+        setCurrentSet(updatedSet[0])
+    }
+
+    const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {
+        await deleteCardById(setId, cardId)
+        const key = `${setId}/${cardId}/${fileName}`
+        console.log("KEY WHEN DELETING FULL CARD:", key)
+        handleImageDelete(key)
+        await updateCurrentSet(setId)
+    }
+
+    const handleEditCardBtnPress = async (
+        setId: number,
+        cardId: number,
+        category: string,
+        front: string,
+        back: string,
+        fileName: string,
+    ) => {  
+        setCurrentCardData({
+            setId: setId,
+            cardId: cardId,
+            category: category,
+            front: front,
+            back: back,
+            fileName: fileName,
+        })
+
+        setPreviousFileName(fileName);
+        setActive("create")
+        setCurrentSelectedImage(currentSetImages[cardId])
+        setUpdatingCard(true)
+    }
+
+
     const handleAddCard = async () => {
         const { 
             category, 
@@ -139,7 +178,7 @@ export default function Create() {
 
         clearCurrentCardData()
 
-        await addOneCardToSet(
+        const temp = await addOneCardToSet(
             currentSetId,
             cardId,
             category, 
@@ -147,6 +186,8 @@ export default function Create() {
             back, 
             fileName,
         );
+
+        console.log("SQL RETURN: ", temp)
         
         const updatedSet = await getSetById(currentSetId);
         setCurrentSet(updatedSet[0])
@@ -174,47 +215,6 @@ export default function Create() {
         clearCurrentImage()
     };   
 
-    const updateCurrentSet = async (id: number) => {
-        const updatedSet = await getSetById(id)
-        setCurrentSet(updatedSet[0])
-    }
-
-    const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {
-        await deleteCardById(setId, cardId)
-        const key = `${setId}/${cardId}/${fileName}`
-        handleImageDelete(key)
-        await updateCurrentSet(setId)
-    }
-
-    const handleImageDelete = async (key) => {
-        console.log("first")
-        await fetch(`/api/S3/delete?key=${key}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" }
-        })
-    }
-
-    const handleEditCardBtnPress = async (
-        setId: number,
-        cardId: number,
-        category: string,
-        front: string,
-        back: string,
-        fileName: string,
-    ) => {  
-        setCurrentCardData({
-            setId: setId,
-            cardId: cardId,
-            category: category,
-            front: front,
-            back: back,
-            fileName: fileName,
-        })
-
-        setActive("create")
-        setCurrentSelectedImage(currentSetImages[cardId])
-        setUpdatingCard(true)
-    }
 
     const handleUpdateCard = async ({
         setId,
@@ -224,40 +224,39 @@ export default function Create() {
         back,
         fileName
     }) => {
-        if (file) {
-            if (fileName) {
-                const key = `${setId}/${cardId}/${fileName}`
-                console.log("key: ", key)
-                await handleImageDelete(key)
-            }
+        if (file && previousFileName) {
+            const key = `${setId}/${cardId}/${previousFileName}`;
+            console.log("Deleting old image with key:", key);
+            await handleImageDelete(key);
 
-            const formData = new FormData()
-            formData.append("file", file)
+            const formData = new FormData();
+            formData.append("file", file);
 
             try {
                 const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}`, {
                     method: "POST",
                     body: formData,
                 });
-                const data = await response.json()
-                console.log("New image uploaded:", data)
+                const data = await response.json();
+                console.log("New image uploaded:", data);
             } catch (error) {
-                console.error("Failed to upload new image:", error)
+                console.error("Failed to upload new image:", error);
             }
         }
-        await updateCardData(
-            setId, 
-            cardId, 
-            category, 
-            front, 
-            back, 
-            fileName
-        )
-
+        await updateCardData(setId, cardId, category, front, back, fileName)
         setUpdatingCard(false)
         setActive("manage")
         clearCurrentCardData()
+        setPreviousFileName(null)
         await updateCurrentSet(setId)
+    }
+
+    const handleImageDelete = async (key: string) => {
+        console.log("Deleting given image...")
+        await fetch(`/api/S3/delete?key=${key}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" }
+        })
     }
 
     const handleImageUrlInput = (e) => {
@@ -270,7 +269,10 @@ export default function Create() {
             setFile(selectedImage)
             const imageURL = URL.createObjectURL(selectedImage);
             setCurrentSelectedImage(imageURL)
-            setCurrentCardData(currentCardData["fileName"] = selectedImage.name)
+            setCurrentCardData({
+                ...currentCardData,
+                fileName: selectedImage.name,
+            });
         }
     };
 
@@ -411,7 +413,7 @@ export default function Create() {
                                             toast({title: "Enter a value for the front of the card."})
                                         } else if (currentCardData["back"] == "Back") {
                                             toast({title:  "Enter a value for the back of the card."})
-                                        } else {handleAddCard(currentCardData)} 
+                                        } else {handleAddCard()} 
                                     }
                                 }}
                                 >

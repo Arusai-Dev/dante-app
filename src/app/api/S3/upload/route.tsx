@@ -30,7 +30,7 @@ export async function POST(request) {
         const fileBuffer = Buffer.from(await file.arrayBuffer());
 
         const key = `${setId}/${cardId}/${file.name}`
-
+        console.log("KEY WHEN UPLOADING NEW CARD:", key)
         const params = {
             Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
             Key: key,

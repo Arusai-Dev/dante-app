@@ -13,14 +13,14 @@ const s3Client = new S3Client({
 })
 
 export async function DELETE(request) {
-    const bucketName = process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME
     const { searchParams } = new URL(request.url)
     const key = searchParams.get("key")
 
+    console.log("S3 DELETE key:", key);
     try {
         await s3Client.send(
             new DeleteObjectCommand({
-                Bucket: bucketName,
+                Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
                 Key: key,
             }),
         )
