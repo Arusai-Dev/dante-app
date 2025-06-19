@@ -65,6 +65,8 @@ export default function Create() {
      
     const handleSettingCurrentSetImages = async (id: number) => {
         const set = await getSetById(id);
+        if (!set[0]) return
+
         const cardsWithImages = set[0]?.cards.filter(card => card.fileName && card.fileName.trim() !== "");
         console.log(cardsWithImages)
         if (cardsWithImages.length === 0) {
@@ -97,7 +99,7 @@ export default function Create() {
         fetchData();
     }, []);
 
-
+    
 
     const preloadImage = (src: string) => {
         const img = new Image()
@@ -299,10 +301,11 @@ export default function Create() {
 
             setFile(fileFromUrl)
             setCurrentSelectedImage(URL.createObjectURL(blob));
-            setCurrentCardData(prev => ({
-                ...prev,
+            console.log(uniqueName)
+            setCurrentCardData({
+                ...currentCardData,
                 fileName: uniqueName,
-            }));
+            });
         } catch (err) {
             console.error("Failed to fetch image from URL:", err)
         }
@@ -333,7 +336,7 @@ export default function Create() {
         });
     };
 
-
+    console.log(currentCardData)
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
@@ -559,7 +562,7 @@ export default function Create() {
                             ><PlusCircle height={18}/> Create Card</button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-[15px] p-1 py-2 h-fit">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-5 md:gap-[15px] p-1 py-2 h-fit">
                             {currentSet.cards && currentSet.cards.map((card, id: number) => (
                                 <div
                                     key={id}
@@ -596,18 +599,16 @@ export default function Create() {
                                     </div>
 
 
-                                    <div className="w-full max-h-[160px] py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
+                                    <div className="w-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
                                         <h1 className={`text-[12px] md:text-lg font-semibold truncate w-full text-[#474747] px-2`}>{card.back}</h1>
-                                        <div className="pr-1 h-[150px]">
+                                        <div className="pr-1">
                                             {
                                                 currentSetImages[card.cardId] ? (
                                                     // eslint-disable-next-line @next/next/no-img-element
                                                     <img
-                                                        src={currentSetImages[card.cardId]}
-                                                        alt={card.fileName}
-                                                        width={100}
-                                                        height={100}
-                                                        className={`w-full h-full md:min-h-[120px] md:max-h-[150px] object-contain border border-[#b1b1b1] rounded-[5px] ${loading == true ? "hidden" : ""}`}
+                                                    src={currentSetImages[card.cardId]}
+                                                    alt={card.fileName}
+                                                    className={`w-[100px] md:w-[245px] aspect-square object-cover border border-[#b1b1b1] rounded-[5px] ${loading ? "hidden" : ""}`}
                                                     />
                                                 ) : (
                                                     <div/>
