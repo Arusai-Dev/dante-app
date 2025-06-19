@@ -31,6 +31,12 @@ function Toast(props: ToastProps) {
     );
 }
 
+function generateUniqueFilename() {
+    const timestamp = Date.now().toString(16);
+    const randomHex = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
+    return `img_${timestamp}_${randomHex}.png`;
+}
+
 export default function Create() {
     const { 
         updatingCard,
@@ -260,8 +266,21 @@ export default function Create() {
     }
 
     const handleImageUrlInput = (e) => {
-        const inputtedUrl = e.target.value
-    }
+        const inputtedUrl = e.target.value;
+
+        const uniqueName = generateUniqueFilename()
+
+        setCurrentCardData(prev => ({
+            ...prev,
+            fileName: inputtedUrl,
+        }));
+
+        
+        setFile({
+            name: uniqueName 
+        })
+        setCurrentSelectedImage(inputtedUrl);
+    };
 
     const handleFileChange = (e) => {
         const selectedImage = e.target.files[0]
@@ -368,7 +387,7 @@ export default function Create() {
                         <h2 className="text-[12px] md:text-[16px] pb-1 ">Image URL:</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             placeholder="https://example.com/image.jpg"
-                            onChange={(e) => handleImageUrlInput(e.target.value)}
+                            onChange={handleImageUrlInput}
                         ></input>
 
 
@@ -387,7 +406,8 @@ export default function Create() {
 
                         {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                             <div className="flex justify-between mt-4">
-                                <NextImage
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
                                     src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
                                     alt="Card preview"
                                     width={200}
@@ -464,7 +484,8 @@ export default function Create() {
                                 <div className="flex justify-center items-center h-[calc(100%-80px)] gap-[16px] text-sm lg:text-lg">
                                     <div className="w-[50%] flex justify-center">{currentCardData["back"]}</div>
                                     {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
-                                        <NextImage
+                                        // eslint-disable-next-line @next/next/no-img-element
+                                        <img
                                             src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
                                             alt="Card preview"
                                             width={200}
