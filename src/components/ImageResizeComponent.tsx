@@ -40,50 +40,65 @@ export default function ImageEditor() {
             {imageCropUi && (
                 <>
                     <div
-                        className="fixed inset-0 bg-black/3 backdrop-blur-sm z-40"
+                        className={`${imageCropUi ? "fixed inset-0 bg-black/3 backdrop-blur-sm z-0" : ""}`}
                         onClick={() => setImageCropUI(!imageCropUi)}
-                    ></div>
+                    />
 
-                    <div className="fixed inset-0 flex items-center justify-center z-40">
-                        <div className="relative w-[300px] h-[300px] flex flex-col">
-                            <Cropper
-                                className="w-full"
-                                image={currentSelectedImage}
-                                crop={crop}
-                                zoom={zoom}
-                                aspect={1}
-                                onCropChange={setCrop}
-                                onZoomChange={setZoom}
-                                onCropComplete={onCropComplete}
-                                cropShape="rect"
-                                showGrid={false}
-                            />
-                            <Slider.Root
-                                className="relative flex h-5 touch-none select-none items-center"
-                                value={[zoom * 100]}
-                                min={100}
-                                max={300}
-                                step={1}
-                                onValueChange={(value) => {
-                                    let zoomValue = value[0] / 100
-                                    if (zoomValue >= 1) {
-                                        setZoom(zoomValue)
-                                    } else {
-                                        zoomValue = 1
-                                        setZoom(zoomValue)
-                                    }
-                                }}
-                            >
-                                <Slider.Track className="relative h-[3px] grow rounded-full bg-blackA7">
-                                    <Slider.Range className="absolute h-full rounded-full bg-white" />
-                                </Slider.Track>
-                                <Slider.Thumb
-                                    className="block size-5 rounded-[10px] bg-white shadow-[0_2px_10px] shadow-blackA4 hover:bg-violet3 focus:shadow-[0_0_0_5px] focus:shadow-blackA5 focus:outline-none"
-                                    aria-label="Volume"
+                    <div className="fixed inset-0 flex items-center justify-center z-40 flex-col gap-8">
+                        <div className="relative min-w-[300px] min-h-[300px] flex flex-col-reverse">
+                            <div>
+                                <Cropper
+                                    image={currentSelectedImage}
+                                    crop={crop}
+                                    zoom={zoom}
+                                    maxZoom={10}
+                                    aspect={1}
+                                    onCropChange={setCrop}
+                                    onZoomChange={setZoom}
+                                    onCropComplete={onCropComplete}
+                                    cropShape="rect"
+                                    // cropSize={{ width: 300, height: 300 }}
+                                    showGrid={false}
+                                    style={{
+                                        containerStyle: {
+                                            borderRadius: '10px',
+                                            boxShadow: '0 0 20px rgba(0, 0, 0, 0.2)',
+                                            backgroundColor: '#000', 
+                                        },
+                                        cropAreaStyle: {
+                                            borderRadius: '10px',
+                                            border: '2px solid white',
+                                        },
+                                        mediaStyle: {
+                                            filter: 'brightness(0.9)',
+                                            objectFit: 'cover',
+                                        }
+                                    }}
                                 />
-                            </Slider.Root>
+                            </div>
+                            <div>
+                                <Slider.Root
+                                    className="relative top-5 bg-white rounded-b-xl flex h-6 w-full touch-none select-none items-center"
+                                    value={[zoom * 100]}
+                                    min={100}
+                                    max={1000}
+                                    step={1}
+                                    onValueChange={(value) => {
+                                        const zoomValue = Math.max(value[0] / 100, 1);
+                                        setZoom(zoomValue);
+                                    }}
+                                >
+                                    <Slider.Track className="relative h-[4px] w-full rounded-full bg-neutral-300 dark:bg-neutral-700">
+                                        <Slider.Range className="absolute h-full rounded-full bg-black dark:bg-white transition-colors duration-200" />
+                                    </Slider.Track>
+                                    <Slider.Thumb
+                                        className="block size-3 rounded-full bg-white dark:bg-neutral-100 border border-neutral-400 dark:border-neutral-600 shadow hover:scale-150 focus:ring-black transition-transform duration-150"
+                                        aria-label="Zoom"
+                                    />
+                                </Slider.Root>
+                            </div>
                         </div>
-                        <button className=' cursor-pointer hover-animation' onClick={handleCrop}>Crop</button>
+                        <button className=' gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center  h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary' onClick={handleCrop}>Crop</button>
                     </div>
                 </>
             )}

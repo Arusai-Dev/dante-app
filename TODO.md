@@ -24,7 +24,7 @@
         - [ ] - Auto recommend images for back side
         - [x] - Add image through URL
     - Minor Changes for QOL
-      - [ ] - On deletion of img; clear url text field aswell
+        - [ ] - On deletion of img; clear url text field aswell
 
 
 - My Sets Page

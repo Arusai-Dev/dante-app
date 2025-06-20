@@ -6,7 +6,6 @@ import { useCreateStore } from "@/app/stores/createStores"
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
 import { toast as sonnerToast } from 'sonner';
-import NextImage from "next/image"
 import RetrieveCardImages from "@/components/functions/RetrieveImagesBySetId"
 import ImageResizeComponent from "@/components/ImageResizeComponent"
 
@@ -106,13 +105,13 @@ export default function Create() {
             setSets(data.Sets);
 
             await handleSettingCurrentSetImages(currentSet.id)
+            await handleSettingCurrentSetImages(currentSet.id)
         }
 
         fetchData();
     }, []);
 
     
-
     const preloadImage = (src: string) => {
         const img = new Image()
         img.src = src
@@ -191,6 +190,8 @@ export default function Create() {
         } = useCreateStore.getState().currentCardData;
 
         const currentSetId = currentSet?.id
+
+        await updateCurrentSet(currentSet.id)        
         console.log(currentSetId)
         const fileName = file == null ? "" : file.name;
         console.log(file)
@@ -304,7 +305,6 @@ export default function Create() {
         const inputtedUrl = e.target.value;
         const uniqueName = generateUniqueFilename()
 
-
         try {
             const res = await fetch(inputtedUrl, { mode: 'cors'})
             const blob = await res.blob()
@@ -350,7 +350,6 @@ export default function Create() {
         });
     };
 
-    console.log(currentCardData)
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
 
@@ -512,7 +511,6 @@ export default function Create() {
 
                             </button>
                         </div>
-                        
                     </div>
 
                     {/* Preview */}
@@ -576,7 +574,7 @@ export default function Create() {
                             ><PlusCircle height={18}/> Create Card</button>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-5 md:gap-[15px] p-1 py-2 h-fit">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-5 p-1 py-2 h-fit">
                             {currentSet.cards && currentSet.cards.map((card, id: number) => (
                                 <div
                                     key={id}
@@ -637,7 +635,6 @@ export default function Create() {
                     )}
                 </div>
             )}
-
-        </section>  
+        </section>
     )  
 }
