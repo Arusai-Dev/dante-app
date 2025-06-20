@@ -19,8 +19,8 @@ interface FlashCard extends Card {
 }
 
 type Message = {
-    sender: "user" | "model";
-    text: string;
+    role: "user" | "assistant";
+    content: string;
 }
 
 export default function CardButton({ jsonCards, number_cards, setId, set }) {
@@ -31,7 +31,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     const [dueCards, setDueCards] = useState<FlashCard[]>([]);
     const [showSidebar, setShowSidebar] = useState(false);
     const [message, setMessage] = useState('');
-    const [sidebarWidth, setSidebarWidth] = useState(320);
+    const [sidebarWidth, setSidebarWidth] = useState(430);
     const [allMessages, setAllMessages] = useState<Message[]>([]);
     const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [studyComplete, setStudyComplete] = useState(false);
@@ -42,7 +42,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
     const isResizing = useRef(false);
     const sidebarRef = useRef(null);
     const startX = useRef(0);
-    const startWidth = useRef(320);
+    const startWidth = useRef(430);
     
     useEffect(() => {
         const initializeCards = () => {
@@ -117,7 +117,6 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
         initializeCards();
     }, [jsonCards]);
     
-    console.log(allCardImages)
 
     const getCurrentCard = useCallback(() => {
         return dueCards[currentCardIndex];
@@ -232,12 +231,14 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
         
         if (message.length > 0) {
             const userMessage: Message = {
-                sender: "user",
-                text: message
+                role: "user",
+                content: message
             };
             
-            setAllMessages((prev) => [...prev, userMessage]);
-            
+
+            const updatedMessages = [...allMessages, userMessage];
+            setAllMessages(updatedMessages);
+
             setMessage("");
             
             try {
@@ -245,7 +246,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                     method: "POST",
                     headers: {"Content-Type": "application/json"},
                     body: JSON.stringify({
-                        message: message,
+                        message: updatedMessages,
                         sessionId: crypto.randomUUID() 
                     })
                 });
@@ -253,8 +254,8 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                 const data = await res.json();
                 
                 const modelMessage: Message = {
-                    sender: "model",
-                    text: data.response
+                    role: "assistant",
+                    content: data.response
                 };
                 
                 setAllMessages((prev) => [...prev, modelMessage]);
@@ -358,7 +359,7 @@ export default function CardButton({ jsonCards, number_cards, setId, set }) {
                             style={{ height: 'calc(100vh - 200px)' }}
                         >
                             {allMessages.map((msg, index) => (
-                                <ChatBubble key={index} message={msg.text} sender={msg.sender} />
+                                <ChatBubble key={index} message={msg.content} sender={msg.role} />
                             ))}
                         </div>
 
