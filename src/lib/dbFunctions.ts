@@ -186,3 +186,8 @@ export async function getPublicCards() {
     }
 
 }
+
+export async function uploadConversationHistory(conversationHistory, id) {
+    await sql('UPDATE flashcards SET "conversation_history"=$1 WHERE id=$2', [conversationHistory, id])
+        
+}
