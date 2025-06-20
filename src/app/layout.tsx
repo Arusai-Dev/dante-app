@@ -4,7 +4,7 @@ import {
 } from '@clerk/nextjs'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/layout/Navbar'
 import Head from 'next/head'
 import { Toaster } from 'sonner'
 

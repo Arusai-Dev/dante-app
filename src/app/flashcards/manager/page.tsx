@@ -1,44 +1,17 @@
 'use client'
 
-import SetSelectionSection from "@/components/SetSelectionSection"
 import { useEffect, useState } from "react"
-import { useCreateStore } from "@/app/stores/createStores"
-import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
-import { toast as sonnerToast } from 'sonner';
-import RetrieveCardImages from "@/components/functions/RetrieveImagesBySetId"
-import ImageResizeComponent from "@/components/ImageResizeComponent"
+import { useCreateStore } from "@/app/stores/createStores"
+import SetSelectionSection from "@/components/SetSelectionSection"
+import ImageCropper from "@/components/ImageCropper"
+import { fieldMissingModal } from "@/components/modals/fieldMissingModal"
+import { handleImageUrlInput, handleFileChange, clearCurrentImage } from "@/app/hooks/cardHooks/useImageHandlers"
+import { updateSetImagesMap } from "@/app/hooks/cardHooks/useSetHandlers"
+import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/cardHooks/useCardHandlers"
 
-function toast(toast: Omit<ToastProps, 'id'>) {
-    return sonnerToast.custom((id) => (
-        <Toast
-            title={toast.title}
-        />
-    ));
-}
-
-function Toast(props: ToastProps) {
-    const { title } = props;
-   
-    return (
-        <div className="flex rounded-lg bg-white shadow-lg ring-1 ring-black/5 w-full md:max-w-[364px] items-center p-4">
-            <div className="flex flex-1 items-center">
-                <div className="w-full">
-                    <p className="text-sm font-medium text-gray-900">{title}</p>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function generateUniqueFilename() {
-    const timestamp = Date.now().toString(16);
-    const randomHex = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
-    return `img_${timestamp}_${randomHex}.png`;
-}
 
 export default function Create() {
-
     // Todo:
     // 1. when crop is pressed check if originalImgUrl exists
     // 2. If not: store current url 
@@ -46,7 +19,6 @@ export default function Create() {
     // 4. when card is added or updated, pass originalImgUrl and croppedImgUrl to card json
     // 5. upload originalImg and croppedImg to s3 for storing
     // 6. whenever a card is being edited and edit img btn is pressed, show originalImgUrl instead of croppedImgUrl
-
 
     const { 
         updatingCard,
@@ -69,31 +41,7 @@ export default function Create() {
     const [active, setActive] = useState<string>("create");
     const [loading, setLoading] = useState<boolean>(true);
     const [previousFileName, setPreviousFileName] = useState<string | null>(null);
-    const [containsImages, setContainImages] = useState<boolean>(false);
-    const [originalImgUrl, setOriginalImgUrl] = useState<string>("")
     const [croppedImgUrl, setCroppedImgUrl] = useState<string>("")
-
-     
-    const handleSettingCurrentSetImages = async (id: number) => {
-        const set = await getSetById(id);
-        if (!set[0]) return
-
-        const cardsWithImages = set[0]?.cards.filter(card => card.fileName && card.fileName.trim() !== "");
-        console.log(cardsWithImages)
-        if (cardsWithImages.length === 0) {
-            setContainImages(false);
-            console.log("No images to fetch");
-            return;
-        }
-
-        setContainImages(true);
-        const map = await RetrieveCardImages(id);
-        for (const [, imageUrl] of Object.entries(map)) {
-            preloadImage(imageUrl);
-            console.log(imageUrl, "Loaded");
-        }
-        setCurrentSetImages(map);
-    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -104,18 +52,11 @@ export default function Create() {
             const data = await res.json();
             setSets(data.Sets);
 
-            await handleSettingCurrentSetImages(currentSet.id)
-            await handleSettingCurrentSetImages(currentSet.id)
+            await updateSetImagesMap(currentSet.id)
         }
 
         fetchData();
     }, []);
-
-    
-    const preloadImage = (src: string) => {
-        const img = new Image()
-        img.src = src
-    }
 
     const updateCard = useCreateStore(state => state.updateCurrentCardData)
     const clearCard = useCreateStore(state => state.clearCurrentCardData)
@@ -134,6 +75,7 @@ export default function Create() {
     const closeAnyUi = (e: MouseEvent) => {
         const target = e.target as HTMLElement; 
         if (!target.closest(".select-set-dd")) {setDropDownIsOpen(false)}
+        if (!target.closest(".cropper-id")) {setImageCropUI(false)}
     }
     
     useEffect(() => {
@@ -143,20 +85,6 @@ export default function Create() {
             document.removeEventListener('click', closeAnyUi);
         };
     }, []);
-
-
-    const updateCurrentSet = async (id: number) => {
-        const updatedSet = await getSetById(id)
-        setCurrentSet(updatedSet[0])
-    }
-
-    const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {
-        await deleteCardById(setId, cardId)
-        const key = `${setId}/${cardId}/${fileName}`
-        console.log("KEY WHEN DELETING FULL CARD:", key)
-        handleImageDelete(key)
-        await updateCurrentSet(setId)
-    }
 
     const handleEditCardBtnPress = async (
         setId: number,
@@ -179,176 +107,7 @@ export default function Create() {
         setActive("create")
         setCurrentSelectedImage(currentSetImages[cardId])
         setUpdatingCard(true)
-    }
-
-
-    const handleAddCard = async () => {
-        const { 
-            category, 
-            front, 
-            back,
-        } = useCreateStore.getState().currentCardData;
-
-        const currentSetId = currentSet?.id
-
-        await updateCurrentSet(currentSet.id)        
-        console.log(currentSetId)
-        const fileName = file == null ? "" : file.name;
-        console.log(file)
-
-        await updateCurrentSet(currentSet.id)        
-        
-        if (!currentSetId) {
-            console.warn("No set selected.");
-            return;
-        }
-
-        const generateUniqueCardId = (existingIds: number[], max = 100000): number => {
-            let cardId;
-            const usedIds = new Set(existingIds);
-        
-            do {
-                cardId = Math.floor(Math.random() * max) + 1;
-            } while (usedIds.has(cardId));
-        
-            return cardId;
-        }
-
-        const cardId = generateUniqueCardId(currentSet.cards.map(card => card.cardId))
-
-        clearCurrentCardData()
-
-        const temp = await addOneCardToSet(
-            currentSetId,
-            cardId,
-            category, 
-            front, 
-            back, 
-            fileName,
-        );
-
-        console.log("SQL RETURN: ", temp)
-        
-        const updatedSet = await getSetById(currentSetId);
-        setCurrentSet(updatedSet[0])
-
-        await updateCardCount(currentSetId, updatedSet[0].cards.length)
-        await updateCurrentSet(currentSetId)
-
-        if (file) {
-            const formData = new FormData();
-            formData.append("file", file);
-
-            try {
-                const response = await fetch(`/api/S3/upload?setId=${currentSetId}&cardId=${cardId}`, {
-                    method: "POST",
-                    body: formData,
-                })
-
-                const data = await response.json()
-                console.log(data)
-            } catch(error) {
-                console.log(error)
-            }
-            handleSettingCurrentSetImages(currentSet.id)
-            clearCurrentImage()
-        }   
-    };   
-
-
-    const handleUpdateCard = async ({
-        setId,
-        cardId,
-        category,
-        front,
-        back,
-        fileName
-    }) => {
-        if (file && previousFileName) {
-            const key = `${setId}/${cardId}/${previousFileName}`;
-            console.log("Deleting old image with key:", key);
-            await handleImageDelete(key);
-
-            const formData = new FormData();
-            formData.append("file", file);
-
-            try {
-                const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}`, {
-                    method: "POST",
-                    body: formData,
-                });
-                const data = await response.json();
-                console.log("New image uploaded:", data);
-            } catch (error) {
-                console.error("Failed to upload new image:", error);
-            }
-        }
-        await updateCardData(setId, cardId, category, front, back, fileName)
-        await handleSettingCurrentSetImages(currentSet.id)
-        setUpdatingCard(false)
-        setActive("manage")
-        clearCurrentCardData()
-        setPreviousFileName(null)
-        await updateCurrentSet(setId)
-    };
-
-
-    const handleImageDelete = async (key: string) => {
-        console.log("Deleting given image...")
-        await fetch(`/api/S3/delete?key=${key}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json", "Access-Control-Allow-Methods": "*", "Access-Control-Allow-Origin": "*" }
-        })
-    };
-
-    const handleImageUrlInput = async (e) => {
-        const inputtedUrl = e.target.value;
-        const uniqueName = generateUniqueFilename()
-
-        try {
-            const res = await fetch(inputtedUrl, { mode: 'cors'})
-            const blob = await res.blob()
-            
-            const fileFromUrl = new File([blob], uniqueName, { type: blob.type })
-
-            setFile(fileFromUrl)
-            setCurrentSelectedImage(URL.createObjectURL(blob));
-            console.log(uniqueName)
-            setCurrentCardData({
-                ...currentCardData,
-                fileName: uniqueName,
-            });
-        } catch (err) {
-            console.error("Failed to fetch image from URL:", err)
-        }
-        
-    };
-
-    const handleFileChange = (e) => {
-        const selectedImage = e.target.files[0]
-        if (selectedImage) {
-            setFile(selectedImage)
-            const imageURL = URL.createObjectURL(selectedImage);
-            setOriginalImgUrl(imageURL)
-            setCurrentSelectedImage(imageURL)
-            setCurrentCardData({
-                ...currentCardData,
-                fileName: selectedImage.name,
-            });
-        }
-    };
-
-
-    const clearCurrentImage = () => {
-        setCurrentSelectedImage(null);
-        setFile(null);
-    
-        setCurrentSetImages(prevImages => {
-            const updated = { ...prevImages };
-            delete updated[currentCardData[1]];
-            return updated;
-        });
-    };
+    }  
 
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
@@ -360,7 +119,9 @@ export default function Create() {
             </div>      
 
 
+
             <SetSelectionSection/>
+
 
 
             {/* Nav -> Create Card / Manage Cards */}
@@ -385,7 +146,7 @@ export default function Create() {
                     onClick={async () =>  {
                         setActive("manage")
                         setLoading(false)
-                        handleSettingCurrentSetImages(currentSet.id)
+                        updateSetImagesMap(currentSet.id)
                     }}
                     >
 
@@ -447,7 +208,7 @@ export default function Create() {
                             </label>
                         </div>
 
-                        <ImageResizeComponent/>
+                        <ImageCropper/>
 
                         {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                             <div className="flex justify-between mt-4">
@@ -482,9 +243,9 @@ export default function Create() {
                                         handleUpdateCard(currentCardData)
                                     } else {
                                         if (currentCardData["front"] == "Front") {
-                                            toast({title: "Enter a value for the front of the card."})
+                                            fieldMissingModal({title: "Enter a value for the front of the card."})
                                         } else if (currentCardData["back"] == "Back") {
-                                            toast({title:  "Enter a value for the back of the card."})
+                                            fieldMissingModal({title:  "Enter a value for the back of the card."})
                                         } else {handleAddCard()} 
                                     }
                                 }}
