@@ -1,21 +1,6 @@
-import { getSetById } from "@/lib/dbFunctions";
+import { getSetById } from "../dbFunctions"
 
-const checkImageExists = (url: string): Promise<boolean> => {
-    return new Promise((resolve) => {
-        const img = new Image()
-        img.src = url
-        img.onload = () => resolve(true)
-        img.onerror = () => resolve(false)
-    })
-}  
-
-const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
-    const res = await fetch(`/api/S3/retrieve?setId=${setId}&cardId=${cardId}&fileName=${fileName}`)
-    const data = await res.json()
-    return data.url
-}
-
-const RetrieveCardImages = async (setId: number) => {
+export const RetrieveCardImages = async (setId: number) => {
     const set = await getSetById(setId)
     const currentSetCardsWithImages = set[0]?.cards.filter(card => card.fileName && card.fileName.trim() !== "")
     
@@ -47,10 +32,22 @@ const RetrieveCardImages = async (setId: number) => {
     return Object.fromEntries(filteredEntries);
 }
 
-const preloadImage = (src: string) => {
+export const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
+    const res = await fetch(`/api/S3/retrieve?setId=${setId}&cardId=${cardId}&fileName=${fileName}`)
+    const data = await res.json()
+    return data.url
+}
+
+export const checkImageExists = (url: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+        const img = new Image()
+        img.src = url
+        img.onload = () => resolve(true)
+        img.onerror = () => resolve(false)
+    })
+} 
+
+export const preloadImage = (src: string) => {
     const img = new Image();
     img.src = src;
 };
-
-export default RetrieveCardImages
-

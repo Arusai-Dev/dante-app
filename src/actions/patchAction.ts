@@ -1,6 +1,6 @@
 'use server'
 
-import SM2calculateInterval from "@/lib/sm2";
+import SM2calculateInterval from "@/lib/algorithms/sm2";
 import {createEmptyCard, formatDate, fsrs, generatorParameters, Rating, Grades, FSRS, RecordLog} from 'ts-fsrs';
 import dayjs from 'dayjs';
 

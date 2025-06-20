@@ -1,4 +1,4 @@
-export default async function getCroppedImg(imageSrc, pixelCrop) {
+export async function getCroppedImg(imageSrc, pixelCrop) {
     const image = new Image();
     image.src = imageSrc;
     await new Promise((resolve) => {
