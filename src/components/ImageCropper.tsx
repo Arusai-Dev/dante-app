@@ -5,6 +5,7 @@ import Cropper from 'react-easy-crop'
 import * as Slider from "@radix-ui/react-slider";
 import { useCreateStore } from '@/app/stores/createStores';
 import { getCroppedImg } from '@/lib/image';
+import { convertUrlToFile } from '@/app/hooks/cardHooks/useCardHandlers';
 
 export default function ImageEditor() {
     const { 
@@ -12,27 +13,29 @@ export default function ImageEditor() {
         setCurrentSelectedImage,
         imageCropUi,
         setImageCropUI,
-        setFile,
+        originalImageUrl,
+        setOriginalImageUrl,
+        setOriginalFile,
+        setCroppedFile,
     } = useCreateStore()
 
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
     const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
 
-    const onCropComplete = useCallback((_, croppedAreaPixels) => {
+    const onCropComplete = useCallback((_: unknown, croppedAreaPixels: unknown) => {
         setCroppedAreaPixels(croppedAreaPixels)
     }, [])
 
     const handleCrop = async () => {
         const croppedImage = await getCroppedImg(currentSelectedImage, croppedAreaPixels);
 
-        setImageCropUI(false);
-        setCurrentSelectedImage(croppedImage);
+        setImageCropUI(false)
+        setOriginalImageUrl(currentSelectedImage)
+        setCurrentSelectedImage(croppedImage)
 
-        const res = await fetch(croppedImage);
-        const blob = await res.blob();
-        const file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
-        setFile(file);
+        setOriginalFile(convertUrlToFile(originalImageUrl, "original"))
+        setCroppedFile(convertUrlToFile(currentSelectedImage, "cropped"))
     };
 
     return (
@@ -51,7 +54,7 @@ export default function ImageEditor() {
                         >
                             <div>
                                 <Cropper
-                                    image={currentSelectedImage}
+                                    image={originalImageUrl}
                                     crop={crop}
                                     zoom={zoom}
                                     maxZoom={10}

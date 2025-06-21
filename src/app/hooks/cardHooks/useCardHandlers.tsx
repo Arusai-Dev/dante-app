@@ -4,13 +4,54 @@ import { updateCurrentSet, updateSetImagesMap } from "./useSetHandlers"
 import { useCreateStore } from "@/app/stores/createStores";
 
 
+function getExtensionFromMime(mime: string): string {
+    const map: Record<string, string> = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/webp': 'webp',
+        'image/gif': 'gif',
+        'image/svg+xml': 'svg',
+        'image/bmp': 'bmp',
+    };
+    return map[mime] || 'bin';
+}
+
+export const convertUrlToFile = async (url: string, baseName: string) => {
+    console.log("URLL !!  !! ! ! ! :", url)
+    const res = await fetch(url);
+    const blob = await res.blob();
+
+    if (!blob.type.startsWith("image/")) {
+        throw new Error(`Invalid image type: ${blob.type}`)
+    }
+    
+    const ext = getExtensionFromMime(blob.type)
+    const fileName = `${baseName}.${ext}`
+    return new File([blob], fileName, { type: blob.type })
+}
 
 // addCard
 export const handleAddCard = async () => {
     const { category, front, back } = useCreateStore.getState().currentCardData;
     const currentSet = useCreateStore.getState().currentSet;
-    const file = useCreateStore.getState().file;
+    let file = useCreateStore.getState().croppedFile ? useCreateStore.getState().croppedFile : useCreateStore.getState().originalFile
     
+    if (!useCreateStore.getState().croppedFile) {
+        if (file instanceof File) {
+            const newFile = new File([file], `original.${file.type.split('/')[1] || 'png'}`, { type: file.type })
+            useCreateStore.getState().setOriginalFile(newFile)
+
+        } else if (typeof file === 'string') {
+            const newFile = await convertUrlToFile(file, "original")
+            useCreateStore.getState().setOriginalFile(newFile)
+
+        } else {
+            console.error('Invalid file:', file)
+        }
+    }
+
+    file = useCreateStore.getState().originalFile
+
     const clearCurrentCardData = () => {
         useCreateStore.getState().clearCurrentCardData()
         useCreateStore.getState().setCurrentSelectedImage("")
@@ -24,9 +65,9 @@ export const handleAddCard = async () => {
     await updateCurrentSet(currentSetId)        
     console.log("Current Set Id:", currentSetId)
 
+    console.log("FILE:::", file)
     const fileName = file == null ? "" : file.name;
-    console.log("Current File:", file)
-    
+
     const generateUniqueCardId = (existingIds: number[], max = 100000): number => {
         let cardId;
         const usedIds = new Set(existingIds);
@@ -40,9 +81,9 @@ export const handleAddCard = async () => {
 
     const cardId = generateUniqueCardId(currentSet.cards.map(card => card.cardId))
 
-    clearCurrentCardData()
 
-    const temp = await addOneCardToSet(
+    console.log("FILENAME:", fileName)
+    await addOneCardToSet(
         currentSetId,
         cardId,
         category, 
@@ -51,14 +92,13 @@ export const handleAddCard = async () => {
         fileName,
     );
 
-    console.log("SQL RETURN: ", temp)
-    
     const updatedSet = await getSetById(currentSetId);
     useCreateStore.getState().setCurrentSet(updatedSet[0])
 
     await updateCardCount(currentSetId, updatedSet[0].cards.length)
     await updateCurrentSet(currentSetId)
-    await handleImageUpload({cardId, fileName})
+    await handleImageUpload(cardId)
+    clearCurrentCardData()
 };   
 
 // deleteCard
@@ -66,9 +106,9 @@ export const handleCardDelete = async (setId: number, cardId: number, fileName: 
     await deleteCardById(setId, cardId)
     const key = `${setId}/${cardId}/${fileName}`
     
-    console.log("KEY WHEN DELETING FULL CARD:", key)
+    console.log("Key when deleting card:", key)
 
-    handleImageDelete({cardId, fileName})
+    handleImageDelete(cardId, fileName)
     await updateCurrentSet(setId)
 }
 
@@ -93,7 +133,7 @@ export const handleUpdateCard = async ({
     previousFileName
 }: handleUpdateCardProps) => {
 
-    handleImageUpdate({previousFileName, fileName, cardId})
+    handleImageUpdate(previousFileName, fileName, cardId)
     await updateCardData(setId, cardId, category, front, back, fileName)
     await updateSetImagesMap(setId)
     useCreateStore.getState().setUpdatingCard(false)

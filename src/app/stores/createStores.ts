@@ -29,7 +29,8 @@ type createStoreState = {
     imageCropUi: boolean
     containsImages: boolean
     originalImageUrl: string
-    file: any
+    originalFile: any
+    croppedFile: any
     previousFile: any
     setActive: (mode: string) => void
     setUpdatingCard: (mode: boolean) => void
@@ -42,7 +43,8 @@ type createStoreState = {
     setImageCropUI: (mode: boolean) => void 
     setContainsImages: (mode: boolean) => void 
     setOriginalImageUrl: (mode: string) => void 
-    setFile: (data: any) => void
+    setOriginalFile: (data: any) => void
+    setCroppedFile: (data: any) => void
     setPreviousFile: (data: any) => void
     updateCurrentCardData: (key: string, value: any) => void
     clearCurrentCardData: () => void
@@ -78,7 +80,8 @@ export const useCreateStore = create(
             imageCropUi: false,
             containsImages: false,
             originalImageUrl: "",
-            file: {},
+            originalFile: {},
+            croppedFile: {},
             previousFile: {},
             setActive: (mode) => set({ active: mode }),
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
@@ -91,7 +94,8 @@ export const useCreateStore = create(
             setImageCropUI: (mode) => set({ imageCropUi: mode}),
             setContainsImages: (mode) => set({ containsImages: mode}),
             setOriginalImageUrl: (mode) => set({ originalImageUrl: mode}),
-            setFile: (data) => set({ file: data }),
+            setOriginalFile: (data) => set({ originalFile: data }),
+            setCroppedFile: (data) => set({ croppedFile: data }),
             setPreviousFile: (data) => set({ file: data }),
             updateCurrentCardData: (key, value) => set({
                 currentCardData: {

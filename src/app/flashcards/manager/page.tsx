@@ -13,35 +13,30 @@ import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/c
 
 export default function Create() {
     // Todo:
-    // 1. when crop is pressed check if originalImgUrl exists
-    // 2. If not: store current url 
-    // 3. then: create new blob url of cropped img
-    // 4. when card is added or updated, pass originalImgUrl and croppedImgUrl to card json
-    // 5. upload originalImg and croppedImg to s3 for storing
+    // 1. when crop is pressed check if originalImgUrl exists /
+    // 2. If not: store current url /
+    // 3. then: create new blob url of cropped img /
+    // 4. when card is added or updated, pass originalImgUrl and croppedImgUrl to card json /
+    // 5. upload originalImg and croppedImg to s3 for storing /
     // 6. whenever a card is being edited and edit img btn is pressed, show originalImgUrl instead of croppedImgUrl
 
     const { 
         updatingCard,
         setUpdatingCard,
         currentSet,
-        setCurrentSet,
         currentSelectedImage,
         setCurrentSelectedImage,
         currentSetImages,
-        setCurrentSetImages,
         currentCardData,
         setCurrentCardData,
-        imageCropUi,
         setImageCropUI,
-        file,
-        setFile,
         setSets, 
         setDropDownIsOpen, 
     } = useCreateStore()
+
     const [active, setActive] = useState<string>("create");
     const [loading, setLoading] = useState<boolean>(true);
     const [previousFileName, setPreviousFileName] = useState<string | null>(null);
-    const [croppedImgUrl, setCroppedImgUrl] = useState<string>("")
 
     useEffect(() => {
         const fetchData = async () => {
@@ -75,9 +70,8 @@ export default function Create() {
     const closeAnyUi = (e: MouseEvent) => {
         const target = e.target as HTMLElement; 
         if (!target.closest(".select-set-dd")) {setDropDownIsOpen(false)}
-        if (!target.closest(".cropper-id")) {setImageCropUI(false)}
     }
-    
+
     useEffect(() => {
         document.addEventListener('click', closeAnyUi);
 
@@ -111,7 +105,7 @@ export default function Create() {
 
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
-
+            
             {/* Title */}
             <div className="flex flex-col w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] items-left pt-[40px]">
                 <h1 className="text-[20px] sm:text-lg md:text-2xl lg:text-3xl font-bold">Set Manager</h1>
@@ -119,9 +113,7 @@ export default function Create() {
             </div>      
 
 
-
             <SetSelectionSection/>
-
 
 
             {/* Nav -> Create Card / Manage Cards */}
@@ -153,9 +145,8 @@ export default function Create() {
                     Manage Cards
                 </button>
             </div>            
-
-
-
+            
+            
             {/* Create Flashcard / Preview Section */}
             {active == "create" && (
                 <div className="flex md:flex-row flex-col mt-3 md:mt-4 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] ">
@@ -209,7 +200,7 @@ export default function Create() {
                         </div>
 
                         <ImageCropper/>
-
+                        
                         {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                             <div className="flex justify-between mt-4">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -319,7 +310,6 @@ export default function Create() {
                 </div>
             )}
             
-
             
             {/* Manage Cards Section */}
             {active == "manage" && (

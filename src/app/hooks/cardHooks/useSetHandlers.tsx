@@ -1,6 +1,6 @@
 import { useCreateStore } from "@/app/stores/createStores";
 import { getSetById } from "@/lib/dbFunctions";
-import { preloadImage, RetrieveCardImages } from "@/lib/image";
+import { preloadImage, RetrieveSetImages } from "@/lib/image";
 
 
 // Add Set
@@ -13,24 +13,22 @@ export const updateCurrentSet = async (id: number) => {
 
 // Update Set Images
 export const updateSetImagesMap = async (id: number) => {
-    const set = await getSetById(id);
+    const set = await getSetById(id)
     if (!set[0]) return
 
-    const cardsWithImages = set[0]?.cards.filter(card => card.fileName && card.fileName.trim() !== "");
-    console.log(cardsWithImages)
+    const cardsWithImages = set[0]?.cards.filter((card: { fileName: string; }) => card.fileName && card.fileName.trim() !== "")
     if (cardsWithImages.length === 0) {
-        useCreateStore.getState().setContainsImages(false);
-        console.log("No images to fetch");
-        return;
+        useCreateStore.getState().setContainsImages(false)
+        console.log("No images to fetch")
+        return
     }
 
-    useCreateStore.getState().setContainsImages(true);
-    const map = await RetrieveCardImages(id);
+    useCreateStore.getState().setContainsImages(true)
+    const map = await RetrieveSetImages(id)
     for (const [, imageUrl] of Object.entries(map)) {
-        preloadImage(imageUrl);
-        console.log(imageUrl, "Loaded");
+        preloadImage(imageUrl)
     }
-    useCreateStore.getState().setCurrentSetImages(map);
+    useCreateStore.getState().setCurrentSetImages(map)
 };
 
 // Delete Set
