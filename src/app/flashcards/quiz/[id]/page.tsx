@@ -8,15 +8,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Progress } from "@/components/ui/progress"
 import { CheckCircle, XCircle, RotateCcw, Eye, EyeOff, Play, Pause, Timer, Clock } from "lucide-react"
 
-interface Question {
-  id: number
-  type: "multiple-choice" | "true-false"
-  question: string
-  options?: string[]
-  correctAnswer: string | boolean
-  explanation: string
-}
-
 export default function QuizSet({ params }) {
 
     const [paramId, setParamId] = useState();
@@ -38,9 +29,52 @@ export default function QuizSet({ params }) {
     const [showTimerFull, setShowTimerFull] = useState(true)
     const [finalTime, setFinalTime] = useState(0)
 
+    useEffect(() => {
+        async function getParamId() {
+            const { id } = await params;
+            setParamId(id);
+        }
+
+        getParamId()
+    }, [params])
+
+
+    useEffect(() => {
+        async function getInfo() {
+            const [set] = await getSetById(paramId)
+            
+            setFlashcardSet([set])
+
+        }
+        getInfo()
+    }, [paramId])
+
+    const quizData = []
+
+
+    flashcardSet?.forEach(set => {
+        let idCount = 1;
+
+        set?.cards.forEach(card => {
+
+            quizData.push({
+                id: idCount,
+                type: "multiple-choice",
+                question: card.front,
+                options: [card.back, "", "", ""],
+                correctAnswer: card.back,
+                explanation: ""
+            })
+
+            idCount++; 
+        })
+    });
+
+
     const question = quizData[currentQuestion]
-    const isCorrect = selectedAnswer === question.correctAnswer
-    const progress = ((currentQuestion + 1) / quizData.length) * 100
+    const isCorrect = selectedAnswer === question?.correctAnswer
+    const progress = ((currentQuestion + 1) / quizData?.length) * 100
+
 
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null
@@ -77,7 +111,7 @@ export default function QuizSet({ params }) {
 
 
     const handleNext = () => {
-        if (currentQuestion < quizData.length - 1) {
+        if (currentQuestion < quizData?.length - 1) {
         setCurrentQuestion(currentQuestion + 1)
         setSelectedAnswer(null)
         setShowFeedback(false)
@@ -89,25 +123,6 @@ export default function QuizSet({ params }) {
         setQuizCompleted(true)
         }
     }
-    useEffect(() => {
-        async function getParamId() {
-            const { id } = await params;
-            setParamId(id);
-        }
-
-        getParamId()
-    }, [params])
-
-
-    useEffect(() => {
-        async function getInfo() {
-            const [set] = await getSetById(paramId)
-            
-            setFlashcardSet([set])
-
-        }
-        getInfo()
-    }, [paramId])
 
     const handleRestart = () => {
         setCurrentQuestion(0)
@@ -247,12 +262,12 @@ export default function QuizSet({ params }) {
 
       <Card className="bg-neutral-900">
         <CardHeader className="pb-6">
-          <CardTitle className="text-2xl text-gray-200">{question.question}</CardTitle>
+          <CardTitle className="text-2xl text-gray-200">{question?.question}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8 p-8">
 
 
-          {question.type === "multiple-choice" && question.options && (
+          {question?.type === "multiple-choice" && question?.options && (
             <RadioGroup
               value={selectedAnswer as string}
               onValueChange={(value) => handleAnswerSelect(value)}
@@ -289,7 +304,7 @@ export default function QuizSet({ params }) {
           )}
 
 
-          {question.type === "true-false" && (
+          {question?.type === "true-false" && (
             <RadioGroup
               value={selectedAnswer?.toString()}
               onValueChange={(value) => handleAnswerSelect(value === "true")}
