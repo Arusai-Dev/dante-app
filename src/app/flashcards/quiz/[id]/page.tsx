@@ -18,16 +18,14 @@ export default function QuizSet({ params }) {
     const [correctAnswers, setCorrectAnswers] = useState(0)
     const [wrongAnswers, setWrongAnswers] = useState(0)
     const [quizCompleted, setQuizCompleted] = useState(false)
-
     const [showCounters, setShowCounters] = useState(true)
-
     const [showHeader, setShowHeader] = useState(false)
-
     const [timerActive, setTimerActive] = useState(false)
     const [timerRunning, setTimerRunning] = useState(false)
     const [timerTime, setTimerTime] = useState(0)
     const [showTimerFull, setShowTimerFull] = useState(true)
     const [finalTime, setFinalTime] = useState(0)
+    const [generatedQuizDetails, setGeneratedQuizDetails] = useState([])
 
     useEffect(() => {
         async function getParamId() {
@@ -49,8 +47,54 @@ export default function QuizSet({ params }) {
         getInfo()
     }, [paramId])
 
-    const quizData = []
+    useEffect(() => {
+        async function generateQuizDetails() {
+            const allGeneratedDetails = [];
 
+
+            flashcardSet?.forEach(set => {
+                set?.cards.forEach(async card => {
+
+                    const api = await fetch('http://localhost:3000/api/generate-quiz', {
+                      method: "POST",
+                      body: 
+                        JSON.stringify({prompt: `
+                          this is a multiple-choice question, The question is as follows:
+                          <question> ${card.front} </question>
+    
+                          The correct answer is:
+                          <answer>
+                          ${card.back}
+                          </answer>
+                          
+                          your answer should be in the following format:
+                          { options: ["option1", "option2", "option3", "option4"], explanation: "your short, explanation for the question's answer" }                        
+
+                          guidelines for your response:
+                          1. The options array will contain 3 incorrect options and the correct option. All the options should be shuffled in a random order.
+                          2. The explanation string: provide a short, explanation for the question's answer
+                        `})
+                    })
+
+                    const response = await api.json()
+                    allGeneratedDetails.push(response.response)
+                      
+                    
+                });
+
+            });
+
+            setGeneratedQuizDetails(allGeneratedDetails)
+
+        }
+
+        generateQuizDetails();
+
+    }, [flashcardSet])
+
+
+
+    const quizData = []
 
     flashcardSet?.forEach(set => {
         let idCount = 1;
@@ -61,9 +105,9 @@ export default function QuizSet({ params }) {
                 id: idCount,
                 type: "multiple-choice",
                 question: card.front,
-                options: [card.back, "", "", ""],
+                options: generatedQuizDetails[idCount-1]?.options,
                 correctAnswer: card.back,
-                explanation: ""
+                explanation: generatedQuizDetails[idCount-1]?.explanation
             })
 
             idCount++; 
