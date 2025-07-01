@@ -18,7 +18,7 @@ export default function Navbar() {
 
     const pathname = usePathname()
 
-    const hideNavbar = pathname?.startsWith('/flashcards/practice/') || pathname?.startsWith('/flashcards/play/')
+    const hideNavbar = pathname?.startsWith('/flashcards/practice/') || pathname?.startsWith('/flashcards/play/') || pathname?.startsWith('/flashcards/quiz/') 
 
     if (hideNavbar) return null
     return (

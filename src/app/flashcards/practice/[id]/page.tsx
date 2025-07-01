@@ -11,6 +11,8 @@ import Link from "next/link";
 import { getSetById, uploadConversationHistory } from "@/lib/dbFunctions";
 import Image from 'next/image'
 
+import { useCompletion } from '@ai-sdk/react'
+
 interface FlashCard extends Card {
     cardId: number;
     front: string;
@@ -63,6 +65,10 @@ export default function PracticeSet({ params }) {
         getInfo()
     }, [paramId])
 
+
+    const { completion, complete } = useCompletion({
+        api: '/api/chat/gptnano-response',
+    })
 
     const set = flashcardSet[0];
     const jsonCards = set?.cards;
@@ -278,27 +284,27 @@ export default function PracticeSet({ params }) {
 
             setMessage("");
             
-            try {
-                const res = await fetch("/api/chat/gptnano-response", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        message: updatedMessages,
-                        sessionId: crypto.randomUUID() 
-                    })
-                });
+            // try {
+            //     const res = await fetch("/api/chat/gptnano-response", {
+            //         method: "POST",
+            //         headers: {"Content-Type": "application/json"},
+            //         body: JSON.stringify({
+            //             message: updatedMessages,
+            //             sessionId: crypto.randomUUID() 
+            //         })
+            //     });
                 
-                const data = await res.json();
+            //     const data = await res.json();
                 
-                const modelMessage: Message = {
-                    role: "assistant",
-                    content: data.response
-                };
+            //     const modelMessage: Message = {
+            //         role: "assistant",
+            //         content: data.response
+            //     };
                 
-                setAllMessages((prev) => [...prev, modelMessage]);
-            } catch (error) {
-                console.error('Chat error:', error);
-            }
+            //     setAllMessages((prev) => [...prev, modelMessage]);
+            // } catch (error) {
+            //     console.error('Chat error:', error);
+            // }
             
         }        
     };
