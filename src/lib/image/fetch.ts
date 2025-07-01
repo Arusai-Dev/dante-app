@@ -1,40 +1,51 @@
+import { useCreateStore } from "@/app/stores/createStores"
 import { getSetById } from "../dbFunctions"
 
 export const RetrieveSetImages = async (setId: number) => {
     const set = await getSetById(setId)
-    const currentSetCardsWithImages = set[0]?.cards.filter(card => card.fileName && card.fileName.trim() !== "")
-    
+    const currentSetCardsWithImages = set[0]?.cards.filter(card => card.originalFileName && card.originalFileName.trim() !== "")
+    if (!currentSetCardsWithImages) return
     const imagePromises = currentSetCardsWithImages.map(async (card) => {
-        console.log("setId:", setId, "cardId:", card.cardId, "fileName:", card.fileName)
-        const imageUrl = await handleImageRetrieval(setId, card.cardId, card.fileName)
-        console.log("imageUrl:", imageUrl)
+        const imageEntries: [string, string | null][] = [];
 
-        const exists = await checkImageExists(imageUrl)
-        if (exists) {
-            const isExternal = imageUrl.startsWith("https://") || imageUrl.startsWith("http://")
-            const proxiedUrl = isExternal ? `/api/proxy/image?url=${encodeURIComponent(imageUrl)}` : imageUrl
+        const originalImageUrl = await handleImageRetrieval(setId, card.cardId, card.originalFileName)
+        const originalImageExists = await checkImageExists(originalImageUrl)
+        if (originalImageExists) {
+            console.log("Found original image...")
+            const isExternal = originalImageUrl.startsWith("https://") || originalImageUrl.startsWith("http://")
+            const proxiedOriginal = isExternal ? `/api/proxy/image?url=${encodeURIComponent(originalImageUrl)}` : originalImageUrl   
             
-            return [card.cardId, proxiedUrl]
-        } else {
-            console.warn(`Image not found or not accessible:`, card.fileName)
-            return [card.cardId, null]
+            imageEntries.push([`${card.cardId}-original`, proxiedOriginal]);
         }
+
+        if (card.croppedFileName != "") {
+            const croppedImageUrl = await handleImageRetrieval(setId, card.cardId, card.croppedFileName)
+            const croppedImageExists = await checkImageExists(croppedImageUrl)
+            if (croppedImageExists) {
+                console.log("Found cropped image...")
+                const isExternal = croppedImageUrl.startsWith("https://") || croppedImageUrl.startsWith("http://")
+                const proxiedCropped = isExternal ? `/api/proxy/image?url=${encodeURIComponent(croppedImageUrl)}` : croppedImageUrl   
+                
+                imageEntries.push([`${card.cardId}-cropped`, proxiedCropped]);
+            }
+        }
+
+        return imageEntries
     })
 
-    const entries = await Promise.all(imagePromises)
+    const nestedResults = await Promise.all(imagePromises);
+    const flatEntries = nestedResults.flat()
 
-    const filteredEntries = entries.filter(Boolean);
-    filteredEntries
-        .sort((a, b) => a[0] - b[0])
-        .forEach(([, url]) => {
-            if (url) preloadImage(url);
-        });
+    flatEntries
+        .filter(([, url]) => !!url)
+        .forEach(([, url]) => preloadImage(url!))
 
-    return Object.fromEntries(filteredEntries);
+    return Object.fromEntries(flatEntries);
 }
 
 export const handleImageRetrieval = async (setId: number, cardId: number, fileName: string) => {
     const key = `${setId}/${cardId}/${fileName}`;
+    console.log("S3 key:", key);
 
     try {
         const res = await fetch(`/api/S3/retrieve?key=${key}`)
@@ -43,6 +54,8 @@ export const handleImageRetrieval = async (setId: number, cardId: number, fileNa
         }
 
         const data = await res.text()
+        console.log("Image URL from backend:", data);
+
         return data
     } catch(err) {
         console.error("Error in fetching image from frontend:", err)
@@ -67,3 +80,5 @@ export const preloadImage = (src: string) => {
     const img = new Image();
     img.src = src;
 };
+
+

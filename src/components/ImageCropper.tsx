@@ -5,18 +5,15 @@ import Cropper from 'react-easy-crop'
 import * as Slider from "@radix-ui/react-slider";
 import { useCreateStore } from '@/app/stores/createStores';
 import { getCroppedImg } from '@/lib/image';
-import { convertUrlToFile } from '@/app/hooks/cardHooks/useCardHandlers';
 
 export default function ImageEditor() {
     const { 
-        currentSelectedImage,
-        setCurrentSelectedImage,
+        currentSelectedImageUrl,
+        setCurrentSelectedImageUrl,
         imageCropUi,
         setImageCropUI,
-        originalImageUrl,
         setOriginalImageUrl,
-        setOriginalFile,
-        setCroppedFile,
+        setCroppedImageUrl,
     } = useCreateStore()
 
     const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -28,14 +25,12 @@ export default function ImageEditor() {
     }, [])
 
     const handleCrop = async () => {
-        const croppedImage = await getCroppedImg(currentSelectedImage, croppedAreaPixels);
+        const croppedImageUrl = await getCroppedImg(currentSelectedImageUrl, croppedAreaPixels);
+        
+        setCroppedImageUrl(croppedImageUrl)
+        setCurrentSelectedImageUrl(croppedImageUrl)
 
         setImageCropUI(false)
-        setOriginalImageUrl(currentSelectedImage)
-        setCurrentSelectedImage(croppedImage)
-
-        setOriginalFile(convertUrlToFile(originalImageUrl, "original"))
-        setCroppedFile(convertUrlToFile(currentSelectedImage, "cropped"))
     };
 
     return (
@@ -54,7 +49,7 @@ export default function ImageEditor() {
                         >
                             <div>
                                 <Cropper
-                                    image={originalImageUrl}
+                                    image={currentSelectedImageUrl}
                                     crop={crop}
                                     zoom={zoom}
                                     maxZoom={10}
@@ -104,7 +99,10 @@ export default function ImageEditor() {
                                 </Slider.Root>
                             </div>
                         </div>
-                        <button className=' gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center  h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary' onClick={handleCrop}>Crop</button>
+                        <button 
+                            className="gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center  h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary" 
+                            onClick={handleCrop}
+                        >Crop</button>
                     </div>
                 </>
             )}

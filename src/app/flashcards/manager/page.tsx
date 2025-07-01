@@ -3,35 +3,61 @@
 import { useEffect, useState } from "react"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
 import { useCreateStore } from "@/app/stores/createStores"
-import SetSelectionSection from "@/components/SetSelectionSection"
+import SetSelectionComp from "@/components/SetSelectionComp"
 import ImageCropper from "@/components/ImageCropper"
 import { fieldMissingModal } from "@/components/modals/fieldMissingModal"
-import { handleImageUrlInput, handleFileChange, clearCurrentImage } from "@/app/hooks/cardHooks/useImageHandlers"
-import { updateSetImagesMap } from "@/app/hooks/cardHooks/useSetHandlers"
-import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/cardHooks/useCardHandlers"
+import { handleImageUrlInput, handleFileChange, clearCurrentImage } from "@/app/hooks/managerHooks/useImageHandlers"
+import { updateSetImagesMap } from "@/app/hooks/managerHooks/useSetHandlers"
+import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/managerHooks/useCardHandlers"
+
+export const fetchAllData = () => {
+    const {
+        updatingCard,
+        currentSet,
+        currentSelectedImageUrl,
+        currentSetImages,
+        currentCardData,
+        imageCropUi,
+        containsImages,
+        originalImageUrl,
+        croppedImageUrl,
+        originalFile,
+        croppedFile,
+        previousFile,
+    } = useCreateStore.getState();
+
+    console.log({
+        updatingCard,
+        currentSet,
+        currentSelectedImageUrl,
+        currentSetImages,
+        currentCardData,
+        imageCropUi,
+        containsImages,
+        originalImageUrl,
+        croppedImageUrl,
+        originalFile,
+        croppedFile,
+        previousFile,
+    });
+};
 
 
 export default function Create() {
-    // Todo:
-    // 1. when crop is pressed check if originalImgUrl exists /
-    // 2. If not: store current url /
-    // 3. then: create new blob url of cropped img /
-    // 4. when card is added or updated, pass originalImgUrl and croppedImgUrl to card json /
-    // 5. upload originalImg and croppedImg to s3 for storing /
-    // 6. whenever a card is being edited and edit img btn is pressed, show originalImgUrl instead of croppedImgUrl
 
     const { 
         updatingCard,
         setUpdatingCard,
         currentSet,
-        currentSelectedImage,
-        setCurrentSelectedImage,
+        currentSelectedImageUrl,
+        setCurrentSelectedImageUrl,
         currentSetImages,
         currentCardData,
         setCurrentCardData,
         setImageCropUI,
         setSets, 
-        setDropDownIsOpen, 
+        setCroppedImageUrl,
+        setOriginalImageUrl,
     } = useCreateStore()
 
     const [active, setActive] = useState<string>("create");
@@ -57,7 +83,7 @@ export default function Create() {
     const clearCard = useCreateStore(state => state.clearCurrentCardData)
     const clearCurrentCardData = () => {
         clearCard()
-        setCurrentSelectedImage("")
+        setCurrentSelectedImageUrl("")
     }
 
     // Preview Card
@@ -66,19 +92,7 @@ export default function Create() {
         setShowFront(!showFront);
     }
 
-    // Closes any open UI
-    const closeAnyUi = (e: MouseEvent) => {
-        const target = e.target as HTMLElement; 
-        if (!target.closest(".select-set-dd")) {setDropDownIsOpen(false)}
-    }
 
-    useEffect(() => {
-        document.addEventListener('click', closeAnyUi);
-
-        return () => {
-            document.removeEventListener('click', closeAnyUi);
-        };
-    }, []);
 
     const handleEditCardBtnPress = async (
         setId: number,
@@ -86,7 +100,8 @@ export default function Create() {
         category: string,
         front: string,
         back: string,
-        fileName: string,
+        originalFileName: string,
+        croppedFileName: string,
     ) => {  
         setCurrentCardData({
             setId: setId,
@@ -94,14 +109,29 @@ export default function Create() {
             category: category,
             front: front,
             back: back,
-            fileName: fileName,
+            originalFileName: originalFileName,
+            croppedFileName: croppedFileName,
         })
 
-        setPreviousFileName(fileName);
+        setPreviousFileName(originalFileName);
         setActive("create")
-        setCurrentSelectedImage(currentSetImages[cardId])
+        setCurrentSelectedImageUrl(
+            currentSetImages[`${cardId}-cropped`] ??
+            currentSetImages[`${cardId}-original`] ??
+            ""
+        )
+        setOriginalImageUrl(
+            currentSetImages[`${cardId}-original`] ??
+            ""
+        )
+        setCroppedImageUrl(
+            currentSetImages[`${cardId}-cropped`] ??
+            ""
+        )
         setUpdatingCard(true)
     }  
+
+    fetchAllData()
 
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
@@ -113,7 +143,7 @@ export default function Create() {
             </div>      
 
 
-            <SetSelectionSection/>
+            <SetSelectionComp/>
 
 
             {/* Nav -> Create Card / Manage Cards */}
@@ -201,11 +231,11 @@ export default function Create() {
 
                         <ImageCropper/>
                         
-                        {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
+                        {(currentSelectedImageUrl || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                             <div className="flex justify-between mt-4">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
-                                    src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
+                                    src={currentSelectedImageUrl || currentSetImages[currentCardData["fileName"]]}
                                     alt="Card preview"
                                     width={200}
                                     height={200}
@@ -286,10 +316,10 @@ export default function Create() {
                                 <h2 className="pl-3 py-2">{currentCardData["category"] == "" ? "Category" : currentCardData["category"]}</h2>
                                 <div className="flex justify-center items-center h-[calc(100%-80px)] gap-[16px] text-sm lg:text-lg">
                                     <div className="w-[50%] flex justify-center">{currentCardData["back"]}</div>
-                                    {(currentSelectedImage || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
+                                    {(currentSelectedImageUrl || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <img
-                                            src={currentSelectedImage || currentSetImages[currentCardData["fileName"]]}
+                                            src={currentSelectedImageUrl || currentSetImages[currentCardData["fileName"]]}
                                             alt="Card preview"
                                             width={200}
                                             height={200}
@@ -342,7 +372,7 @@ export default function Create() {
                                                     <Edit 
                                                         className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
                                                         onClick={() => {
-                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back, card.fileName)
+                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back, card.originalFileName, card.croppedFileName)
                                                         }}
                                                     />
                                                 </div>
@@ -366,11 +396,15 @@ export default function Create() {
                                         <h1 className={`text-[12px] md:text-lg font-semibold truncate w-full text-[#474747] px-2`}>{card.back}</h1>
                                         <div className="pr-1">
                                             {
-                                                currentSetImages[card.cardId] ? (
+                                                currentSetImages[`${card.cardId}-original`] ? (
                                                     // eslint-disable-next-line @next/next/no-img-element
                                                     <img
-                                                    src={currentSetImages[card.cardId]}
-                                                    alt={card.fileName}
+                                                    src={
+                                                        card.croppedFileName
+                                                            ? currentSetImages[`${card.cardId}-cropped`]
+                                                            : currentSetImages[`${card.cardId}-original`]
+                                                    }
+                                                    alt={card.originalFileName}
                                                     className={`w-[100px] md:w-[245px] aspect-square object-cover border border-[#b1b1b1] rounded-[5px] ${loading ? "hidden" : ""}`}
                                                     />
                                                 ) : (

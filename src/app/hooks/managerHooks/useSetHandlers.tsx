@@ -14,21 +14,23 @@ export const updateCurrentSet = async (id: number) => {
 // Update Set Images
 export const updateSetImagesMap = async (id: number) => {
     const set = await getSetById(id)
-    if (!set[0]) return
-
+    console.log("HELP:",set[0]?.cards)
     const cardsWithImages = set[0]?.cards.filter((card: { fileName: string; }) => card.fileName && card.fileName.trim() !== "")
+    if (!cardsWithImages) return
+    
     if (cardsWithImages.length === 0) {
         useCreateStore.getState().setContainsImages(false)
         console.log("No images to fetch")
         return
     }
-
     useCreateStore.getState().setContainsImages(true)
     const map = await RetrieveSetImages(id)
     for (const [, imageUrl] of Object.entries(map)) {
         preloadImage(imageUrl)
     }
     useCreateStore.getState().setCurrentSetImages(map)
+
+    console.log(useCreateStore.getState().currentSetImages)
 };
 
 // Delete Set

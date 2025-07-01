@@ -89,7 +89,8 @@ export async function addOneCardToSet(
     category: string,
     front: string,
     back: string,
-    fileName: string,
+    originalFileName: string,
+    croppedFileName: string,
 ) {
     try {
         const due = 0
@@ -111,7 +112,8 @@ export async function addOneCardToSet(
                 category, 
                 front, 
                 back, 
-                fileName,
+                originalFileName,
+                croppedFileName,
                 due,
                 reps,
                 state,
@@ -149,7 +151,8 @@ export async function updateCardData(
     category: string,
     front: string,
     back: string,
-    fileName: string,
+    originalFileName: string,
+    croppedFileName: string,
 ) {
     try {
         const result = await sql<{ cards: any[] }>(
@@ -162,7 +165,7 @@ export async function updateCardData(
 
         const updatedCards = currentCards.map((card) => {
             if (card.cardId === cardId) {
-                return { ...card, category, front, back, fileName };
+                return { ...card, category, front, back, originalFileName, croppedFileName };
             }
             return card;
         });

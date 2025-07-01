@@ -6,8 +6,7 @@ type createStoreState = {
     updatingCard: boolean
     sets: any[]
     currentSet: any
-    dropDownIsOpen: boolean
-    currentSelectedImage: any
+    currentSelectedImageUrl: any
     currentSetImages: any
     currentCardData: {
         setId: number | null
@@ -15,7 +14,8 @@ type createStoreState = {
         category: string
         front: string
         back: string
-        fileName: string
+        originalFileName: string
+        croppedFileName: string
         // due: number
         // reps: number
         // state: number
@@ -29,6 +29,7 @@ type createStoreState = {
     imageCropUi: boolean
     containsImages: boolean
     originalImageUrl: string
+    croppedImageUrl: string
     originalFile: any
     croppedFile: any
     previousFile: any
@@ -36,13 +37,13 @@ type createStoreState = {
     setUpdatingCard: (mode: boolean) => void
     setSets: (data: any[]) => void
     setCurrentSet: (data: any) => void
-    setDropDownIsOpen: (mode: boolean) => void
-    setCurrentSelectedImage: (mode: any) => void
+    setCurrentSelectedImageUrl: (mode: any) => void
     setCurrentSetImages: (data: any) => void
     setCurrentCardData: (data: any) => void
     setImageCropUI: (mode: boolean) => void 
     setContainsImages: (mode: boolean) => void 
     setOriginalImageUrl: (mode: string) => void 
+    setCroppedImageUrl: (mode: string) => void 
     setOriginalFile: (data: any) => void
     setCroppedFile: (data: any) => void
     setPreviousFile: (data: any) => void
@@ -57,8 +58,7 @@ export const useCreateStore = create(
             updatingCard: false,
             sets: [],
             currentSet: [],
-            dropDownIsOpen: false,
-            currentSelectedImage: "",
+            currentSelectedImageUrl: "",
             currentSetImages: [],
             currentCardData: {
                 setId: null, 
@@ -66,7 +66,8 @@ export const useCreateStore = create(
                 category: 'Category', 
                 front: 'Front', 
                 back: 'Back', 
-                fileName: '',
+                originalFileName: '',
+                croppedFileName: '',
                 // due: 0,
                 // reps: 0,
                 // state: 0,
@@ -80,6 +81,7 @@ export const useCreateStore = create(
             imageCropUi: false,
             containsImages: false,
             originalImageUrl: "",
+            croppedImageUrl: "",
             originalFile: {},
             croppedFile: {},
             previousFile: {},
@@ -87,16 +89,16 @@ export const useCreateStore = create(
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
             setSets: (data) => set({ sets: data }),
             setCurrentSet: (data) => set({ currentSet: data }),
-            setDropDownIsOpen: (mode) => set({ dropDownIsOpen: mode }),
-            setCurrentSelectedImage: (mode) => set({ currentSelectedImage: mode }),
+            setCurrentSelectedImageUrl: (mode) => set({ currentSelectedImageUrl: mode }),
             setCurrentSetImages: (data) => set({ currentSetImages: data }),
             setCurrentCardData: (data) => set({ currentCardData: data }),
             setImageCropUI: (mode) => set({ imageCropUi: mode}),
             setContainsImages: (mode) => set({ containsImages: mode}),
             setOriginalImageUrl: (mode) => set({ originalImageUrl: mode}),
+            setCroppedImageUrl: (mode) => set({ croppedImageUrl: mode}),
             setOriginalFile: (data) => set({ originalFile: data }),
             setCroppedFile: (data) => set({ croppedFile: data }),
-            setPreviousFile: (data) => set({ file: data }),
+            setPreviousFile: (data) => set({ previousFile: data }),
             updateCurrentCardData: (key, value) => set({
                 currentCardData: {
                     ...get().currentCardData,
@@ -111,7 +113,8 @@ export const useCreateStore = create(
                         category: 'Category',
                         front: 'Front',
                         back: 'Back',
-                        fileName: '',
+                        originalFileName: '',
+                        croppedFileName: '',
                         // due: 0,
                         // reps: 0,
                         // state: 0,
@@ -121,7 +124,9 @@ export const useCreateStore = create(
                         // elapsed_day: 0,
                         // scheduled_days: 0,
                         // last_review: null,
-                    }
+                    },
+                    originalFile: null,
+                    croppedFile: null
                 })
             }
         }),

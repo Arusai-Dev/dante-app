@@ -1,12 +1,17 @@
 import { useCreateStore } from "@/app/stores/createStores";
 import { updateSetImagesMap } from "./useSetHandlers"
+import { convertUrlToFile } from "./useCardHandlers";
 
 
-function generateUniqueFilename() {
-    const timestamp = Date.now().toString(16);
-    const randomHex = Math.floor(Math.random() * 0xffff).toString(16).padStart(4, '0');
-    return `img_${timestamp}_${randomHex}.png`;
-}
+// TODO:
+// 1. *When the user adds an image ie. fileChange: save that file to originalFile & originalFileUrl so we can store the original
+// 2. *If the user decides to crop the image we have to save the croppedImageUrl and convert it to a file then save croppedFile  
+// 3. When user presses addCard both cropped and original are uploaded to S3
+// 4. The fileName that is given for addCard is croppedFile.name
+// 5. On ImageRetrieval fetch both imgs
+// 6. Show croppedImg on all img sections
+// 7. When card is being edited and cropped button is pressed show originalImageUrl to allow re-cropping
+
 
 // Upload
 export const handleImageUpload = async (cardId: number) => {
@@ -78,43 +83,31 @@ export const handleImageDelete = async (cardId: number, fileName: string) => {
 
 
 // Update
-export const handleImageUpdate = async (previousFileName: string, fileName: string, cardId: number) => {
-    const originalFile = useCreateStore.getState().originalFile
+export const handleImageUpdate = async (
+    previousOriginalFileName: string, 
+    previousCroppedFileName: string, 
+    cardId: number
+) => {
+    if (previousOriginalFileName)
+        await handleImageDelete(cardId, previousOriginalFileName)
 
-    if (originalFile && previousFileName) {
-        await handleImageDelete(cardId, fileName);
-        
-        const formData = new FormData();
-        formData.append("file", originalFile);
-        
-        await handleImageUpload(cardId)
-    }
+    if (previousCroppedFileName)
+        await handleImageDelete(cardId, previousCroppedFileName)
+
+    handleImageUpload(cardId)
 }
 
 
 export const handleImageUrlInput = async (e) => {
-    const currentCardData = useCreateStore.getState().currentCardData
-
     const inputtedUrl = e.target.value;
-    const uniqueName = generateUniqueFilename()
 
     try {
-        const res = await fetch(inputtedUrl, { mode: 'cors' });
-        const blob = await res.blob();
-
-        if (!blob.type.startsWith('image/')) {
-            throw new Error(`Invalid image type: ${blob.type}`);
-        }
         
-        const fileFromUrl = new File([blob], uniqueName, { type: blob.type })
+        const fileFromUrl = await convertUrlToFile(inputtedUrl, "original")
 
         useCreateStore.getState().setOriginalFile(fileFromUrl)
-        useCreateStore.getState().setCurrentSelectedImage(URL.createObjectURL(blob));
-        console.log(uniqueName)
-        useCreateStore.getState().setCurrentCardData({
-            ...currentCardData,
-            fileName: uniqueName,
-        });
+        useCreateStore.getState().setOriginalImageUrl(inputtedUrl)
+        useCreateStore.getState().setCurrentSelectedImageUrl(useCreateStore.getState().originalImageUrl);
 
     } catch(error) {
         console.log("Image Url Input Error:", error)
@@ -122,19 +115,20 @@ export const handleImageUrlInput = async (e) => {
 };
 
 
+// Save original file data to allow recropping in the future
 export const handleFileChange = (e) => {
-    const currentCardData = useCreateStore.getState().currentCardData
-    
     const selectedImage = e.target.files[0]
+    console.log(selectedImage)
     if (selectedImage) {
         useCreateStore.getState().setOriginalFile(selectedImage)
         const imageURL = URL.createObjectURL(selectedImage);
-        useCreateStore.getState().setOriginalImageUrl(imageURL)
-        useCreateStore.getState().setCurrentSelectedImage(imageURL)
-        useCreateStore.getState().setCurrentCardData({
-            ...currentCardData,
-            fileName: selectedImage.name,
-        });
+        console.log("imageURL:",imageURL)
+        useCreateStore.getState().setCurrentSelectedImageUrl(imageURL)
+
+        useCreateStore.getState().setCroppedFile(null);
+        useCreateStore.getState().setCroppedImageUrl("");
+        useCreateStore.getState().setOriginalImageUrl("");
+
     }
 };
 
@@ -142,9 +136,11 @@ export const handleFileChange = (e) => {
 export const clearCurrentImage = () => {
     const currentCardData = useCreateStore.getState().currentCardData
 
-    useCreateStore.getState().setCurrentSelectedImage(null);
+    useCreateStore.getState().setCurrentSelectedImageUrl("");
     useCreateStore.getState().setOriginalFile(null);
     useCreateStore.getState().setCroppedFile(null);
+    useCreateStore.getState().setCroppedImageUrl("");
+    useCreateStore.getState().setOriginalImageUrl("");
 
     useCreateStore.getState().setCurrentSetImages(prevImages => {
         const updated = { ...prevImages };
