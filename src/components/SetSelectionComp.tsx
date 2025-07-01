@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon } from "lucide-react";
+import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2 } from "lucide-react";
 import { createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast } from "sonner";
@@ -20,6 +20,20 @@ export default function SetSelectionComp() {
     const [selectedDelimiterText, setSelectedDelimiterText] = useState("Pipe (|)");
     const [selectedDelimiter, setSelectedDelimiter] = useState("|");
     const [delimiterDropDown, setDelimiterDropDown] = useState(false);
+    const [importedCardData, setImportedCardData] = useState([
+        {
+            "id": 1,
+            "front": "What is 2+2?",
+            "back": "4",
+            "category": "Math",
+        },
+        {
+            "id": 2,
+            "front": "What is the capital of France?",
+            "back": "Paris",
+            "category": "Geography"
+        }
+    ]);
 
     const delimiters = ["Pipe (|)", "Comma (,)", "Semicolon (;)", "Tab"]
 
@@ -299,19 +313,33 @@ export default function SetSelectionComp() {
             <>
             <div className="fixed inset-0 bg-black/3 backdrop-blur-sm z-30" onClick={toggleImportUI}></div>
 
-            <div className="
+            {/* <div className="
                 fixed 
                 right-[5px]
-                left-[5px] md:left-1/2
-                top-[55px] md:top-1/2
-                translate-x-0 md:-translate-x-1/2
-                translate-y-0 md:-translate-y-1/2
-                md:transform 
-                overflow-y-scroll
+                left-[5px] lg:left-1/2
+                top-[55px] lg:top-1/2
+                translate-x-0 lg:-translate-x-1/2
+                translate-y-0 lg:-translate-y-1/2
+                lg:transform
                 z-40
-            "
+            " */}
+            <div
+                className="
+                    fixed
+                    z-40
+                "
             >
-                <div className="max-w-[875px] bg-[#1e1e1e] p-2 md:p-7 flex flex-col gap-4 md:gap-5 rounded-[5px] md:rounded-[10px] border-2 border-[#cfcfcf]">
+                <div 
+                    className="
+                        max-w-[875px] flex flex-col lg:border-2 lg:border-[#cfcfcf] bg-[#1e1e1e] 
+                        lg:mt-5
+                        p-4 lg:p-7 
+                        gap-4 lg:gap-5 
+                        rounded-[5px] lg:rounded-[10px] 
+                        h-screen lg:h-[calc(100vh-80px)]
+                        overflow-y-scroll
+                        ">
+                    {/* Header */}
                     <div>
                         <h1 className="font-bold text-[14px] md:text-[20px]">Bulk Import Cards</h1>
                         <h3 className="text-[11px] md:text-[16px]">
@@ -321,9 +349,9 @@ export default function SetSelectionComp() {
                             your chosen delimiter.
                         </h3>
                     </div>
-
+                    {/* Delimiter selection */}
                     <div>
-                        <h2 className="pb-1 text-[11px] md:text-[16px] md:text-md font-semibold">Delimiter</h2>
+                        <h2 className="pb-1 text-[13px] md:text-[16px] font-semibold">Delimiter</h2>
                         <button 
                             className="flex justify-between cursor-pointer items-center w-full gap-[3px] md:gap-2 h-[25px] lg:w-[230px] md:w-[150px] lg:h-[40px] whitespace-nowrap sm:pr-[2px] py-1 pl-[8px] pr-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
                             onClick={() => setDelimiterDropDown(!delimiterDropDown)}
@@ -355,28 +383,74 @@ export default function SetSelectionComp() {
                             </div>
                         )}  
                     </div>
-
+                    {/* Card data text area */}
                     <div>
-                        <h2 className="pb-1 text-[11px] md:text-[16px] font-semibold">Card Data</h2>
+                        <h2 className="pb-1 text-[13px] md:text-[16px] font-semibold">Card Data</h2>
 
-                        <textarea className="text-[11px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[155px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                        <textarea className="text-[13px] md:text-[16px] px-2 py-1 w-full resize-y h-[110px] md:h-[155px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
                             placeholder={
                                 `Enter your cards, one per line. Format:\nFront${selectedDelimiter}Back${selectedDelimiter}Category\n\nExample:\nWhat is 2+2?${selectedDelimiter}4${selectedDelimiter}Math\nCapital of France${selectedDelimiter}Paris${selectedDelimiter}Geography`
                             }
                         ></textarea>
                     </div>
-
+                    {/* Guidelines for importing data */}
                     <div className="bg-[#D9D9D9]/3 p-3 rounded-[10px]">
                         <div className="flex gap-2">
                             <FileTextIcon className="w-[18px]"/>
-                            <p className="font-semibold text-[14px]">Format Guidelines:</p>
+                            <p className="font-semibold text-[13px] md:text-[16px] pt-1">Format Guidelines:</p>
                         </div>
-                        <ul className="list-disc pl-7 list-inside space-y-[2px] text-sm">
+                        <ul className="list-disc pl-10 space-y-[2px] text-sm list-outside text-[11px] md:text-[16px]">
                             <li>One card per line</li>
                             <li>Use your chosen delimiter to separate front, back, and category</li>
                             <li>Category is optional</li>
                             <li>Empty lines will be ignored</li>
                         </ul>
+                    </div>
+                    {/* Display imported cards */}    
+                    <div className=" font-semibold">   
+                        <h1 className="text-[13px] md:text-[16px]">Card Data:</h1>
+                        <div className="overflow-y-auto p-3 border-1 border-[#8f8f8f]">  
+                            {importedCardData.map((card, key) => (
+                                <div
+                                    key={key}
+                                    className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col pb-3"
+
+                                >   
+                                    <div className="flex justify-between pt-2 px-2">
+                                        <h1 className="text-[8px] md:text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
+                                            {card.category == "Category" ? "N/A": card.category }
+                                        </h1>
+                                        <div className="flex gap-1 items-center">
+                                            <div className="flex items-center justify-center ">
+                                                <Trash2 
+                                                    className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
+                                                    onClick={() => {
+                                                        console.log("Deleted Card")
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {/* TODO: feat: change card values individually */}
+                                    <div className="h-full flex pt-[20px] md:pt-[20px] px-2">
+                                        {/* <textarea
+                                            className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[34px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                                            placeholder=""
+                                            value={card.front}
+                                        ></textarea> */}
+                                        <h1 className="text-[13px] md:text-[16px]">{card.front}</h1>
+                                    </div>
+                                    <div className="w-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px] px-2">
+                                        {/* <textarea 
+                                            className="text-[12px] text-[#272727] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[34px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                                            placeholder=""
+                                            value={card.back}
+                                        ></textarea> */}
+                                        <h1 className="text-[12px] md:text-[16px] text-[#272727] ">{card.back}</h1>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
