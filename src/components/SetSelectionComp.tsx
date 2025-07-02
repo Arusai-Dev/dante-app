@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2, Save } from "lucide-react";
+import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2, Save, MenuSquare, Menu } from "lucide-react";
 import { addMultipleCardsToSet, createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ export default function SetSelectionComp() {
     const [selectedDelimiter, setSelectedDelimiter] = useState("|");
     const [delimiterDropDown, setDelimiterDropDown] = useState(false);
     const [importedCardData, setImportedCardData] = useState();
+    const [mobileActionsDropDown, setMobileActionsDropDown] = useState(false);
     const tempCardData = [
         {
             id: 1,
@@ -187,7 +188,160 @@ export default function SetSelectionComp() {
     return (
         <>
         {/* Set Selection / Description */}
-        <div className="mt-10 flex flex-col-reverse relative md:flex-row w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:justify-between h-[100px] md:h-[150px] bg-[#D9D9D9]/3 py-2 px-2 md:px-3 rounded-[10px] gap-2">
+        {/* Select Set Drop Down / New Set Button */} 
+        <div className="md:w-[1150px]">
+            <div className="
+                justify-end mt-3 flex 
+                flex-col md:flex-row
+                gap-[5px] md:gap-[11px]">
+
+                {/* Select Set Drop Down */}
+                <div className="select-set-dd">
+                    <button 
+                        className="
+                            flex cursor-pointer justify-between items-center whitespace-nowrap bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
+                            gap-[5px] md:gap-[11px]
+                            text-[12px] md:text-[14px] lg:text-[16px]
+                            w-[calc(100vw-20px)] md:w-[110px] lg:w-[140px]
+                            h-[25px] lg:h-[40px]
+                            px-2
+                        "
+                        onClick={toggleDropDown}
+                    >
+
+                        <div className="truncate text-[12px] md:text-[14px] lg:text-[16px]">{currentSet.title == null ? "Select A Set" : currentSet.title}</div>
+                        <div className="flex items-center justify-center">
+                            <ArrowDown className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
+                        </div>
+                    </button>
+
+                    {/* Drop Drown Content */} 
+                    {dropDownIsOpen && (
+                        <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
+                            {sets.map((set, index:number) => (
+                                <div 
+                                    key={index} 
+                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] md:pl-1 gap-x-1 mx-1 md:mr-2 hover-animation whitespace-nowrap "
+                                    
+                                    onClick={() => {
+                                        setCurrentSet(set)
+                                        const updateCtn = async () => {
+                                            await updateCardCount(currentSet.id, currentSet.card_cnt)
+                                        }
+                                        updateCtn()
+                                    }}
+                                >
+                                    <div className="flex items-center justify-center">
+                                        {currentSet.title == set.title && (
+                                            <Check className="h-[16px] md:h-[20px] md:w-[20px] mx-1"/>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="w-fit md:max-w-[250px] text-[12px] md:text-lg overflow-x-hidden truncate" title={set.title}>{set.title}</div>
+                                </div>
+                            ))}
+                        </div>
+                    )}        
+                </div>
+
+
+                {/* Bulk Import */}
+                <div className="hidden md:block">
+
+                    <button
+                        className="
+                            flex cursor-pointer justify-between items-center whitespace-nowrap  bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
+                            gap-[5px] md:gap-[11px]
+                            text-[12px] md:text-[14px] lg:text-[16px]
+                            w-[110px] md:w-[110px] lg:w-[140px]
+                            h-[25px] lg:h-[40px]
+                            px-2
+                        "
+                        onClick={toggleImportUI}
+                    >
+                        <div className="flex items-center justify-center">
+                            <Import className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
+                        </div>
+                        <h1>Bulk Import</h1>
+                    </button>
+                </div>
+                
+
+                {/* New Set Button */}
+                <div className="new-set-btn hidden md:block">
+                    <button 
+                        className="flex cursor-pointer justify-between items-center text-[12px] md:text-[14px] lg:text-[16px] w-full md:w-[110px] lg:w-[130px] h-[25px] lg:h-[40px] md:text-lg whitespace-nowrap py-1 pb-[5px] lg:pr-[8px] lg:pl-[8px] pr-[7px] pl-[5px] sm:pr-[8px] bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                        onClick={toggleNewSetUI}
+                    >
+                        <div className="flex items-center justify-center">
+                            <PlusCircle className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
+                        </div>
+                        New Set
+                    </button>
+                </div>
+
+                <div className="md:hidden"
+                    onClick={() => setMobileActionsDropDown(!mobileActionsDropDown)}
+                >
+                    <button
+                        className="
+                            flex cursor-pointer justify-center items-center whitespace-nowrap bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
+                            gap-[5px] md:gap-[11px]
+                            text-[12px] md:text-[14px] lg:text-[16px]
+                            w-[calc(100vw-20px)] md:w-[110px] lg:w-[140px]
+                            h-[25px] lg:h-[40px]
+                            px-2
+                        "
+                    >   
+                        <Menu className="h-[16px] w-[16px]"
+                        />
+                        Actions
+                    </button>
+                    
+                    {mobileActionsDropDown && (
+                        <div className="absolute px-1 mt-1 flex flex-row gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
+                            {/* Bulk Import */}
+
+                            <button
+                                className="
+                                    flex cursor-pointer justify-between items-center whitespace-nowrap  bg-[#1d1d1d] rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
+                                    gap-[5px] md:gap-[11px]
+                                    text-[12px] md:text-[14px] lg:text-[16px]
+                                    w-[110px] md:w-[110px] lg:w-[140px]
+                                    h-[25px] lg:h-[40px]
+                                    px-2
+                                "
+                                onClick={toggleImportUI}
+                            >
+                                <div className="flex items-center justify-center">
+                                    <Import className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
+                                </div>
+                                <h1>Bulk Import</h1>
+                            </button>
+                            
+
+                            {/* New Set Button */}
+                            <button 
+                                className="flex cursor-pointer justify-between items-center text-[12px] md:text-[14px] lg:text-[16px] w-full md:w-[110px] lg:w-[130px] h-[25px] lg:h-[40px] md:text-lg whitespace-nowrap py-1 pb-[5px] lg:pr-[8px] lg:pl-[8px] pr-[7px] pl-[5px] sm:pr-[8px] bg-[#1d1d1d] rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                                onClick={toggleNewSetUI}
+                            >
+                                <div className="flex items-center justify-center">
+                                    <PlusCircle className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
+                                </div>
+                                New Set
+                            </button>
+                        </div>                      
+                    )}
+
+                </div>
+            </div>
+            </div>
+            <div className="
+                mt-3 relative bg-[#D9D9D9]/3 rounded-[10px] gap-2 w-[calc(100vw-20px)] flex
+                flex-col-reverse md:flex-row md:justify-between
+                max-w-[400px] md:max-w-[1150px]
+                h-[100px] md:h-[150px] p-3
+            ">
             <div className="flex flex-col justify-between h-full">
                 <div>
                     <h2 className="font-bold text-[14px] pb-1 md:text-xl lg:text-2xl truncate">{currentSet.title == null ? "No set selected..." : currentSet.title}</h2>
@@ -198,91 +352,6 @@ export default function SetSelectionComp() {
                         <p className="text-[12px] md:text-xl">{currentSet.card_cnt} Cards</p>
                     </div>
                 )}
-            </div>
-
-            {/* Select Set Drop Down / New Set Button */} 
-            {/* mobile/desktop tailwind */}
-
-            <div className="
-                absolute md:static 
-                left-1/2 md:left-auto 
-                top-[-30px] md:top-auto 
-                -translate-x-1/2 md:translate-x-0
-                w-[calc(100vw-20px)] md:w-fit 
-                max-w-[400px] md:max-w-[1150px] 
-                justify-center md:justify-between
-                md:flex md:flex-col md:items-end
-            ">
-                <div className="flex gap-[5px] md:gap-[11px]">
-                    {/* Select Set Drop Down */}
-                    <div className="select-set-dd basis-[70%] max-w-[68%] grow">
-                        <button 
-                            className="flex justify-between cursor-pointer items-center w-full gap-[3px] md:gap-2 h-[25px] lg:w-[230px] md:w-[150px] lg:h-[40px] whitespace-nowrap sm:pr-[2px] py-1 pl-[8px] pr-[4px] md:px-3 bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover-animation"
-                            onClick={toggleDropDown}
-                            >
-
-                            <div className="truncate font-semibold text-[12px] lg:text-[18px] md:text-[14px]">{currentSet.title == null ? "Select A Set" : currentSet.title}</div>
-                            <div className="flex items-center justify-center">
-                                <ArrowDown className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
-                            </div>
-                        </button>
-
-                        {/* Drop Drown Content */} 
-                        {dropDownIsOpen && (
-                            <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
-                                {sets.map((set, index:number) => (
-                                    <div 
-                                        key={index} 
-                                        className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] md:pl-1 gap-x-1 mx-1 md:mr-2 hover-animation whitespace-nowrap "
-                                        
-                                        onClick={() => {
-                                            setCurrentSet(set)
-                                            const updateCtn = async () => {
-                                                await updateCardCount(currentSet.id, currentSet.card_cnt)
-                                            }
-                                            updateCtn()
-                                        }}
-                                    >
-                                        <div className="flex items-center justify-center">
-                                            {currentSet.title == set.title && (
-                                                <Check className="h-[16px] md:h-[20px] md:w-[20px] mx-1"/>
-                                            )}
-                                        </div>
-                                        
-                                        <div className="w-fit md:max-w-[250px] text-[12px] md:text-lg overflow-x-hidden truncate" title={set.title}>{set.title}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}        
-                    </div>
-                    
-
-                    {/* New Set Button */}
-                    <div className="new-set-btn basis-[30%]">
-                        <button 
-                            className="flex cursor-pointer justify-between items-center font-semibold text-[12px] md:text-[14px] lg:text-[18px] w-full md:w-[110px] lg:w-[130px] h-[25px] lg:h-[40px] md:text-lg whitespace-nowrap py-1 pb-[5px] lg:pr-[8px] lg:pl-[8px] pr-[7px] pl-[5px] sm:pr-[8px] bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
-                            onClick={toggleNewSetUI}
-                        >
-                            <div className="flex items-center justify-center">
-                                <PlusCircle className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
-                            </div>
-                            New Set
-                        </button>
-                    </div>
-                </div>
-                <div>        
-                    <div className="">
-                        <button 
-                            className="flex cursor-pointer justify-between items-center font-semibold text-[12px] md:text-[14px] lg:text-[18px] w-full md:w-[110px] lg:w-[130px] h-[25px] lg:h-[40px] md:text-lg whitespace-nowrap py-1 pb-[5px] lg:pr-[8px] lg:pl-[8px] pr-[7px] pl-[5px] sm:pr-[8px] bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
-                            onClick={toggleImportUI}
-                        >
-                            <div className="flex items-center justify-center">
-                                <Import className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
-                            </div>
-                            Bulk Import
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
         
