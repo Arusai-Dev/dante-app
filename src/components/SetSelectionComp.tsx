@@ -1,10 +1,13 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2 } from "lucide-react";
-import { createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
+import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2, Save } from "lucide-react";
+import { addMultipleCardsToSet, createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast } from "sonner";
+import { generateUniqueCardId } from "@/lib/card/card";
+import LineNumberedTextarea from "./TextAreaLineNumbers";
+import { updateCurrentSet } from "@/app/hooks/managerHooks/useSetHandlers";
 
 export default function SetSelectionComp() {
 
@@ -20,20 +23,39 @@ export default function SetSelectionComp() {
     const [selectedDelimiterText, setSelectedDelimiterText] = useState("Pipe (|)");
     const [selectedDelimiter, setSelectedDelimiter] = useState("|");
     const [delimiterDropDown, setDelimiterDropDown] = useState(false);
-    const [importedCardData, setImportedCardData] = useState([
+    const [importedCardData, setImportedCardData] = useState();
+    const tempCardData = [
         {
-            "id": 1,
-            "front": "What is 2+2?",
-            "back": "4",
-            "category": "Math",
+            id: 1,
+            front: "What is 2+2?",
+            back: "4",
+            category: "Math",
+            due: 0,
+            reps: 0,
+            state: 0,
+            lapses: 0,
+            stability: 0,
+            difficulty: 0,
+            elapsed_day: 0,
+            scheduled_days: 0,
+            last_review: null,
         },
         {
             "id": 2,
             "front": "What is the capital of France?",
             "back": "Paris",
-            "category": "Geography"
+            "category": "Geography",
+            due: 0,
+            reps: 0,
+            state: 0,
+            lapses: 0,
+            stability: 0,
+            difficulty: 0,
+            elapsed_day: 0,
+            scheduled_days: 0,
+            last_review: null,
         }
-    ]);
+    ]
 
     const delimiters = ["Pipe (|)", "Comma (,)", "Semicolon (;)", "Tab"]
 
@@ -118,9 +140,42 @@ export default function SetSelectionComp() {
     }
 
     const handleImportDataChange = (e) => {
+        const data = e.target.value
 
-    }
+        const due = 0
+        const reps = 0
+        const state = 0
+        const lapses = 0
+        const stability = 0
+        const difficulty = 0
+        const elapsed_day = 0
+        const scheduled_days = 0
+        const last_review = null
 
+        const cards = data
+            .split("\n")
+            .filter(line => line.trim())
+            .map((line, index) => {
+                const [front, back, category] = line.trim().split(selectedDelimiter)
+                return {
+                    id: generateUniqueCardId(currentSet.cards.map(card => card.cardId)),
+                    front: front?.trim() || '',
+                    back: back?.trim() || '',
+                    category: category == "" ? category?.trim() || '' : "N/A",
+                    due: due,
+                    reps: reps,
+                    state: state,
+                    lapses: lapses,
+                    stability: stability,
+                    difficulty: difficulty,
+                    elapsed_day: elapsed_day,
+                    scheduled_days: scheduled_days,
+                    last_review: last_review,
+                }
+            })
+        
+        setImportedCardData(cards)
+    }   
 
     return (
         <>
@@ -139,12 +194,12 @@ export default function SetSelectionComp() {
             </div>
 
             {/* Select Set Drop Down / New Set Button */} 
-            {/* mobile/desktop tailwind */}￼
+            {/* mobile/desktop tailwind */}
 
             <div className="
                 absolute md:static 
                 left-1/2 md:left-auto 
-                top-[-35px] md:top-auto 
+                top-[-30px] md:top-auto 
                 -translate-x-1/2 md:translate-x-0
                 w-[calc(100vw-20px)] md:w-fit 
                 max-w-[400px] md:max-w-[1150px] 
@@ -313,16 +368,6 @@ export default function SetSelectionComp() {
             <>
             <div className="fixed inset-0 bg-black/3 backdrop-blur-sm z-30" onClick={toggleImportUI}></div>
 
-            {/* <div className="
-                fixed 
-                right-[5px]
-                left-[5px] lg:left-1/2
-                top-[55px] lg:top-1/2
-                translate-x-0 lg:-translate-x-1/2
-                translate-y-0 lg:-translate-y-1/2
-                lg:transform
-                z-40
-            " */}
             <div
                 className="
                     fixed
@@ -386,12 +431,12 @@ export default function SetSelectionComp() {
                     {/* Card data text area */}
                     <div>
                         <h2 className="pb-1 text-[13px] md:text-[16px] font-semibold">Card Data</h2>
-
-                        <textarea className="text-[13px] md:text-[16px] px-2 py-1 w-full resize-y h-[110px] md:h-[155px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                        <LineNumberedTextarea
+                            onChange={handleImportDataChange}
                             placeholder={
                                 `Enter your cards, one per line. Format:\nFront${selectedDelimiter}Back${selectedDelimiter}Category\n\nExample:\nWhat is 2+2?${selectedDelimiter}4${selectedDelimiter}Math\nCapital of France${selectedDelimiter}Paris${selectedDelimiter}Geography`
                             }
-                        ></textarea>
+                        />
                     </div>
                     {/* Guidelines for importing data */}
                     <div className="bg-[#D9D9D9]/3 p-3 rounded-[10px]">
@@ -409,48 +454,99 @@ export default function SetSelectionComp() {
                     {/* Display imported cards */}    
                     <div className=" font-semibold">   
                         <h1 className="text-[13px] md:text-[16px]">Card Data:</h1>
-                        <div className="overflow-y-auto p-3 border-1 border-[#8f8f8f]">  
-                            {importedCardData.map((card, key) => (
-                                <div
-                                    key={key}
-                                    className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col pb-3"
-
-                                >   
-                                    <div className="flex justify-between pt-2 px-2">
-                                        <h1 className="text-[8px] md:text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
-                                            {card.category == "Category" ? "N/A": card.category }
-                                        </h1>
-                                        <div className="flex gap-1 items-center">
-                                            <div className="flex items-center justify-center ">
-                                                <Trash2 
-                                                    className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
-                                                    onClick={() => {
-                                                        console.log("Deleted Card")
-                                                    }}
-                                                />
+                        <div className="overflow-y-auto p-3 border-1 border-[#8f8f8f] rounded md:rounded-[5px]">  
+                            {importedCardData ? 
+                                importedCardData.map((card, key) => (
+                                    <div
+                                        key={key}
+                                        className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col pb-3"
+                                    >   
+                                        <div className="flex justify-between pt-2 px-2">
+                                            <div className="flex gap-2">
+                                                <h1 className="text-[8px] md:text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
+                                                    {key + 1}
+                                                </h1>
+                                                <h1 className="text-[8px] md:text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
+                                                    {card?.category == "Category" ? "N/A": card?.category}
+                                                </h1>
+                                            </div>
+                                            <div className="flex gap-1 items-center">
+                                                <div className="flex items-center justify-center ">
+                                                    <Trash2 
+                                                        className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
+                                                        onClick={() => {
+                                                            console.log("Deleted Card")
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
+                                        <div className="h-full flex pt-[20px] md:pt-[20px] px-2">
+                                            <h1 className="text-[13px] md:text-[16px]">{card?.front}</h1>
+                                        </div>
+                                        <div className="w-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px] px-2">
+                                            <h1 className="text-[12px] md:text-[16px] text-[#272727] ">{card?.back}</h1>
+                                        </div>
                                     </div>
-                                    {/* TODO: feat: change card values individually */}
-                                    <div className="h-full flex pt-[20px] md:pt-[20px] px-2">
-                                        {/* <textarea
-                                            className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[34px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                                            placeholder=""
-                                            value={card.front}
-                                        ></textarea> */}
-                                        <h1 className="text-[13px] md:text-[16px]">{card.front}</h1>
+                                ))
+                                : 
+                                tempCardData.map((card, key) => (
+                                   <div
+                                        key={key}
+                                        className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col pb-3"
+                                    >   
+                                        <div className="flex justify-between pt-2 px-2">
+                                            <div className="flex gap-2">
+                                                <h1 className="text-[8px] md:text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
+                                                    {key + 1}
+                                                </h1>
+                                                <h1 className="text-[8px] md:text-[12px] bg-amber-50 text-[#141414] px-3 py-[2px] font-semibold rounded-2xl ">
+                                                    {card?.category == "Category" ? "N/A": card?.category}
+                                                </h1>
+                                            </div>
+                                            <div className="flex gap-1 items-center">
+                                                <div className="flex items-center justify-center ">
+                                                    <Trash2 
+                                                        className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
+                                                        onClick={() => {
+                                                            console.log("Deleted Card")
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="h-full flex pt-[20px] md:pt-[20px] px-2">
+                                            <h1 className="text-[13px] md:text-[16px]">{card?.front}</h1>
+                                        </div>
+                                        <div className="w-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px] px-2">
+                                            <h1 className="text-[12px] md:text-[16px] text-[#272727] ">{card?.back}</h1>
+                                        </div>
                                     </div>
-                                    <div className="w-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px] px-2">
-                                        {/* <textarea 
-                                            className="text-[12px] text-[#272727] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[34px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                                            placeholder=""
-                                            value={card.back}
-                                        ></textarea> */}
-                                        <h1 className="text-[12px] md:text-[16px] text-[#272727] ">{card.back}</h1>
-                                    </div>
-                                </div>
-                            ))}
+                                ))
+                            }
                         </div>
+                    </div>
+                    {/* Import Cards Button */}
+                    <div className="w-full flex gap-2">
+                        <button 
+                            className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
+                            onClick={async () => {
+                                addMultipleCardsToSet(currentSet.id, importedCardData)
+                                setImportedCardData([])
+                                setImportUI(!importUI)
+                                await updateCurrentSet(currentSet.id)
+                            }}
+                            >
+                            {"Import Cards"}
+                        </button>
+                        <button 
+                            className="flex gap-2 justify-center cursor-pointer bg-[#252525] text-[#d3d3d3] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
+                            onClick={async () => {
+                                setImportUI(!importUI)
+                            }}
+                            >
+                            {"Cancel"}
+                        </button>
                     </div>
                 </div>
             </div>

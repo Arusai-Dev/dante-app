@@ -1,4 +1,3 @@
-import { useCreateStore } from "@/app/stores/createStores";
 import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.NEXT_PUBLIC_DATABASE_URL);
@@ -10,6 +9,7 @@ export async function deleteSetById(id: number) {
         console.log(error)
     }
 }
+
 
 export async function deleteCardById(setId: number, cardId: number) {
 
@@ -40,6 +40,7 @@ export async function deleteCardById(setId: number, cardId: number) {
     }
 }
 
+
 export async function getSetById(id: number) {
     try {
         return await sql('SELECT * FROM flashcards WHERE "id"= $1', [id]);
@@ -49,7 +50,6 @@ export async function getSetById(id: number) {
 }
 
 
-
 export async function getSetByTitle(user_id: string, title: string) {
     try {
         return await sql('SELECT * FROM flashcards WHERE "user"= $1 AND "title"=$2 LIMIT 1', [user_id, title]);
@@ -57,6 +57,7 @@ export async function getSetByTitle(user_id: string, title: string) {
         console.log(error)
     }
 }
+
 
 export async function createNewSet(
     title: string, 
@@ -127,6 +128,51 @@ export async function addOneCardToSet(
         ); 
     } catch (error) {
         console.log(error);
+    }
+}
+
+interface FlashCard {
+    id?: number;
+    front: string;
+    back: string;
+    category: string;
+    due: number
+    reps: number
+    state: number
+    lapses: number
+    stability: number
+    difficulty: number
+    elapsed_day: number
+    scheduled_days: number
+    last_review: number | null
+}
+
+export async function addMultipleCardsToSet(setId: number, newCards: FlashCard[]) {
+    try {
+        if (!Array.isArray(newCards) || newCards.length === 0) {
+            throw new Error('Cards must be a non-empty array');
+        }
+
+        // Get existing cards
+        const result = await sql`
+            SELECT cards FROM flashcards WHERE id = ${setId}
+        `;
+        
+        if (result.length === 0) {
+            throw new Error('Flashcard set not found');
+        }
+
+        const existingCards = result[0].cards || [];
+        const updatedCards = [...existingCards, ...newCards];
+
+        return await sql`
+            UPDATE flashcards
+            SET cards = ${JSON.stringify(updatedCards)}
+            WHERE id = ${setId}
+        `;
+    } catch (err) {
+        console.log(err);
+        throw err;
     }
 }
 

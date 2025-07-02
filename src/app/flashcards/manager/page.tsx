@@ -7,7 +7,7 @@ import SetSelectionComp from "@/components/SetSelectionComp"
 import ImageCropper from "@/components/ImageCropper"
 import { fieldMissingModal } from "@/components/modals/fieldMissingModal"
 import { handleImageUrlInput, handleFileChange, clearCurrentImage } from "@/app/hooks/managerHooks/useImageHandlers"
-import { updateSetImagesMap } from "@/app/hooks/managerHooks/useSetHandlers"
+import { updateCurrentSet, updateSetImagesMap } from "@/app/hooks/managerHooks/useSetHandlers"
 import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/managerHooks/useCardHandlers"
 
 export const fetchAllData = () => {
@@ -159,7 +159,7 @@ export default function Create() {
                         setActive("create")
                         setLoading(true)
                     }}
-                    >
+                >
                     Create Card
                 </button>
                 
@@ -168,10 +168,10 @@ export default function Create() {
                     onClick={async () =>  {
                         setActive("manage")
                         setLoading(false)
-                        updateSetImagesMap(currentSet.id)
+                        await updateSetImagesMap(currentSet.id)
+                        await updateCurrentSet(currentSet.id)
                     }}
-                    >
-
+                >
                     Manage Cards
                 </button>
             </div>            
