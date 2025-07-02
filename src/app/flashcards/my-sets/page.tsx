@@ -14,6 +14,7 @@ import {
     PlusCircle,
     PlusSquare,
     Search,
+    Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -201,20 +202,21 @@ export default function MyFlashcards() {
 
 
                                         <div className="flex mt-20  items-center justify-center">
-                                                <Button
-                                                    variant="secondary"
-                                                    className="mr-2 w-1/2"
-                                                >
+                                                <Button variant="secondary" className="mr-2 w-1/2">
                                                     <Link href={`practice/${set.id}`}
-                                                    className="px-12 py-3"
+                                                    className="px-8 py-3"
                                                     >
                                                     Start Studying
                                                     </Link>
                                                 </Button>
-                                            
-                                                <Button className="bg-neutral-800 text-white hover:bg-neutral-700"
-                                                variant="secondary"
-                                                >
+
+                                                <Button className="bg-neutral-500 mr-2 px-4 hover:bg-neutral-400">
+                                                    <Link href={`quiz/${set.id}`}>
+                                                        <Sparkles className="inline-block"/> Quiz
+                                                    </Link>
+                                                </Button>
+
+                                                <Button className="bg-neutral-800 text-white hover:bg-neutral-700" variant="secondary">
                                                     <Link href={`play/${set.id}`}>
                                                     Review
                                                     </Link>

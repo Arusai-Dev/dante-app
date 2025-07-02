@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Progress } from "@/components/ui/progress"
-import { CheckCircle, XCircle, RotateCcw, Eye, EyeOff, Play, Pause, Timer, Clock } from "lucide-react"
+import { CheckCircle, XCircle, RotateCcw, Eye, EyeOff, Play, Pause, Timer, Clock, LoaderCircle, Home } from "lucide-react"
+import Link from "next/link";
 
 export default function QuizSet({ params }) {
 
@@ -26,6 +27,7 @@ export default function QuizSet({ params }) {
     const [showTimerFull, setShowTimerFull] = useState(true)
     const [finalTime, setFinalTime] = useState(0)
     const [quizData, setQuizData] = useState([])
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         async function getParamId() {
@@ -100,6 +102,7 @@ export default function QuizSet({ params }) {
           const results = await Promise.all(allPromises);
           
           setQuizData(results);
+          setIsLoading(false)
       }
 
       if (flashcardSet?.length > 0 && flashcardSet[0]?.cards) {
@@ -190,7 +193,7 @@ export default function QuizSet({ params }) {
             <Card>
             <CardHeader className="text-center">
                 <CardTitle className="text-3xl mb-2">Quiz Completed!</CardTitle>
-                <p className="text-lg text-muted-foreground">Web Development Fundamentals Quiz</p>
+                <p className="text-lg text-gray-200">{flashcardSet[0].title}</p>
             </CardHeader>
             <CardContent className="text-center space-y-6 p-8">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -220,14 +223,38 @@ export default function QuizSet({ params }) {
                 )}
 
                 <Button onClick={handleRestart} className="gap-2 px-8 py-3 text-lg">
-                <RotateCcw className="w-5 h-5" />
-                Restart Quiz
+                  <RotateCcw className="w-5 h-5" />
+                  Restart Quiz
                 </Button>
+                
+                <Link href={"/flashcards/my-sets"}>
+                  <Button onClick={handleRestart} className="gap-2 ml-5 px-8 py-3 text-lg">
+                    <Home className="w-5 h-5" />
+                    Home
+                  </Button>
+                
+                </Link>
             </CardContent>
             </Card>
         </div>
         )
     }
+
+
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center w-screen pt-60">
+          <div className="block">
+            <h1 className="text-5xl">Please wait a moment.</h1>
+            <p className="text-2xl pt-7">Your custom, unique quiz will be ready soon</p>
+
+            <LoaderCircle className="animate-spin size-25 text-purple-400"></LoaderCircle>
+
+          </div>
+        </div>
+
+    )
+  }      
 
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
@@ -238,22 +265,22 @@ export default function QuizSet({ params }) {
               variant="ghost"
               size="sm"
               onClick={() => setShowHeader(false)}
-              className="absolute top-4 right-4 h-8 w-8 p-0"
+              className="absolute top-4 right-4 h-8 w-8 p-0 hover:bg-neutral-800"
             >
               <EyeOff className="w-4 h-4" />
             </Button>
-            <CardTitle className="text-3xl">Web Development Fundamentals Quiz</CardTitle>
+            <CardTitle className="text-3xl">{flashcardSet[0].title}</CardTitle>
             <p className="text-lg text-gray-200 mt-2">
-              Test your knowledge of web development basics including HTML, CSS, JavaScript, and React
+              {flashcardSet[0].description}
             </p>
-            <div className="text-sm text-muted-foreground mt-1">{quizData.length} questions • Mixed question types</div>
+            <div className="text-sm text-muted-foreground mt-1">{quizData.length} questions • {flashcardSet[0].category}</div>
           </CardHeader>
         </Card>
       )}
 
       {!showHeader && (
         <div className="flex justify-center">
-          <Button variant="outline" size="sm" onClick={() => setShowHeader(true)} className="gap-2 text-black hover:bg-gray-300">
+          <Button variant="outline" size="sm" onClick={() => setShowHeader(true)} className="gap-2 text-gray-200 bg-neutral-900 hover:bg-neutral-700 hover:text-gray-200">
             <Eye className="w-4 h-4" />
             Show Quiz Info
           </Button>
