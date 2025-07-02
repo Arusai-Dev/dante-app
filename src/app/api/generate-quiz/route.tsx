@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     store: true
     });
 
-    return NextResponse.json({"response": response.output_text})
+
+    return NextResponse.json({"model_response": JSON.parse(response.output_text)})
 
 } 

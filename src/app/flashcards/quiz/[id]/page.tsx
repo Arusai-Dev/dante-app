@@ -25,7 +25,7 @@ export default function QuizSet({ params }) {
     const [timerTime, setTimerTime] = useState(0)
     const [showTimerFull, setShowTimerFull] = useState(true)
     const [finalTime, setFinalTime] = useState(0)
-    const [generatedQuizDetails, setGeneratedQuizDetails] = useState([])
+    const [quizData, setQuizData] = useState([])
 
     useEffect(() => {
         async function getParamId() {
@@ -47,75 +47,68 @@ export default function QuizSet({ params }) {
         getInfo()
     }, [paramId])
 
-    useEffect(() => {
-        async function generateQuizDetails() {
-            const allGeneratedDetails = [];
 
-
-            flashcardSet?.forEach(set => {
-                set?.cards.forEach(async card => {
-
-                    const api = await fetch('http://localhost:3000/api/generate-quiz', {
+  useEffect(() => {
+      
+      async function generateQuizDetails() {
+          
+          const allPromises = flashcardSet?.flatMap(set => {
+              if (!set || !set.cards) {
+                  return [];
+              }
+              
+              return set.cards.map(async (card, index) => {
+                  
+                  const api = await fetch('http://localhost:3000/api/generate-quiz', {
                       method: "POST",
-                      body: 
-                        JSON.stringify({prompt: `
-                          this is a multiple-choice question, The question is as follows:
-                          <question> ${card.front} </question>
-    
-                          The correct answer is:
-                          <answer>
-                          ${card.back}
-                          </answer>
-                          
-                          your answer should be in the following format:
-                          { options: ["option1", "option2", "option3", "option4"], explanation: "your short, explanation for the question's answer" }                        
+                      headers: {
+                          'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                          prompt: 
+                          `this is a multiple-choice question, The question is as follows:
+                            <question> ${card.front} </question>
 
-                          guidelines for your response:
-                          1. The options array will contain 3 incorrect options and the correct option. All the options should be shuffled in a random order.
-                          2. The explanation string: provide a short, explanation for the question's answer
-                        `})
-                    })
+                            The correct answer is:
+                            <answer>
+                            ${card.back}
+                            </answer>
 
-                    const response = await api.json()
-                    allGeneratedDetails.push(response.response)
-                      
-                    
-                });
+                            your answer should be in the following format:
+                            { options: ["option1", "option2", "option3", "option4"], explanation: "your short, explanation for the question's answer" }                        
 
-            });
+                            guidelines for your response:
+                            1. The options array will contain 3 incorrect options and the correct option. All the options should be shuffled in a random order.
+                            2. The explanation string: provide a short, explanation for the question's answer
+                            3. Your response must be valid JSON`
+                      })
+                  });
 
-            setGeneratedQuizDetails(allGeneratedDetails)
+                  const response = await api.json();
 
-        }
+                  return {
+                      id: index + 1,
+                      type: "multiple-choice",
+                      question: card.front,
+                      options: response.model_response.options,
+                      correctAnswer: card.back,
+                      explanation: response.model_response.explanation
+                  };
+              });
+          }) || [];
 
-        generateQuizDetails();
+          const results = await Promise.all(allPromises);
+          
+          setQuizData(results);
+      }
 
-    }, [flashcardSet])
-
-
-
-    const quizData = []
-
-    flashcardSet?.forEach(set => {
-        let idCount = 1;
-
-        set?.cards.forEach(card => {
-
-            quizData.push({
-                id: idCount,
-                type: "multiple-choice",
-                question: card.front,
-                options: generatedQuizDetails[idCount-1]?.options,
-                correctAnswer: card.back,
-                explanation: generatedQuizDetails[idCount-1]?.explanation
-            })
-
-            idCount++; 
-        })
-    });
+      if (flashcardSet?.length > 0 && flashcardSet[0]?.cards) {
+          generateQuizDetails();
+      }
+  }, [flashcardSet]);    
 
 
-    const question = quizData[currentQuestion]
+    const question = quizData?.[currentQuestion]
     const isCorrect = selectedAnswer === question?.correctAnswer
     const progress = ((currentQuestion + 1) / quizData?.length) * 100
 
@@ -311,7 +304,7 @@ export default function QuizSet({ params }) {
         <CardContent className="space-y-8 p-8">
 
 
-          {question?.type === "multiple-choice" && question?.options && (
+          {question?.type === "multiple-choice" && question.options && (
             <RadioGroup
               value={selectedAnswer as string}
               onValueChange={(value) => handleAnswerSelect(value)}
