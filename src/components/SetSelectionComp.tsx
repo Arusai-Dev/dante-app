@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2, Save, MenuSquare, Menu } from "lucide-react";
+import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2, Menu } from "lucide-react";
 import { addMultipleCardsToSet, createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
 import { useCreateStore } from "@/app/stores/createStores";
 import { toast } from "sonner";
@@ -19,7 +19,7 @@ export default function SetSelectionComp() {
     } = useCreateStore()
     const [newSetUI, setNewSetUI] = useState(false);
     const [importUI, setImportUI] = useState(false);
-    const [dropDownIsOpen, setDropDownIsOpen] = useState(false);
+    const [selectionDropDown, setSelectionDropDown] = useState(false);
     const [selectedDelimiterText, setSelectedDelimiterText] = useState("Pipe (|)");
     const [selectedDelimiter, setSelectedDelimiter] = useState("|");
     const [delimiterDropDown, setDelimiterDropDown] = useState(false);
@@ -61,8 +61,20 @@ export default function SetSelectionComp() {
     const delimiters = ["Pipe (|)", "Comma (,)", "Semicolon (;)", "Tab"]
 
 
-    const toggleDropDown = () => {
-        setDropDownIsOpen(!dropDownIsOpen);
+    const toggleSelectionDropDown = () => {
+        if (selectionDropDown) setSelectionDropDown(false)
+        else {
+            setSelectionDropDown(true)
+            setMobileActionsDropDown(false)
+        }
+    }
+
+    const toggleActionDropDown = () => {
+        if (mobileActionsDropDown) setMobileActionsDropDown(false)
+        else {
+            setMobileActionsDropDown(true)
+            setSelectionDropDown(false)
+        }
     }
 
     const toggleNewSetUI = () => {
@@ -112,7 +124,7 @@ export default function SetSelectionComp() {
 
     const closeAnyUi = (e: MouseEvent) => {
         const target = e.target as HTMLElement; 
-        if (!target.closest(".select-set-dd")) {setDropDownIsOpen(false)}
+        if (!target.closest(".select-set-dd")) {setSelectionDropDown(false)}
     }
 
     useEffect(() => {
@@ -189,9 +201,9 @@ export default function SetSelectionComp() {
         <>
         {/* Set Selection / Description */}
         {/* Select Set Drop Down / New Set Button */} 
-        <div className="md:w-[1150px]">
+        <div className="w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px]">
             <div className="
-                justify-end mt-3 flex 
+                justify-start mb:my-5 flex 
                 flex-col md:flex-row
                 gap-[5px] md:gap-[11px]">
 
@@ -199,25 +211,23 @@ export default function SetSelectionComp() {
                 <div className="select-set-dd">
                     <button 
                         className="
-                            flex cursor-pointer justify-between items-center whitespace-nowrap bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
+                            flex truncate cursor-pointer justify-between items-center whitespace-nowrap bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
                             gap-[5px] md:gap-[11px]
-                            text-[12px] md:text-[14px] lg:text-[16px]
-                            w-[calc(100vw-20px)] md:w-[110px] lg:w-[140px]
-                            h-[25px] lg:h-[40px]
-                            px-2
+                            w-full md:w-[300px]
+                            px-2 py-1
                         "
-                        onClick={toggleDropDown}
+                        onClick={toggleSelectionDropDown}
                     >
 
-                        <div className="truncate text-[12px] md:text-[14px] lg:text-[16px]">{currentSet.title == null ? "Select A Set" : currentSet.title}</div>
+                        <div className="truncate text-[12px] md:text-[14px]">{currentSet.title == null ? "Select A Set" : currentSet.title}</div>
                         <div className="flex items-center justify-center">
                             <ArrowDown className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
                         </div>
                     </button>
 
                     {/* Drop Drown Content */} 
-                    {dropDownIsOpen && (
-                        <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
+                    {selectionDropDown && (
+                        <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:w-[300px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
                             {sets.map((set, index:number) => (
                                 <div 
                                     key={index} 
@@ -237,7 +247,7 @@ export default function SetSelectionComp() {
                                         )}
                                     </div>
                                     
-                                    <div className="w-fit md:max-w-[250px] text-[12px] md:text-lg overflow-x-hidden truncate" title={set.title}>{set.title}</div>
+                                    <div className="w-fit md:max-w-[250px] text-[12px] md:text-[14px] overflow-x-hidden truncate" title={set.title}>{set.title}</div>
                                 </div>
                             ))}
                         </div>
@@ -251,11 +261,9 @@ export default function SetSelectionComp() {
                     <button
                         className="
                             flex cursor-pointer justify-between items-center whitespace-nowrap  bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
-                            gap-[5px] md:gap-[11px]
-                            text-[12px] md:text-[14px] lg:text-[16px]
-                            w-[110px] md:w-[110px] lg:w-[140px]
-                            h-[25px] lg:h-[40px]
-                            px-2
+                            text-[12px] md:text-[14px]
+                            w-[110px] md:w-[130px] lg:w-[150px]
+                            px-2 py-1 md:px-3
                         "
                         onClick={toggleImportUI}
                     >
@@ -270,7 +278,12 @@ export default function SetSelectionComp() {
                 {/* New Set Button */}
                 <div className="new-set-btn hidden md:block">
                     <button 
-                        className="flex cursor-pointer justify-between items-center text-[12px] md:text-[14px] lg:text-[16px] w-full md:w-[110px] lg:w-[130px] h-[25px] lg:h-[40px] md:text-lg whitespace-nowrap py-1 pb-[5px] lg:pr-[8px] lg:pl-[8px] pr-[7px] pl-[5px] sm:pr-[8px] bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                        className="
+                            flex cursor-pointer justify-between items-center whitespace-nowrap bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
+                            text-[12px] md:text-[14px] 
+                            w-full md:w-[110px] lg:w-[130px] 
+                            px-2 py-1 md:px-3
+                        "
                         onClick={toggleNewSetUI}
                     >
                         <div className="flex items-center justify-center">
@@ -281,16 +294,15 @@ export default function SetSelectionComp() {
                 </div>
 
                 <div className="md:hidden"
-                    onClick={() => setMobileActionsDropDown(!mobileActionsDropDown)}
+                    onClick={toggleActionDropDown}
                 >
                     <button
                         className="
                             flex cursor-pointer justify-center items-center whitespace-nowrap bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
                             gap-[5px] md:gap-[11px]
-                            text-[12px] md:text-[14px] lg:text-[16px]
-                            w-[calc(100vw-20px)] md:w-[110px] lg:w-[140px]
-                            h-[25px] lg:h-[40px]
-                            px-2
+                            text-[12px] md:text-[14px]
+                            w-full md:w-[110px] lg:w-[140px]
+                            px-2 py-1 md:px-3
                         "
                     >   
                         <Menu className="h-[16px] w-[16px]"
@@ -299,22 +311,21 @@ export default function SetSelectionComp() {
                     </button>
                     
                     {mobileActionsDropDown && (
-                        <div className="absolute px-1 mt-1 flex flex-row gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
+                        <div className="md:hidden absolute px-1 mt-1 flex flex-row gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] md:w-[250px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
                             {/* Bulk Import */}
 
                             <button
                                 className="
                                     flex cursor-pointer justify-between items-center whitespace-nowrap  bg-[#1d1d1d] rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
-                                    gap-[5px] md:gap-[11px]
-                                    text-[12px] md:text-[14px] lg:text-[16px]
-                                    w-[110px] md:w-[110px] lg:w-[140px]
-                                    h-[25px] lg:h-[40px]
-                                    px-2
+                                    gap-[5px]
+                                    text-[12px]
+                                    w-[120px]
+                                    px-2 py-1
                                 "
                                 onClick={toggleImportUI}
                             >
                                 <div className="flex items-center justify-center">
-                                    <Import className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
+                                    <Import className="h-[16px] w-[16px]"/>
                                 </div>
                                 <h1>Bulk Import</h1>
                             </button>
@@ -322,11 +333,16 @@ export default function SetSelectionComp() {
 
                             {/* New Set Button */}
                             <button 
-                                className="flex cursor-pointer justify-between items-center text-[12px] md:text-[14px] lg:text-[16px] w-full md:w-[110px] lg:w-[130px] h-[25px] lg:h-[40px] md:text-lg whitespace-nowrap py-1 pb-[5px] lg:pr-[8px] lg:pl-[8px] pr-[7px] pl-[5px] sm:pr-[8px] bg-[#1d1d1d] rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200"
+                                className="
+                                    flex cursor-pointer justify-between items-center whitespace-nowrap bg-[#D9D9D9]/3 rounded-[5px] border-1 border-[#828282] hover:bg-[#474747] transition-colors duration-200
+                                    text-[12px]
+                                    w-full
+                                    px-2 py-1
+                                "
                                 onClick={toggleNewSetUI}
                             >
                                 <div className="flex items-center justify-center">
-                                    <PlusCircle className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
+                                    <PlusCircle className="h-[16px] w-[16px]"/>
                                 </div>
                                 New Set
                             </button>
@@ -335,21 +351,21 @@ export default function SetSelectionComp() {
 
                 </div>
             </div>
-            </div>
-            <div className="
-                mt-3 relative bg-[#D9D9D9]/3 rounded-[10px] gap-2 w-[calc(100vw-20px)] flex
-                flex-col-reverse md:flex-row md:justify-between
-                max-w-[400px] md:max-w-[1150px]
-                h-[100px] md:h-[150px] p-3
-            ">
-            <div className="flex flex-col justify-between h-full">
+        </div>
+        <div className="
+            mt-3 relative bg-[#D9D9D9]/3 rounded-[10px] gap-2 w-[calc(100vw-20px)] flex
+            flex-col-reverse md:flex-row md:justify-between
+            max-w-[400px] md:max-w-[1150px]
+            h-fit py-3 px-4
+        ">
+            <div className="flex flex-col justify-between h-full gap-3 md:gap-3">
                 <div>
-                    <h2 className="font-bold text-[14px] pb-1 md:text-xl lg:text-2xl truncate">{currentSet.title == null ? "No set selected..." : currentSet.title}</h2>
-                    <p className="text-[12px] md:text-lg lg:text-xl truncate">{currentSet.title == "" ? '' : currentSet.description}</p>
+                    <h2 className="font-bold text-[14px] md:text-[18px] truncate">{currentSet.title == null ? "No set selected..." : currentSet.title}</h2>
+                    <p className="text-[12px] md:text-[14px]">{currentSet.title == "" ? '' : currentSet.description}</p>
                 </div>
                 {currentSet.description && (
                     <div>
-                        <p className="text-[12px] md:text-xl">{currentSet.card_cnt} Cards</p>
+                        <p className="text-[12px] md:text-[14px]">{currentSet.card_cnt} Cards</p>
                     </div>
                 )}
             </div>
@@ -452,11 +468,10 @@ export default function SetSelectionComp() {
             >
                 <div 
                     className="
-                        max-w-[875px] flex flex-col lg:border-2 lg:border-[#cfcfcf] bg-[#1e1e1e] 
+                        max-w-[875px] flex flex-col lg:border-1 lg:border-[#cfcfcf] bg-[#1e1e1e] 
                         lg:mt-5
                         p-4 lg:p-7 
                         gap-4 lg:gap-5 
-                        rounded-[5px] lg:rounded-[10px] 
                         h-screen lg:h-[calc(100vh-80px)]
                         hidden-scrollbar
                         "

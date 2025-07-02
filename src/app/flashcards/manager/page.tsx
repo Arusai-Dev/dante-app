@@ -137,9 +137,9 @@ export default function Create() {
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
             
             {/* Title */}
-            <div className="flex flex-col w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] items-left pt-[40px]">
-                <h1 className="text-[20px] sm:text-lg md:text-2xl lg:text-3xl font-bold">Set Manager</h1>
-                <p className="text-[12px] sm:text-md md:text-xl lg:text-2xl pt-1">Create, organize, and manage your sets!</p>   
+            <div className="flex flex-col w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] items-center md:items-start py-[20px] md:pt-[40px]">
+                <h1 className="font-bold text-[18px] md:text-[20px]">Set Manager</h1>
+                <p className="text-[13px] md:text-[16px]">Create, organize, and manage your sets!</p>   
             </div>      
 
 
@@ -152,9 +152,9 @@ export default function Create() {
                 gap-1 md:gap-2
                 px-1 md:px-2
                 mt-3 md:mt-4 
-                w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[65px] rounded md:rounded-[5px]">
+                w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] h-[40px] md:h-[55px] rounded md:rounded-[5px]">
                 <button 
-                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
+                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[40px] py-1 px-3 font-semibold text-[14px] md:text-[18px] rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={() => {
                         setActive("create")
                         setLoading(true)
@@ -164,7 +164,7 @@ export default function Create() {
                 </button>
                 
                 <button 
-                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[50px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
+                    className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[40px] py-1 px-3 font-semibold text-[14px] md:text-[18px] rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={async () =>  {
                         setActive("manage")
                         setLoading(false)
@@ -181,35 +181,35 @@ export default function Create() {
             {active == "create" && (
                 <div className="flex md:flex-row flex-col mt-3 md:mt-4 w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] ">
                     <div className="md:w-[565px] bg-[#D9D9D9]/3 rounded md:rounded-[5px] py-3 px-4">
-                        <h1 className="font-bold text-[16px] md:text-2xl pb-3 md:pb-4">Create New Card</h1>
+                        <h1 className="font-bold text-[18px] md:text-[20px] pb-3 md:pb-4">Create New Card</h1>
 
 
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Category (optional)</h2>
-                        <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
+                        <h2 className="text-[12px] md:text-[15px] pb-1 md:pb-2">Category (optional)</h2>
+                        <input className="text-[12px] md:text-[15px] mb-4 px-2 py-1 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             value={currentCardData["category"] == "Category" ? '' : currentCardData["category"]}
                             onChange={(e) => updateCard("category", e.target.value)}
                             placeholder="e.g., Vocab, Grammar, Math, Science, etc..."
                         ></input>
 
                         
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Front Side</h2>
-                        <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                        <h2 className="text-[12px] md:text-[15px] pb-1 md:pb-2">Front Side</h2>
+                        <textarea className="text-[12px] md:text-[15px] mb-4 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
                             value={currentCardData["front"] == "Front" ? '' : currentCardData["front"]}
                             onChange={(e) => updateCard("front", e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
 
                         
-                        <h2 className="text-[12px] md:text-[16px] pb-1 md:pb-2 font-semibold">Back Side</h2>
-                        <textarea className="text-[12px] md:text-[16px] mb-3 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
+                        <h2 className="text-[12px] md:text-[15px] pb-1 md:pb-2">Back Side</h2>
+                        <textarea className="text-[12px] md:text-[15px] mb-4 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
                             value={currentCardData["back"] == "Back" ? '' : currentCardData["back"]}
                             onChange={(e) => updateCard("back", e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
 
                         
-                        <h2 className="text-[12px] md:text-[16px] pb-1 font-semibold">Back Side Image (Optional)</h2>
-                        <h2 className="text-[12px] md:text-[16px] pb-1 ">Image URL:</h2>
+                        <h2 className="text-[12px] md:text-[15px] pb-1 font-semibold">Back Side Image (Optional)</h2>
+                        <h2 className="text-[12px] md:text-[15px] pb-1 ">Image URL:</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             placeholder="https://example.com/image.jpg"
                             onChange={handleImageUrlInput}
@@ -217,7 +217,7 @@ export default function Create() {
 
 
                         <div className="flex items-center h-fit  gap-2">
-                            <h2 className="text-[12px] md:text-[16px]">or</h2>
+                            <h2 className="text-[12px] md:text-[15px]">or</h2>
                             <label htmlFor="imageFile" className="inline-block px-3 py-1 bg-[#D9D9D9] text-sm font-semibold text-[#0F0F0F] rounded-[5px] cursor-pointer hover:bg-[#cbb88a] transition-colors duration-200">
                                 <input
                                     id="imageFile"
