@@ -158,10 +158,12 @@ export default function SetSelectionComp() {
             .map((line, index) => {
                 const [front, back, category] = line.trim().split(selectedDelimiter)
                 return {
-                    id: generateUniqueCardId(currentSet.cards.map(card => card.cardId)),
+                    cardId: generateUniqueCardId(currentSet.cards.map(card => card.cardId)),
                     front: front?.trim() || '',
                     back: back?.trim() || '',
                     category: category == "" ? category?.trim() || '' : "N/A",
+                    originalFileName: "",
+                    croppedFileName: "",
                     due: due,
                     reps: reps,
                     state: state,
@@ -176,6 +178,11 @@ export default function SetSelectionComp() {
         
         setImportedCardData(cards)
     }   
+
+    const handleBulkImport = async () => {
+        setImportUI(!importUI)
+        await updateCurrentSet(currentSet.id)
+    }
 
     return (
         <>
@@ -382,8 +389,9 @@ export default function SetSelectionComp() {
                         gap-4 lg:gap-5 
                         rounded-[5px] lg:rounded-[10px] 
                         h-screen lg:h-[calc(100vh-80px)]
-                        overflow-y-scroll
-                        ">
+                        hidden-scrollbar
+                        "
+                    >
                     {/* Header */}
                     <div>
                         <h1 className="font-bold text-[14px] md:text-[20px]">Bulk Import Cards</h1>
@@ -541,9 +549,7 @@ export default function SetSelectionComp() {
                         </button>
                         <button 
                             className="flex gap-2 justify-center cursor-pointer bg-[#252525] text-[#d3d3d3] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
-                            onClick={async () => {
-                                setImportUI(!importUI)
-                            }}
+                            onClick={handleBulkImport}
                             >
                             {"Cancel"}
                         </button>

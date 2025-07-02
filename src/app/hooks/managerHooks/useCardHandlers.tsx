@@ -85,11 +85,11 @@ export const handleAddCard = async () => {
 
 // deleteCard
 export const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {
+    console.log("setId:", setId, "cardId:",  cardId)
     await deleteCardById(setId, cardId)
-    const key = `${setId}/${cardId}/${fileName}`
     
+    const key = `${setId}/${cardId}/${fileName}`
     console.log("Key when deleting card:", key)
-
     handleImageDelete(cardId, fileName)
     await updateCurrentSet(setId)
 }

@@ -6,6 +6,7 @@
     - [ ] - Change updated_at whenever user makes any change to set
     - [ ] - Update estimated time whenever user adds new card
     - [ ] - Auto card creation from given data eg: (front, back, category)
+    - [ ] - Add category and tags options when creating a set
     
 
     - Manage Cards Section

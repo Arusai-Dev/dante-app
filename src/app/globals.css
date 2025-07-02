@@ -146,6 +146,7 @@ body {
 /* Hides scroll bar but keeps functionality */
 @layer utilities {
   .hidden-scrollbar::-webkit-scrollbar {
+    overflow-y: scroll; 
     display: none; 
   }
 
