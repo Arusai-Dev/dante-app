@@ -13,7 +13,7 @@ export async function deleteSetById(id: number) {
 
 export async function deleteCardById(setId: number, cardId: number) {
 
-    console.log("setId: ", setId, "cardId: ", cardId)
+    // console.log("setId: ", setId, "cardId: ", cardId)
 
     try {
 
@@ -30,7 +30,7 @@ export async function deleteCardById(setId: number, cardId: number) {
         }
 
         const updateCards = currentCards.filter((card) => card.cardId !== cardId);
-        console.log(updateCards)
+        // console.log(updateCards)
         updateCardCount(setId, updateCards.length)
 
 

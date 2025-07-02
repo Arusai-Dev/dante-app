@@ -460,19 +460,14 @@ export default function SetSelectionComp() {
             <>
             <div className="fixed inset-0 bg-black/3 backdrop-blur-sm z-30" onClick={toggleImportUI}></div>
 
-            <div
-                className="
-                    fixed
-                    z-40
-                "
-            >
+            <div className="fixed z-40">
                 <div 
                     className="
                         max-w-[875px] flex flex-col lg:border-1 lg:border-[#cfcfcf] bg-[#1e1e1e] 
                         lg:mt-5
                         p-4 lg:p-7 
                         gap-4 lg:gap-5 
-                        h-screen lg:h-[calc(100vh-80px)]
+                        h-[calc(100vh-40px)] md:h-[calc(100vh-80px)]
                         hidden-scrollbar
                         "
                     >
@@ -546,12 +541,12 @@ export default function SetSelectionComp() {
                     {/* Display imported cards */}    
                     <div className=" font-semibold">   
                         <h1 className="text-[13px] md:text-[16px]">Card Data:</h1>
-                        <div className="overflow-y-auto p-3 border-1 border-[#8f8f8f] rounded md:rounded-[5px]">  
+                        <div className="overflow-y-auto p-3 border-1 border-[#8f8f8f] rounded md:rounded-[5px] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-5 py-2 h-fit">  
                             {importedCardData ? 
                                 importedCardData.map((card, key) => (
                                     <div
                                         key={key}
-                                        className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col pb-3"
+                                        className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col"
                                     >   
                                         <div className="flex justify-between pt-2 px-2">
                                             <div className="flex gap-2">

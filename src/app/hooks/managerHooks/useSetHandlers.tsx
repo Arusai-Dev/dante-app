@@ -14,7 +14,7 @@ export const updateCurrentSet = async (id: number) => {
 // Update Set Images
 export const updateSetImagesMap = async (id: number) => {
     const set = await getSetById(id)
-    console.log("HELP:",set[0]?.cards)
+    // console.log("HELP:",set[0]?.cards)
     const cardsWithImages = set[0]?.cards.filter((card: { fileName: string; }) => card.fileName && card.fileName.trim() !== "")
     if (!cardsWithImages) return
     

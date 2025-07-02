@@ -131,8 +131,6 @@ export default function Create() {
         setUpdatingCard(true)
     }  
 
-    fetchAllData()
-
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
             
@@ -387,13 +385,13 @@ export default function Create() {
                                             </div>
                                         </div>
                                         <div className="h-full flex pt-[20px] md:pt-[30px] pl-2">
-                                            <h1 className="text-[12px] md:text-lg font-semibold">{card.front}</h1>
+                                            <h1 className="text-[12px] md:text-[16px] font-semibold pb-1">{card.front}</h1>
                                         </div>
                                     </div>
 
 
                                     <div className="w-full py-1 flex text-left bg-[#dddddd] rounded-b-[5px]">
-                                        <h1 className={`text-[12px] md:text-lg font-semibold truncate w-full text-[#474747] px-2`}>{card.back}</h1>
+                                        <h1 className={`text-[12px] md:text-[16px] font-semibold truncate w-full text-[#474747] px-2`}>{card.back}</h1>
                                         <div className="pr-1">
                                             {
                                                 currentSetImages[`${card.cardId}-original`] ? (
