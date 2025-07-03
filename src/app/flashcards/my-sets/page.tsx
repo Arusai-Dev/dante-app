@@ -128,23 +128,16 @@ export default function MyFlashcards() {
                     </div>
                 )}
 
+            {Object.keys(cardsData).length === 0 ? ( 
 
-            {Object.keys(cardsData).length === 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    <div className="flex flex-col space-y-3">
-                        <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                    </div>
-                    <div className="flex flex-col space-y-3">
-                        <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                    </div>
-                    <div className="flex flex-col space-y-3">
-                        <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                    </div>
-                    <div className="flex flex-col space-y-3">
-                        <Skeleton className="h-[360px] w-[294px] rounded-xl bg-neutral-800 animate-pulse" />
-                    </div>
-                </div>
-            ) : (
+                Array.from({length: 6}).map((_, index) => (
+
+                        <div className="flex flex-col space-y-3" key={index}>
+                            <Skeleton className="h-[300px] w-[450px] mt-5 rounded-xl bg-neutral-800 animate-pulse" />
+                        </div>
+                 
+                ))) 
+                : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-4 gap-3 h-full 2xl:grid-cols-4">
                     {
                         //@ts-ignore
@@ -168,7 +161,7 @@ export default function MyFlashcards() {
                                         <Badge
                                             variant="secondary"
                                             className="rounded-xl top-0 left-0"
-                                        >
+                                            >
                                             {set.category}
                                         </Badge>
                                     </div>
@@ -199,8 +192,8 @@ export default function MyFlashcards() {
                                         
                                         
                                         :
-
-
+                                        
+                                        
                                         <div className="flex mt-20  items-center justify-center">
                                                 <Button variant="secondary" className="mr-2 w-1/2">
                                                     <Link href={`practice/${set.id}`}
@@ -224,9 +217,9 @@ export default function MyFlashcards() {
                                             
                                         </div>
                                          
-
-
-                                    }
+                                         
+                                         
+                                        }
                                 </div>
                             </div>
                         ))

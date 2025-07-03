@@ -531,9 +531,8 @@ export default function PracticeSet({ params }) {
                     </div>
                 </div>
                 
-                <div className="top-0 absolute lg:p-50 sm:p-10">
-                    <Target className="inline-block mr-4 top-0" />
-                    <h1 className="top-0 inline-block">Practice Mode - {currentCardIndex + 1}/{dueCards.length} due</h1>
+                <div className="bottom-10 right-5 absolute ">
+                    <h1>{dueCards.length}</h1>
                 </div>
 
                 <Link href="/flashcards/my-sets">

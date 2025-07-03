@@ -77,7 +77,7 @@ export default function QuizSet({ params }) {
                             </answer>
 
                             your answer should be in the following format:
-                            { options: ["option1", "option2", "option3", "option4"], explanation: "your short, explanation for the question's answer" }                        
+                            { "options": ["option1", "option2", "option3", "option4"], "explanation": "your short, explanation for the question's answer" }                        
 
                             guidelines for your response:
                             1. The options array will contain 3 incorrect options and the correct option. All the options should be shuffled in a random order.
@@ -341,7 +341,7 @@ export default function QuizSet({ params }) {
                 {question.options.map((option, index) => (
                   <div
                     key={index}
-                    className={`flex items-center space-x-4 p-4 rounded-lg border transition-colors text-lg ${
+                    className={`flex items-center space-x-4 pl-4 rounded-lg border transition-colors text-lg ${
                       showFeedback
                         ? option === question.correctAnswer
                           ? "border-3 bg-green-400 border-green-200"
@@ -351,8 +351,9 @@ export default function QuizSet({ params }) {
                         : "hover:bg-gray-50 hover:text-black"
                     }`}
                   >
-                    <RadioGroupItem value={option} id={`option-${index}`} />
-                    <label htmlFor={`option-${index}`} className="flex-1 cursor-pointer">
+                    <RadioGroupItem value={option} id={`option-${index}`} className=""/>
+
+                    <label htmlFor={`option-${index}`} className="flex-1 cursor-pointer p-4">
                       {option}
                     </label>
                     {showFeedback && option === question.correctAnswer && (
