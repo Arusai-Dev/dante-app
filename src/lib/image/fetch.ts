@@ -1,4 +1,4 @@
-import { useCreateStore } from "@/app/stores/createStores"
+import { useCreateStore } from "@/app/stores/managerStores"
 import { getSetById } from "../dbFunctions"
 
 export const RetrieveSetImages = async (setId: number) => {

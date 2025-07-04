@@ -1,7 +1,7 @@
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { handleImageDelete, handleImageUpdate, handleImageUpload } from "./useImageHandlers"
 import { updateCurrentSet, updateSetImagesMap } from "./useSetHandlers"
-import { useCreateStore } from "@/app/stores/createStores";
+import { useManagerStore } from "@/app/stores/managerStores";
 import { generateUniqueCardId } from "@/lib/card/card";
 import { fetchAllData } from "@/app/flashcards/manager/page";
 
@@ -38,15 +38,15 @@ export const convertUrlToFile = async (url: string, baseName: string) => {
 
 // addCard
 export const handleAddCard = async () => {
-    const { category, front, back } = useCreateStore.getState().currentCardData;
+    const { category, front, back } = useManagerStore.getState().currentCardData;
 
-    const currentSet = useCreateStore.getState().currentSet;
+    const currentSet = useManagerStore.getState().currentSet;
 
-    console.log("CroppedImageUrl:", useCreateStore.getState().croppedImageUrl)
-    useCreateStore.getState().setCroppedFile(await convertUrlToFile(useCreateStore.getState().croppedImageUrl, "cropped"))
+    console.log("CroppedImageUrl:", useManagerStore.getState().croppedImageUrl)
+    useManagerStore.getState().setCroppedFile(await convertUrlToFile(useManagerStore.getState().croppedImageUrl, "cropped"))
 
-    const originalFileName = useCreateStore.getState().originalFile.name
-    const croppedFileName = useCreateStore.getState().croppedFile.name
+    const originalFileName = useManagerStore.getState().originalFile.name
+    const croppedFileName = useManagerStore.getState().croppedFile.name
 
     console.log("originalFileName:", originalFileName)
     console.log("croppedFileName:", croppedFileName)
@@ -74,20 +74,23 @@ export const handleAddCard = async () => {
     );
 
     const updatedSet = await getSetById(currentSetId);
-    useCreateStore.getState().setCurrentSet(updatedSet[0])
+    useManagerStore.getState().setCurrentSet(updatedSet[0])
 
     await updateCardCount(currentSetId, updatedSet[0].cards.length)
     await updateCurrentSet(currentSetId)
     await handleImageUpload(cardId)
-    useCreateStore.getState().clearCurrentCardData()
-    useCreateStore.getState().setCurrentSelectedImageUrl("")
+    useManagerStore.getState().clearCurrentCardData()
+    useManagerStore.getState().setCurrentSelectedImageUrl("")
 };   
 
 // deleteCard
 export const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {
+    useManagerStore.getState().setLoading(true)
     console.log("setId:", setId, "cardId:",  cardId)
     await deleteCardById(setId, cardId)
-    
+
+    if (fileName == "") return
+
     const key = `${setId}/${cardId}/${fileName}`
     console.log("Key when deleting card:", key)
     handleImageDelete(cardId, fileName)
@@ -122,8 +125,8 @@ export const handleUpdateCard = async ({
     await updateSetImagesMap(setId);
     await updateCurrentSet(setId);
 
-    useCreateStore.getState().setUpdatingCard(false);
-    useCreateStore.getState().setActive("manage");
-    useCreateStore.getState().clearCurrentCardData();
-    useCreateStore.getState().setPreviousFile(null);
+    useManagerStore.getState().setUpdatingCard(false);
+    useManagerStore.getState().setActive("manage");
+    useManagerStore.getState().clearCurrentCardData();
+    useManagerStore.getState().setPreviousFile(null);
 };

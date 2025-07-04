@@ -1,4 +1,4 @@
-import { useCreateStore } from "@/app/stores/createStores";
+import { useManagerStore } from "@/app/stores/managerStores";
 import { updateSetImagesMap } from "./useSetHandlers"
 import { convertUrlToFile } from "./useCardHandlers";
 
@@ -15,9 +15,9 @@ import { convertUrlToFile } from "./useCardHandlers";
 
 // Upload
 export const handleImageUpload = async (cardId: number) => {
-    const originalFile = await useCreateStore.getState().originalFile
-    const croppedFile = await useCreateStore.getState().croppedFile
-    const setId = useCreateStore.getState().currentSet.id
+    const originalFile = await useManagerStore.getState().originalFile
+    const croppedFile = await useManagerStore.getState().croppedFile
+    const setId = useManagerStore.getState().currentSet.id
 
     if (originalFile) {
         const formData = new FormData();
@@ -63,7 +63,7 @@ export const handleImageUpload = async (cardId: number) => {
 
 // Delete
 export const handleImageDelete = async (cardId: number, fileName: string) => {
-    const setId = useCreateStore.getState().currentSet.id
+    const setId = useManagerStore.getState().currentSet.id
 
     console.log("Deleting given image...")
     const key = `${setId}/${cardId}/${fileName}`;
@@ -105,9 +105,9 @@ export const handleImageUrlInput = async (e) => {
         
         const fileFromUrl = await convertUrlToFile(inputtedUrl, "original")
 
-        useCreateStore.getState().setOriginalFile(fileFromUrl)
-        useCreateStore.getState().setOriginalImageUrl(inputtedUrl)
-        useCreateStore.getState().setCurrentSelectedImageUrl(useCreateStore.getState().originalImageUrl);
+        useManagerStore.getState().setOriginalFile(fileFromUrl)
+        useManagerStore.getState().setOriginalImageUrl(inputtedUrl)
+        useManagerStore.getState().setCurrentSelectedImageUrl(useManagerStore.getState().originalImageUrl);
 
     } catch(error) {
         console.log("Image Url Input Error:", error)
@@ -120,29 +120,29 @@ export const handleFileChange = (e) => {
     const selectedImage = e.target.files[0]
     console.log(selectedImage)
     if (selectedImage) {
-        useCreateStore.getState().setOriginalFile(selectedImage)
+        useManagerStore.getState().setOriginalFile(selectedImage)
         const imageURL = URL.createObjectURL(selectedImage);
         console.log("imageURL:",imageURL)
-        useCreateStore.getState().setCurrentSelectedImageUrl(imageURL)
+        useManagerStore.getState().setCurrentSelectedImageUrl(imageURL)
 
-        useCreateStore.getState().setCroppedFile(null);
-        useCreateStore.getState().setCroppedImageUrl("");
-        useCreateStore.getState().setOriginalImageUrl("");
+        useManagerStore.getState().setCroppedFile(null);
+        useManagerStore.getState().setCroppedImageUrl("");
+        useManagerStore.getState().setOriginalImageUrl("");
 
     }
 };
 
 
 export const clearCurrentImage = () => {
-    const currentCardData = useCreateStore.getState().currentCardData
+    const currentCardData = useManagerStore.getState().currentCardData
 
-    useCreateStore.getState().setCurrentSelectedImageUrl("");
-    useCreateStore.getState().setOriginalFile(null);
-    useCreateStore.getState().setCroppedFile(null);
-    useCreateStore.getState().setCroppedImageUrl("");
-    useCreateStore.getState().setOriginalImageUrl("");
+    useManagerStore.getState().setCurrentSelectedImageUrl("");
+    useManagerStore.getState().setOriginalFile(null);
+    useManagerStore.getState().setCroppedFile(null);
+    useManagerStore.getState().setCroppedImageUrl("");
+    useManagerStore.getState().setOriginalImageUrl("");
 
-    useCreateStore.getState().setCurrentSetImages(prevImages => {
+    useManagerStore.getState().setCurrentSetImages(prevImages => {
         const updated = { ...prevImages };
         delete updated[currentCardData[1]];
         return updated;

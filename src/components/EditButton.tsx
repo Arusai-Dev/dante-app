@@ -1,5 +1,5 @@
 "use client"    
-import { useCreateStore } from "@/app/stores/createStores"
+import { useCreateStore } from "@/app/stores/managerStores"
 import { getSetById } from "@/lib/dbFunctions"
 import { Pencil } from "lucide-react"
 import Link from "next/link"

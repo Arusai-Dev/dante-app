@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
-import { useCreateStore } from "@/app/stores/createStores"
+import { useManagerStore } from "@/app/stores/managerStores"
 import SetSelectionComp from "@/components/SetSelectionComp"
 import ImageCropper from "@/components/ImageCropper"
 import { fieldMissingModal } from "@/components/modals/fieldMissingModal"
+import { dismissLoading, loadingModal } from "@/components/modals/loading"
 import { handleImageUrlInput, handleFileChange, clearCurrentImage } from "@/app/hooks/managerHooks/useImageHandlers"
-import { updateCurrentSet, updateSetImagesMap } from "@/app/hooks/managerHooks/useSetHandlers"
+import { updateSetImagesMap } from "@/app/hooks/managerHooks/useSetHandlers"
 import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/managerHooks/useCardHandlers"
 
 export const fetchAllData = () => {
@@ -58,10 +59,11 @@ export default function Create() {
         setSets, 
         setCroppedImageUrl,
         setOriginalImageUrl,
-    } = useCreateStore()
+        loading,
+        setLoading,
+    } = useManagerStore()
 
     const [active, setActive] = useState<string>("create");
-    const [loading, setLoading] = useState<boolean>(true);
     const [previousFileName, setPreviousFileName] = useState<string | null>(null);
 
     useEffect(() => {
@@ -79,8 +81,8 @@ export default function Create() {
         fetchData();
     }, []);
 
-    const updateCard = useCreateStore(state => state.updateCurrentCardData)
-    const clearCard = useCreateStore(state => state.clearCurrentCardData)
+    const updateCard = useManagerStore(state => state.updateCurrentCardData)
+    const clearCard = useManagerStore(state => state.clearCurrentCardData)
     const clearCurrentCardData = () => {
         clearCard()
         setCurrentSelectedImageUrl("")
@@ -91,7 +93,6 @@ export default function Create() {
     const flipCard = () => {
         setShowFront(!showFront);
     }
-
 
 
     const handleEditCardBtnPress = async (
@@ -131,9 +132,10 @@ export default function Create() {
         setUpdatingCard(true)
     }  
 
+    console.log("Loading:", loading)
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
-            
+        
             {/* Title */}
             <div className="flex flex-col w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px] items-center md:items-start py-[20px] md:pt-[40px]">
                 <h1 className="font-bold text-[18px] md:text-[20px]">Set Manager</h1>
@@ -155,7 +157,6 @@ export default function Create() {
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[40px] py-1 px-3 font-semibold text-[14px] md:text-[18px] rounded-[5px] hover-animation ${active == "create" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={() => {
                         setActive("create")
-                        setLoading(true)
                     }}
                 >
                     Create Card
@@ -165,9 +166,7 @@ export default function Create() {
                     className={`flex justify-center cursor-pointer items-center w-full h-[30px] md:h-[40px] py-1 px-3 font-semibold text-[14px] md:text-[18px] rounded-[5px] hover-animation ${active == "manage" ? "bg-[#D9D9D9]/3" : ""}`}
                     onClick={async () =>  {
                         setActive("manage")
-                        setLoading(false)
                         await updateSetImagesMap(currentSet.id)
-                        await updateCurrentSet(currentSet.id)
                     }}
                 >
                     Manage Cards
@@ -357,7 +356,7 @@ export default function Create() {
                             {currentSet.cards && currentSet.cards.map((card, id: number) => (
                                 <div
                                     key={id}
-                                    className="w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col"
+                                    className={`w-full h-fit bg-[#D9D9D9]/3 rounded md:rounded-[5px] flex flex-col`}
                                 >
 
                                     <div className="h-full flex flex-col">
@@ -376,9 +375,18 @@ export default function Create() {
                                                 </div>
                                                 <div className="flex items-center justify-center ">
                                                     <Trash2 
-                                                        className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
-                                                        onClick={() => {
-                                                            handleCardDelete(currentSet.id, card.cardId, card.fileName)
+                                                        className={`h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200 cursor-pointer ${loading ? "bg-gray-700" : "bg-transparent"}`}
+                                                        onClick={async () => {
+                                                            if (loading) return;
+                                                            const loadingToastId = loadingModal({ title: "Deleting card..." });
+                                                            try {
+                                                                await handleCardDelete(currentSet.id, card.cardId, card.fileName);
+                                                                dismissLoading(loadingToastId);
+                                                                setLoading(false)
+                                                            } catch (error) {
+                                                                dismissLoading(loadingToastId);
+                                                                error("Failed to delete card");
+                                                            }
                                                         }}
                                                     />
                                                 </div>
@@ -418,6 +426,8 @@ export default function Create() {
                     )}
                 </div>
             )}
+
+
         </section>
     )  
 }

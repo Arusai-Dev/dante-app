@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2, Menu } from "lucide-react";
 import { addMultipleCardsToSet, createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
-import { useCreateStore } from "@/app/stores/createStores";
+import { useManagerStore } from "@/app/stores/managerStores";
 import { toast } from "sonner";
 import { generateUniqueCardId } from "@/lib/card/card";
 import LineNumberedTextarea from "./TextAreaLineNumbers";
@@ -16,7 +16,7 @@ export default function SetSelectionComp() {
         sets,
         currentSet,
         setCurrentSet,
-    } = useCreateStore()
+    } = useManagerStore()
     const [newSetUI, setNewSetUI] = useState(false);
     const [importUI, setImportUI] = useState(false);
     const [selectionDropDown, setSelectionDropDown] = useState(false);
@@ -193,6 +193,8 @@ export default function SetSelectionComp() {
     }   
 
     const handleBulkImport = async () => {
+        addMultipleCardsToSet(currentSet.id, importedCardData)
+        setImportedCardData([])
         setImportUI(!importUI)
         await updateCurrentSet(currentSet.id)
     }
@@ -617,18 +619,13 @@ export default function SetSelectionComp() {
                     <div className="w-full flex gap-2">
                         <button 
                             className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
-                            onClick={async () => {
-                                addMultipleCardsToSet(currentSet.id, importedCardData)
-                                setImportedCardData([])
-                                setImportUI(!importUI)
-                                await updateCurrentSet(currentSet.id)
-                            }}
+                            onClick={handleBulkImport}
                             >
                             {"Import Cards"}
                         </button>
                         <button 
                             className="flex gap-2 justify-center cursor-pointer bg-[#252525] text-[#d3d3d3] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
-                            onClick={handleBulkImport}
+                            onClick={() => setImportUI(!importUI)}
                             >
                             {"Cancel"}
                         </button>

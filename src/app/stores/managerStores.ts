@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-type createStoreState = {
+type managerStoreState = {
     active: string
     updatingCard: boolean
     sets: any[]
@@ -33,6 +33,7 @@ type createStoreState = {
     originalFile: any
     croppedFile: any
     previousFile: any
+    loading: boolean
     setActive: (mode: string) => void
     setUpdatingCard: (mode: boolean) => void
     setSets: (data: any[]) => void
@@ -47,12 +48,13 @@ type createStoreState = {
     setOriginalFile: (data: any) => void
     setCroppedFile: (data: any) => void
     setPreviousFile: (data: any) => void
+    setLoading: (mode: boolean) => void
     updateCurrentCardData: (key: string, value: any) => void
     clearCurrentCardData: () => void
 }
 
-export const useCreateStore = create(
-    persist<createStoreState>(
+export const useManagerStore = create(
+    persist<managerStoreState>(
         (set, get) => ({
             active: 'create',
             updatingCard: false,
@@ -85,6 +87,7 @@ export const useCreateStore = create(
             originalFile: {},
             croppedFile: {},
             previousFile: {},
+            loading: false,
             setActive: (mode) => set({ active: mode }),
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
             setSets: (data) => set({ sets: data }),
@@ -99,6 +102,7 @@ export const useCreateStore = create(
             setOriginalFile: (data) => set({ originalFile: data }),
             setCroppedFile: (data) => set({ croppedFile: data }),
             setPreviousFile: (data) => set({ previousFile: data }),
+            setLoading: (mode) => set({ loading: mode }),
             updateCurrentCardData: (key, value) => set({
                 currentCardData: {
                     ...get().currentCardData,
@@ -131,7 +135,7 @@ export const useCreateStore = create(
             }
         }),
         {
-            name: 'create-storage', 
+            name: 'manager-storage', 
             storage: createJSONStorage(() => localStorage), 
         },
     )
