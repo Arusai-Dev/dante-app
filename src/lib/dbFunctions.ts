@@ -84,6 +84,7 @@ export async function createNewSet(
     }
 }
 
+
 export async function addOneCardToSet(
     currentSetId: number,
     cardId: number,
@@ -104,30 +105,42 @@ export async function addOneCardToSet(
         const scheduled_days = 0
         const last_review = null
 
-        return await sql(
+        const newCard = {
+            cardId, 
+            category, 
+            front, 
+            back, 
+            originalFileName,
+            croppedFileName,
+            due,
+            reps,
+            state,
+            lapses,
+            stability,
+            difficulty,
+            elapsed_day,
+            scheduled_days,
+            last_review,
+        };
+
+        console.log("Adding card with data:", newCard);
+
+        const res = await sql(
             `UPDATE flashcards
-             SET cards = cards::jsonb || $1::jsonb
+             SET cards = (COALESCE(cards, '[]'::json)::jsonb || $1::jsonb)::json
              WHERE id = $2`,
-            [JSON.stringify([{ 
-                cardId, 
-                category, 
-                front, 
-                back, 
-                originalFileName,
-                croppedFileName,
-                due,
-                reps,
-                state,
-                lapses,
-                stability,
-                difficulty,
-                elapsed_day,
-                scheduled_days,
-                last_review,
-            }]), currentSetId]
-        ); 
+            [JSON.stringify([newCard]), currentSetId]
+        );
+        
+        console.log("Database update result:", res);
+        
+        if (res.rowCount === 0) {
+            console.error("No rows updated - check if currentSetId exists:", currentSetId);
+        }
+        
     } catch (error) {
-        console.log(error);
+        console.error("Error adding card to set:", error);
+        throw error;
     }
 }
 

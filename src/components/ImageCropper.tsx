@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Cropper from 'react-easy-crop'
 import * as Slider from "@radix-ui/react-slider";
 import { useManagerStore } from '@/app/stores/managerStores';
 import { getCroppedImg } from '@/lib/image';
+import { convertUrlToFile } from '@/app/hooks/managerHooks/useCardHandlers';
 
 export default function ImageEditor() {
     const { 
@@ -12,8 +13,11 @@ export default function ImageEditor() {
         setCurrentSelectedImageUrl,
         imageCropUi,
         setImageCropUI,
-        setOriginalImageUrl,
+        originalFile,
+        originalImageUrl,
         setCroppedImageUrl,
+        setCroppedFile,
+        setOriginalFile,
     } = useManagerStore()
 
     const [crop, setCrop] = useState({ x: 0, y: 0 })
@@ -25,12 +29,36 @@ export default function ImageEditor() {
     }, [])
 
     const handleCrop = async () => {
-        const croppedImageUrl = await getCroppedImg(currentSelectedImageUrl, croppedAreaPixels);
-        
-        setCroppedImageUrl(croppedImageUrl)
-        setCurrentSelectedImageUrl(croppedImageUrl)
+        try {
+            const sourceImageUrl = originalImageUrl || currentSelectedImageUrl;
+            const croppedImageUrl = await getCroppedImg(sourceImageUrl, croppedAreaPixels);
+            
+            if (croppedImageUrl) {
+                const originalFileName = originalFile?.name || 'original_image';
+                const baseName = originalFileName.split('.')[0];
 
-        setImageCropUI(false)
+                const croppedFile = await convertUrlToFile(croppedImageUrl, baseName);
+
+                setCroppedImageUrl(croppedImageUrl);
+                setCroppedFile(croppedFile);
+                setCurrentSelectedImageUrl(croppedImageUrl);
+                
+                if (!originalFile && originalFile) {
+                    setOriginalFile(originalFile);
+                }
+                
+                if (!originalImageUrl) {
+                    setOriginalImageUrl(currentSelectedImageUrl);
+                }
+                
+                setImageCropUI(false);
+            } else {
+                console.error('Failed to generate cropped image');
+                return;                
+            }
+        } catch (error) {
+            console.error('Error during crop operation:', error);
+        }
     };
 
     return (
@@ -49,7 +77,7 @@ export default function ImageEditor() {
                         >
                             <div>
                                 <Cropper
-                                    image={currentSelectedImageUrl}
+                                    image={originalImageUrl ? originalImageUrl : currentSelectedImageUrl}
                                     crop={crop}
                                     zoom={zoom}
                                     maxZoom={10}
@@ -79,7 +107,7 @@ export default function ImageEditor() {
                             </div>
                             <div>
                                 <Slider.Root
-                                    className="relative top-5 bg-white rounded-b-xl flex h-6 w-full touch-none select-none items-center"
+                                    className="relative top-5 bg-white flex h-6 w-full touch-none select-none items-center"
                                     value={[zoom * 100]}
                                     min={100}
                                     max={1000}

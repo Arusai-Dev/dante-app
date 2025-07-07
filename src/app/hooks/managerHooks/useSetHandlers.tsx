@@ -11,26 +11,58 @@ export const updateCurrentSet = async (id: number) => {
     useManagerStore.getState().setCurrentSet(updatedSet[0])
 }
 
-// Update Set Images
 export const updateSetImagesMap = async (id: number) => {
-    const set = await getSetById(id)
-    // console.log("HELP:",set[0]?.cards)
-    const cardsWithImages = set[0]?.cards.filter((card: { fileName: string; }) => card.fileName && card.fileName.trim() !== "")
-    if (!cardsWithImages) return
-    
-    if (cardsWithImages.length === 0) {
-        useManagerStore.getState().setContainsImages(false)
-        console.log("No images to fetch")
-        return
-    }
-    useManagerStore.getState().setContainsImages(true)
-    const map = await RetrieveSetImages(id)
-    for (const [, imageUrl] of Object.entries(map)) {
-        preloadImage(imageUrl)
-    }
-    useManagerStore.getState().setCurrentSetImages(map)
+    try {
+        const set = await getSetById(id);
+        
+        if (!set || !set[0] || !set[0].cards) {
+            console.log("No set or cards found");
+            useManagerStore.getState().setContainsImages(false);
+            return;
+        }
 
-    console.log(useManagerStore.getState().currentSetImages)
+        const cardsWithImages = set[0].cards.filter((card: { 
+            originalFileName: string; 
+            croppedFileName: string; 
+        }) => {
+            const hasOriginal = card.originalFileName && card.originalFileName.trim() !== "";
+            const hasCropped = card.croppedFileName && card.croppedFileName.trim() !== "";
+            return hasOriginal || hasCropped;
+        });
+
+        if (cardsWithImages.length === 0) {
+            useManagerStore.getState().setContainsImages(false);
+            console.log("No images to fetch");
+            return;
+        }
+
+        useManagerStore.getState().setContainsImages(true);
+        console.log(`Found ${cardsWithImages.length} cards with images`);
+
+        const map = await RetrieveSetImages(id);
+        
+        const preloadPromises = Object.values(map).map(async (imageUrl) => {
+            try {
+                const result = preloadImage(imageUrl as string);
+                if (result && typeof result.then === 'function') {
+                    await result;
+                } else {
+                    console.warn("preloadImage did not return a Promise for:", imageUrl);
+                }
+            } catch (error) {
+                console.warn("Failed to preload image:", imageUrl, error);
+            }
+        })
+        
+        await Promise.allSettled(preloadPromises);
+        
+        useManagerStore.getState().setCurrentSetImages(map);
+        console.log("Updated set images:", useManagerStore.getState().currentSetImages);
+
+    } catch (error) {
+        console.error("Error updating set images map:", error);
+        useManagerStore.getState().setContainsImages(false);
+    }
 };
 
 // Delete Set

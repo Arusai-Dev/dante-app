@@ -36,52 +36,68 @@ export const convertUrlToFile = async (url: string, baseName: string) => {
 }
 
 
-// addCard
 export const handleAddCard = async () => {
-    const { category, front, back } = useManagerStore.getState().currentCardData;
+    const state = useManagerStore.getState();
+    const { category, front, back } = state.currentCardData;
+    const currentSet = state.currentSet;
+    const currentSetId = currentSet?.id;
 
-    const currentSet = useManagerStore.getState().currentSet;
-
-    console.log("CroppedImageUrl:", useManagerStore.getState().croppedImageUrl)
-    useManagerStore.getState().setCroppedFile(await convertUrlToFile(useManagerStore.getState().croppedImageUrl, "cropped"))
-
-    const originalFileName = useManagerStore.getState().originalFile.name
-    const croppedFileName = useManagerStore.getState().croppedFile.name
-
-    console.log("originalFileName:", originalFileName)
-    console.log("croppedFileName:", croppedFileName)
-
-    const currentSetId = currentSet?.id
     if (!currentSetId) {
         console.warn("No set selected.");
         return;
     }
-    
-    await updateCurrentSet(currentSetId)        
 
+    try {
+        let originalFileName = "";
+        let croppedFileName = "";
 
-    const cardId = generateUniqueCardId(currentSet.cards.map(card => card.cardId))
+        if (state.originalFile) {
+            originalFileName = "original_" + state.originalFile.name;
+        }
 
-    fetchAllData()
-    await addOneCardToSet(
-        currentSetId,
-        cardId,
-        category, 
-        front, 
-        back, 
-        originalFileName,
-        croppedFileName,
-    );
+        if (state.croppedImageUrl && state.croppedImageUrl.trim() !== "") {
+            if (!state.croppedFile) {
+                const croppedFile = await convertUrlToFile(state.croppedImageUrl, "cropped");
+                state.setCroppedFile(croppedFile);
+            }
+            croppedFileName = "cropped_" + state.croppedFile.name;
+        }
 
-    const updatedSet = await getSetById(currentSetId);
-    useManagerStore.getState().setCurrentSet(updatedSet[0])
+        console.log("originalFileName:", originalFileName);
+        console.log("croppedFileName:", croppedFileName);
 
-    await updateCardCount(currentSetId, updatedSet[0].cards.length)
-    await updateCurrentSet(currentSetId)
-    await handleImageUpload(cardId)
-    useManagerStore.getState().clearCurrentCardData()
-    useManagerStore.getState().setCurrentSelectedImageUrl("")
-};   
+        const existingCardIds = currentSet?.cards?.map(card => card.cardId) || [];
+        const cardId = generateUniqueCardId(existingCardIds);
+        
+        await addOneCardToSet(
+            currentSetId,
+            cardId,
+            category, 
+            front, 
+            back, 
+            originalFileName,
+            croppedFileName,
+        );
+
+        await handleImageUpload(cardId);
+
+        const updatedSet = await getSetById(currentSetId);
+        state.setCurrentSet(updatedSet[0]);
+
+        await updateCardCount(currentSetId, updatedSet[0].cards.length);
+
+        await fetchAllData();
+        await updateCurrentSet(currentSetId);
+
+        state.clearCurrentCardData();
+        state.setCurrentSelectedImageUrl("");
+
+        console.log("Card added successfully with ID:", cardId);
+
+    } catch (error) {
+        console.error("Error adding card:", error);
+    }
+};
 
 // deleteCard
 export const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {

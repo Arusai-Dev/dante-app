@@ -1,5 +1,5 @@
 "use client"    
-import { useCreateStore } from "@/app/stores/managerStores"
+import { useManagerStore } from "@/app/stores/managerStores"
 import { getSetById } from "@/lib/dbFunctions"
 import { Pencil } from "lucide-react"
 import Link from "next/link"
@@ -11,7 +11,7 @@ export default function EditButton({ id }) {
         setActive, 
         setCurrentSet,
         currentSet,
-    } = useCreateStore()
+    } = useManagerStore()
 
     const changePage = async () => {
         const res = await getSetById(id)

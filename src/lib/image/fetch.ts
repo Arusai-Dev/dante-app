@@ -1,4 +1,4 @@
-import { useCreateStore } from "@/app/stores/managerStores"
+import { useManagerStore } from "@/app/stores/managerStores"
 import { getSetById } from "../dbFunctions"
 
 export const RetrieveSetImages = async (setId: number) => {
@@ -76,9 +76,12 @@ const checkImageExists = (url: string): Promise<boolean> => {
     });
 };
 
-export const preloadImage = (src: string) => {
-    const img = new Image();
-    img.src = src;
+export const preloadImage = (url: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = url;
+    });
 };
-
 

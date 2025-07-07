@@ -13,52 +13,63 @@ import { convertUrlToFile } from "./useCardHandlers";
 // 7. When card is being edited and cropped button is pressed show originalImageUrl to allow re-cropping
 
 
-// Upload
 export const handleImageUpload = async (cardId: number) => {
-    const originalFile = await useManagerStore.getState().originalFile
-    const croppedFile = await useManagerStore.getState().croppedFile
-    const setId = useManagerStore.getState().currentSet.id
+    const state = useManagerStore.getState();
+    const originalFile = state.originalFile;
+    const croppedFile = state.croppedFile;
+    const setId = state.currentSet.id;
 
-    if (originalFile) {
+    if (!originalFile && !croppedFile) {
+        console.warn("No files to upload");
+        return;
+    }
+
+    const uploadFile = async (file: File, fileType: string) => {
         const formData = new FormData();
-        formData.append("file", originalFile);
+        formData.append("file", file);
+        formData.append("fileType", fileType);
 
         try {
             const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}`, {
                 method: "POST",
                 body: formData,
-            })
+            });
 
-            const data = await response.json()
-            console.log("Image Upload Data:", data)
-        } catch(error) {
-            console.log("Image Upload Error:", error)
+            if (!response.ok) {
+                throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log(`${fileType} Upload Data:`, data);
+            return data;
+        } catch (error) {
+            console.error(`${fileType} Upload Error:`, error);
+            throw error; 
+        }
+    };
+
+    try {
+        const uploadPromises = [];
+
+        if (originalFile) {
+            console.log(originalFile)
+            uploadPromises.push(uploadFile(originalFile, "original"));
         }
 
-        updateSetImagesMap(setId)
-        clearCurrentImage()
-    }
-    
-    if (croppedFile) {
-        const formData = new FormData();
-        formData.append("file", croppedFile);
-
-        try {
-            const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}`, {
-                method: "POST",
-                body: formData,
-            })
-
-            const data = await response.json()
-            console.log("Image Upload Data:", data)
-        } catch(error) {
-            console.log("Image Upload Error:", error)
+        if (croppedFile) {
+            uploadPromises.push(uploadFile(croppedFile, "cropped"));
         }
 
-        updateSetImagesMap(setId)
-        clearCurrentImage()
+        const results = await Promise.all(uploadPromises);
+        console.log("All uploads completed:", results);
+
+        updateSetImagesMap(setId);
+        clearCurrentImage();
+
+    } catch (error) {
+        console.error("Upload process failed:", error);
     }
-}
+};
 
 
 // Delete
@@ -101,48 +112,77 @@ export const handleImageUpdate = async (
 export const handleImageUrlInput = async (e) => {
     const inputtedUrl = e.target.value;
 
-    try {
-        
-        const fileFromUrl = await convertUrlToFile(inputtedUrl, "original")
+    if (!inputtedUrl || !inputtedUrl.trim()) {
+        return; 
+    }
 
-        useManagerStore.getState().setOriginalFile(fileFromUrl)
-        useManagerStore.getState().setOriginalImageUrl(inputtedUrl)
-        useManagerStore.getState().setCurrentSelectedImageUrl(useManagerStore.getState().originalImageUrl);
+    try {
+        new URL(inputtedUrl);
+    } catch {
+        console.log("Invalid URL format");
+        return;
+    }
+
+    try {
+        const fileFromUrl = await convertUrlToFile(inputtedUrl, "original");
+        const objectUrl = URL.createObjectURL(fileFromUrl);
+
+        useManagerStore.getState().setOriginalFile(fileFromUrl);
+        useManagerStore.getState().setOriginalImageUrl(objectUrl);
+        useManagerStore.getState().setCurrentSelectedImageUrl(objectUrl);
+        
+        useManagerStore.getState().setCroppedFile(null);
+        useManagerStore.getState().setCroppedImageUrl("");
 
     } catch(error) {
-        console.log("Image Url Input Error:", error)
+        console.log("Image Url Input Error:", error);
     }
 };
 
-
-// Save original file data to allow recropping in the future
 export const handleFileChange = (e) => {
-    const selectedImage = e.target.files[0]
-    console.log(selectedImage)
+    const selectedImage = e.target.files[0];
+    console.log("selectedImage:", selectedImage);
+    
     if (selectedImage) {
-        useManagerStore.getState().setOriginalFile(selectedImage)
         const imageURL = URL.createObjectURL(selectedImage);
-        console.log("imageURL:",imageURL)
-        useManagerStore.getState().setCurrentSelectedImageUrl(imageURL)
-
+        console.log("imageURL:", imageURL);
+        
+        useManagerStore.getState().setOriginalFile(selectedImage);
+        useManagerStore.getState().setOriginalImageUrl(imageURL); 
+        useManagerStore.getState().setCurrentSelectedImageUrl(imageURL);
+        
         useManagerStore.getState().setCroppedFile(null);
         useManagerStore.getState().setCroppedImageUrl("");
-        useManagerStore.getState().setOriginalImageUrl("");
-
     }
 };
 
 
 export const clearCurrentImage = () => {
-    const currentCardData = useManagerStore.getState().currentCardData
+    const state = useManagerStore.getState();
+    const currentCardData = state.currentCardData;
+    if (!currentCardData || !currentCardData[1]) {
+        console.warn("No current card data to clear image from");
+        return;
+    }
 
-    useManagerStore.getState().setCurrentSelectedImageUrl("");
-    useManagerStore.getState().setOriginalFile(null);
-    useManagerStore.getState().setCroppedFile(null);
-    useManagerStore.getState().setCroppedImageUrl("");
-    useManagerStore.getState().setOriginalImageUrl("");
+    
+    if (state.currentSelectedImageUrl && state.currentSelectedImageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(state.currentSelectedImageUrl);
+    }
+    if (state.originalImageUrl && state.originalImageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(state.originalImageUrl);
+    }
+    if (state.croppedImageUrl && state.croppedImageUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(state.croppedImageUrl);
+    }
 
-    useManagerStore.getState().setCurrentSetImages(prevImages => {
+    state.setCurrentSelectedImageUrl("");
+    state.setOriginalFile(null);
+    state.setCroppedFile(null);
+    state.setCroppedImageUrl("");
+    state.setOriginalImageUrl("");
+
+    state.setCurrentSetImages(prevImages => {
         const updated = { ...prevImages };
         delete updated[currentCardData[1]];
         return updated;
