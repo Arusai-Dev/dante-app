@@ -85,7 +85,7 @@ export default function Explore() {
 
     return (
         <>
-            <div className="min-h-screen bg-neutral-900">
+            <div className="min-h-screen bg-neutral-900 pt-16">
                 <div className="border-b-2  border-neutral-800 bg-neutral-900/95 backdrop-blur supports-[backdrop-filter]:bg-neutral-900/60 sticky top-0 z-50">
                     <div className="container mx-auto px-4 py-6">
                         <div className="flex flex-col gap-4">
