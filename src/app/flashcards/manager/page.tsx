@@ -61,6 +61,12 @@ export default function Create() {
         setOriginalImageUrl, 
         loading,
         setLoading,
+        imageCropUi,
+        originalFile,
+        croppedFile,
+        originalImageUrl,
+        croppedImageUrl,
+        previousFile,
     } = useManagerStore()
 
     const [active, setActive] = useState<string>("create");
@@ -136,6 +142,18 @@ export default function Create() {
     // console.log(currentCardData)
 
     // console.log("Loading:", loading)
+
+    console.log({
+        "currentCardData": currentCardData,
+        "ImageCropUI": imageCropUi,
+        "currentSelectedImageUrl": currentSelectedImageUrl,
+        "originalImageUrl": originalImageUrl,
+        "croppedImageUrl": croppedImageUrl,
+        "originalFile": originalFile,
+        "croppedFile": croppedFile,
+        "previousFile": previousFile,
+    })
+
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
         

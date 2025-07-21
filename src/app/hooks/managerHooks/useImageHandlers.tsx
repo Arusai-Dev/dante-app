@@ -28,6 +28,7 @@ export const handleImageUpload = async (cardId: number) => {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("fileType", fileType);
+        formData.append("originalFileName", originalFile.name);
 
         try {
             const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}`, {
@@ -105,7 +106,7 @@ export const handleImageUpdate = async (
     if (previousCroppedFileName)
         await handleImageDelete(cardId, previousCroppedFileName)
 
-    handleImageUpload(cardId)
+    await handleImageUpload(cardId)
 }
 
 

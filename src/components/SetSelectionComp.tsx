@@ -372,21 +372,20 @@ export default function SetSelectionComp() {
                 )}
             </div>
         </div>
-        
-        {/* TODO: The design for this component needs to be re-done... */}
+
         {newSetUI && (
             <>
             <div className="fixed inset-0 bg-black/3 backdrop-blur-sm z-30" onClick={toggleNewSetUI}></div>
 
             <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40">
-                <div className="new-set-btn-pop-up z-50 flex flex-col gap-8 rounded-sm md:rounded-md w-[calc(100vw-10%)] md:w-[555px] h-[calc(100vh-20%)] md:h-fit bg-[#1e1e1e] transition-all duration-[0.2s]">
-                    <div className="px-7 pt-6 flex flex-col gap-4 md:gap-8">
+                <div className="new-set-btn-pop-up z-50 flex flex-col justify-between gap-3 px-4 py-3 rounded-sm md:rounded-md w-screen md:w-[555px] h-fit md:h-fit bg-[#1e1e1e] transition-all duration-[0.2s]">
+                    <div className="flex flex-col gap-3">
                         <div>
-                            <h1 className="text-lg lg:text-2xl font-bold">Create New Set</h1>
-                            <p className="text-[#8c8c8c] text-md lg:text-xl">Create a new set to organize your flashcards.</p>
+                            <h1 className="font-bold text-[18px] md:text-[20px]">Create New Set</h1>
+                            <p className="text-[#8c8c8c] text-[14px] md:text-[16px]">Create a new set to organize your flashcards.</p>
                         </div>
 
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-1">
                             <h2 className="text-sm lg:text-2xl">Set Title</h2>
                             <input 
                                 className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
@@ -394,8 +393,8 @@ export default function SetSelectionComp() {
                             ></input>
                         </div>
 
-                        <div>
-                            <h2 className="pb-2 text-sm lg:text-2xl">Set Description (optional)</h2>
+                        <div className="flex flex-col gap-1">
+                            <h2 className="text-sm lg:text-2xl">Set Description (optional)</h2>
                             <textarea 
                                 className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                                 value={newSetDescription}
@@ -406,8 +405,7 @@ export default function SetSelectionComp() {
                         </div>
                     </div>
 
-                    
-                    <div className="flex gap-3 justify-between w-full px-5 items-center pb-6">
+                    <div className="flex flex-col gap-3 w-full items-start">
                         <div className="flex items-center">
                             <h1 className="font-semibold pr-2 text-sm lg:text-xl">Visibility:</h1>
                             <button 
@@ -442,13 +440,9 @@ export default function SetSelectionComp() {
                                     if (newSetTitle == "") {
                                         toast('Please enter a Title')
                                     } 
-
-
                                     else { 
                                         onNewSetSubmit()
                                     }
-
-
                                 }}
                             >Save</button>
                         </div>

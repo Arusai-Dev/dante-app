@@ -130,7 +130,11 @@ export const useManagerStore = create(
                         // last_review: null,
                     },
                     originalFile: null,
-                    croppedFile: null
+                    croppedFile: null,
+                    previousFile: null,
+                    croppedImageUrl: "",
+                    originalImageUrl: "",
+                    currentSelectedImageUrl: "",
                 })
             }
         }),

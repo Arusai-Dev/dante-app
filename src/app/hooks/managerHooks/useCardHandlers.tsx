@@ -41,6 +41,7 @@ export const handleAddCard = async () => {
     const { category, front, back } = state.currentCardData;
     const currentSet = state.currentSet;
     const currentSetId = currentSet?.id;
+    const croppedFileName = state.croppedFile?.name;
 
     if (!currentSetId) {
         console.warn("No set selected.");
@@ -49,19 +50,18 @@ export const handleAddCard = async () => {
 
     try {
         let originalFileName = "";
-        let croppedFileName = "";
 
         if (state.originalFile) {
-            originalFileName = "original_" + state.originalFile.name;
+            originalFileName = state.originalFile.name;
         }
 
-        if (state.croppedImageUrl && state.croppedImageUrl.trim() !== "") {
-            if (!state.croppedFile) {
-                const croppedFile = await convertUrlToFile(state.croppedImageUrl, "cropped");
-                state.setCroppedFile(croppedFile);
-            }
-            croppedFileName = "cropped_" + state.croppedFile.name;
-        }
+        // if (state.croppedImageUrl && state.croppedImageUrl.trim() !== "") {
+        //     if (!state.croppedFile) {
+        //         const croppedFile = await convertUrlToFile(state.croppedImageUrl, "cropped");
+        //         state.setCroppedFile(croppedFile);
+        //     }
+        //     croppedFileName = "cropped_" + state.croppedFile.name;
+        // }
 
         console.log("originalFileName:", originalFileName);
         console.log("croppedFileName:", croppedFileName);

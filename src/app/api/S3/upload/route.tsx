@@ -14,6 +14,7 @@ export async function POST(request) {
         const formData = await request.formData();
         const file = formData.get("file");
         const fileType = formData.get("fileType"); 
+        const originalFileName = formData.get("originalFileName");
 
         if (!file) {
             return NextResponse.json({ error: "File is required." }, { status: 400 });
@@ -29,15 +30,19 @@ export async function POST(request) {
 
         const fileBuffer = Buffer.from(await file.arrayBuffer());
 
-        
-        let key;
+        let fileName;
         if (fileType === "original") {
-            key = `${setId}/${cardId}/original_${file.name}`;
+            fileName = file.name;
         } else if (fileType === "cropped") {
-            key = `${setId}/${cardId}/cropped_${file.name}`;
+            const userOriginalName = originalFileName || file.name;
+            const nameWithoutExtension = userOriginalName.split('.')[0];
+            const extension = userOriginalName.split('.').pop();
+            fileName = `cropped_${nameWithoutExtension}.${extension}`;
         } else {
-            key = `${setId}/${cardId}/${file.name}`;
+            fileName = file.name;
         }
+
+        const key = `${setId}/${cardId}/${fileName}`;
 
         console.log("KEY WHEN UPLOADING:", key, "TYPE:", fileType);
 
@@ -55,7 +60,7 @@ export async function POST(request) {
             success: true, 
             key: key, 
             fileType: fileType,
-            fileName: file.name 
+            fileName: fileName
         });
 
     } catch(error) {

@@ -15,6 +15,7 @@ export default function ImageEditor() {
         setImageCropUI,
         originalFile,
         originalImageUrl,
+        setOriginalImageUrl,
         setCroppedImageUrl,
         setCroppedFile,
         setOriginalFile,
@@ -34,8 +35,8 @@ export default function ImageEditor() {
             const croppedImageUrl = await getCroppedImg(sourceImageUrl, croppedAreaPixels);
             
             if (croppedImageUrl) {
-                const originalFileName = originalFile?.name || 'original_image';
-                const baseName = originalFileName.split('.')[0];
+                const originalFileName = originalFile?.name;
+                const baseName = originalFileName;
 
                 const croppedFile = await convertUrlToFile(croppedImageUrl, baseName);
 

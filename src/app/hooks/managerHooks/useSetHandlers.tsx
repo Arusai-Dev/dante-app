@@ -17,7 +17,7 @@ export const updateSetImagesMap = async (id: number) => {
         
         if (!set || !set[0] || !set[0].cards) {
             console.log("No set or cards found");
-            useManagerStore.getState().setContainsImages(false);
+            // useManagerStore.getState().setContainsImages(false);
             return;
         }
 
@@ -31,12 +31,12 @@ export const updateSetImagesMap = async (id: number) => {
         });
 
         if (cardsWithImages.length === 0) {
-            useManagerStore.getState().setContainsImages(false);
+            // useManagerStore.getState().setContainsImages(false);
             console.log("No images to fetch");
             return;
         }
 
-        useManagerStore.getState().setContainsImages(true);
+        // useManagerStore.getState().setContainsImages(true);
         console.log(`Found ${cardsWithImages.length} cards with images`);
 
         const map = await RetrieveSetImages(id);
