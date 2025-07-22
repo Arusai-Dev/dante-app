@@ -24,7 +24,6 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { getSetById } from "@/lib/dbFunctions"
 import Image from "next/image"
-import { useCompletion } from "@ai-sdk/react"
 
 interface FlashCard extends Card {
   cardId: number
@@ -49,7 +48,7 @@ export default function PracticeSet({ params }) {
   const [flashcardSet, setFlashcardSet] = useState([])
   const [currentCardIndex, setCurrentCardIndex] = useState(0)
   const [showFront, setShowFront] = useState(true)
-  const [qualityScore, setQualityScore] = useState<"Easy">("Easy")
+  const [qualityScore, setQualityScore] = useState< Rating | "Easy">("Easy")
   const [cards, setCards] = useState<FlashCard[]>([])
   const [dueCards, setDueCards] = useState<FlashCard[]>([])
   const [showSidebar, setShowSidebar] = useState(false)
@@ -62,6 +61,7 @@ export default function PracticeSet({ params }) {
   const [paramId, setParamId] = useState()
   const [selectedModel, setSelectedModel] = useState(models[0])
   const [isTyping, setIsTyping] = useState(false)
+  const [localCardState, setLocalCardState] = useState([])
 
   useEffect(() => {
     async function getParamId() {
@@ -79,9 +79,6 @@ export default function PracticeSet({ params }) {
     getInfo()
   }, [paramId])
 
-  const { completion, complete } = useCompletion({
-    api: "/api/chat/gptnano-response",
-  })
 
   const set = flashcardSet[0]
   const jsonCards = set?.cards
@@ -151,11 +148,11 @@ export default function PracticeSet({ params }) {
         setAllCardImages(cardImagesMap)
       }
 
-      const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
-        const res = await fetch(`/api/get-image?setId=${setId}&cardId=${cardId}&fileName=${fileName}`)
-        const data = await res.json()
-        return data.url
-      }
+      // const fetchSignedImageUrl = async (setId: number, cardId: number, fileName: string) => {
+      //   const res = await fetch(`/api/get-image?setId=${setId}&cardId=${cardId}&fileName=${fileName}`)
+      //   const data = await res.json()
+      //   return data.url
+      // }
 
       retrieveCardImages()
     }
@@ -216,7 +213,7 @@ export default function PracticeSet({ params }) {
       })
 
       setShowFront(true)
-      setQualityScore(null)
+      setQualityScore("Easy")
     } catch (error) {
       console.error("Error submitting review:", error)
     } finally {
@@ -243,13 +240,46 @@ export default function PracticeSet({ params }) {
   }
 
   const handleQualityScoreClick = (rating: Rating) => {
-    setQualityScore(rating)
-    submitReview(rating)
+    if (isSubmittingReview || dueCards.length === 0) return
+    
+    setIsSubmittingReview(true)
+
+    const card = getCurrentCard()
+    const schedulingInfo = f.repeat(card, new Date())
+    const updatedCard = schedulingInfo[rating].card
+
+    localCardState.push(JSON.stringify({
+      due: updatedCard.due.toISOString(),
+      stability: updatedCard.stability,
+      difficulty: updatedCard.difficulty,
+      elapsed_days: updatedCard.elapsed_days,
+      scheduled_days: updatedCard.scheduled_days,
+      reps: updatedCard.reps,
+      lapses: updatedCard.lapses,
+      state: updatedCard.state,
+      last_review: updatedCard.last_review?.toISOString() || new Date().toISOString(),
+    }))
+  
+    
+    setCards((prevCards) => prevCards.map((c) => (c.cardId === card.cardId ? { ...c, ...updatedCard } : c)))
+      setDueCards((prevDueCards) => {
+        const newDueCards = prevDueCards.filter((_, index) => index !== currentCardIndex)
+        if (newDueCards.length === 0) {
+          setStudyComplete(true)
+        } else {
+          if (currentCardIndex >= newDueCards.length) {
+            setCurrentCardIndex(0)
+          }
+        }
+        return newDueCards
+      })
+
+    setShowFront(true)
+    setQualityScore("Easy")
+    setIsSubmittingReview(false)
+
   }
 
-  useEffect(() => {
-    const sessionId = crypto.randomUUID()
-  }, [])
 
   const handleSidebar = () => {
     setShowSidebar((prev) => !prev)
@@ -521,13 +551,14 @@ export default function PracticeSet({ params }) {
             <div className="flex justify-center items-center h-[calc(100%-120px)] text-2xl">
               {getCurrentCard()?.back}
               {allCardImages[getCurrentCard().cardId] ? (
-                <Image
-                  src={allCardImages[getCurrentCard().cardId] || "/placeholder.svg"}
-                  alt={getCurrentCard()?.fileName}
-                  width={200}
-                  height={200}
-                  className="w-full max-w-xs h-40 object-cover rounded border-1 border-[#8c8c8c]"
-                />
+                <></>
+                // <Image
+                //   src={allCardImages[getCurrentCard().cardId] || "/placeholder.svg"}
+                //   alt={getCurrentCard()?.fileName}
+                //   width={200}
+                //   height={200}
+                //   className="w-full max-w-xs h-40 object-cover rounded border-1 border-[#8c8c8c]"
+                // />
               ) : (
                 ""
               )}
