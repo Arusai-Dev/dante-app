@@ -79,7 +79,7 @@ export const handleAddCard = async () => {
             croppedFileName,
         );
 
-        await handleImageUpload(cardId);
+        // await handleImageUpload(cardId);
 
         const updatedSet = await getSetById(currentSetId);
         state.setCurrentSet(updatedSet[0]);

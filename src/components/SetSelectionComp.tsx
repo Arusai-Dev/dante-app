@@ -372,7 +372,7 @@ export default function SetSelectionComp() {
                 )}
             </div>
         </div>
-
+                
         {newSetUI && (
             <>
             <div className="fixed inset-0 bg-black/3 backdrop-blur-sm z-30" onClick={toggleNewSetUI}></div>
@@ -381,12 +381,12 @@ export default function SetSelectionComp() {
                 <div className="new-set-btn-pop-up z-50 flex flex-col justify-between gap-3 px-4 py-3 rounded-sm md:rounded-md w-screen md:w-[555px] h-fit md:h-fit bg-[#1e1e1e] transition-all duration-[0.2s]">
                     <div className="flex flex-col gap-3">
                         <div>
-                            <h1 className="font-bold text-[18px] md:text-[20px]">Create New Set</h1>
+                            <h1 className="font-bold text-[18px] md:text-[22px]">Create New Set</h1>
                             <p className="text-[#8c8c8c] text-[14px] md:text-[16px]">Create a new set to organize your flashcards.</p>
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <h2 className="text-sm lg:text-2xl">Set Title</h2>
+                            <h2 className="text-[16px] md:text-[20px">Set Title</h2>
                             <input 
                                 className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                                 onChange={(e) => setNewSetTitle(e.target.value)}
@@ -394,7 +394,7 @@ export default function SetSelectionComp() {
                         </div>
 
                         <div className="flex flex-col gap-1">
-                            <h2 className="text-sm lg:text-2xl">Set Description (optional)</h2>
+                            <h2 className="text-[16px] md:text-[20px]">Set Description (optional)</h2>
                             <textarea 
                                 className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                                 value={newSetDescription}

@@ -43,7 +43,6 @@ export const fetchAllData = () => {
     });
 };
 
-
 export default function Create() {
 
     const { 
@@ -99,7 +98,6 @@ export default function Create() {
     const flipCard = () => {
         setShowFront(!showFront);
     }
-
 
     const handleEditCardBtnPress = async (
         setId: number,
@@ -247,8 +245,10 @@ export default function Create() {
                             </label>
                         </div>
 
+
                         <ImageCropper/>
-                        
+
+
                         {(currentSelectedImageUrl || (updatingCard && currentSetImages[currentCardData["originalFileName"]])) && (
                             <div className="flex justify-between mt-4">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -277,6 +277,7 @@ export default function Create() {
                                 </div>
                             </div>
                         )}
+
 
                         <div className="flex gap-2 w-full max-w-[600px] mb-1 mt-4">
                             <button 
