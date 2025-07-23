@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import Cropper from 'react-easy-crop'
 import * as Slider from "@radix-ui/react-slider";
-import { useManagerStore } from '@/app/stores/managerStores';
+import { useManagerPersistentStore } from '@/app/stores/managerStores';
 import { getCroppedImg } from '@/lib/image';
 import { convertUrlToFile } from '@/app/hooks/managerHooks/useCardHandlers';
 
@@ -19,7 +19,7 @@ export default function ImageEditor() {
         setCroppedImageUrl,
         setCroppedFile,
         setOriginalFile,
-    } = useManagerStore()
+    } = useManagerPersistentStore()
 
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)

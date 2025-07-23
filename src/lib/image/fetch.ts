@@ -1,4 +1,4 @@
-import { useManagerStore } from "@/app/stores/managerStores"
+import { useManagerPersistentStore } from "@/app/stores/managerStores"
 import { getSetById } from "../dbFunctions"
 
 export const RetrieveSetImages = async (setId: number) => {

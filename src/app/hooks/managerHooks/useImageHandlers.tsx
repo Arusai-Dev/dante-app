@@ -1,4 +1,4 @@
-import { useManagerStore } from "@/app/stores/managerStores";
+import { useManagerPersistentStore } from "@/app/stores/managerStores";
 import { updateSetImagesMap } from "./useSetHandlers"
 import { convertUrlToFile } from "./useCardHandlers";
 
@@ -14,7 +14,7 @@ import { convertUrlToFile } from "./useCardHandlers";
 
 
 export const handleImageUpload = async (cardId: number) => {
-    const state = useManagerStore.getState();
+    const state = useManagerPersistentStore.getState();
     const originalFile = state.originalFile;
     const croppedFile = state.croppedFile;
     const setId = state.currentSet.id;
@@ -75,7 +75,7 @@ export const handleImageUpload = async (cardId: number) => {
 
 // Delete
 export const handleImageDelete = async (cardId: number, fileName: string) => {
-    const setId = useManagerStore.getState().currentSet.id
+    const setId = useManagerPersistentStore.getState().currentSet.id
 
     console.log("Deleting given image...")
     const key = `${setId}/${cardId}/${fileName}`;
@@ -128,12 +128,12 @@ export const handleImageUrlInput = async (e) => {
         const fileFromUrl = await convertUrlToFile(inputtedUrl, "original");
         const objectUrl = URL.createObjectURL(fileFromUrl);
 
-        useManagerStore.getState().setOriginalFile(fileFromUrl);
-        useManagerStore.getState().setOriginalImageUrl(objectUrl);
-        useManagerStore.getState().setCurrentSelectedImageUrl(objectUrl);
+        useManagerPersistentStore.getState().setOriginalFile(fileFromUrl);
+        useManagerPersistentStore.getState().setOriginalImageUrl(objectUrl);
+        useManagerPersistentStore.getState().setCurrentSelectedImageUrl(objectUrl);
         
-        useManagerStore.getState().setCroppedFile(null);
-        useManagerStore.getState().setCroppedImageUrl("");
+        useManagerPersistentStore.getState().setCroppedFile(null);
+        useManagerPersistentStore.getState().setCroppedImageUrl("");
 
     } catch(error) {
         console.log("Image Url Input Error:", error);
@@ -148,18 +148,18 @@ export const handleFileChange = (e) => {
         const imageURL = URL.createObjectURL(selectedImage);
         console.log("imageURL:", imageURL);
         
-        useManagerStore.getState().setOriginalFile(selectedImage);
-        useManagerStore.getState().setOriginalImageUrl(imageURL); 
-        useManagerStore.getState().setCurrentSelectedImageUrl(imageURL);
+        useManagerPersistentStore.getState().setOriginalFile(selectedImage);
+        useManagerPersistentStore.getState().setOriginalImageUrl(imageURL); 
+        useManagerPersistentStore.getState().setCurrentSelectedImageUrl(imageURL);
         
-        useManagerStore.getState().setCroppedFile(null);
-        useManagerStore.getState().setCroppedImageUrl("");
+        useManagerPersistentStore.getState().setCroppedFile(null);
+        useManagerPersistentStore.getState().setCroppedImageUrl("");
     }
 };
 
 
 export const clearCurrentImage = () => {
-    const state = useManagerStore.getState();
+    const state = useManagerPersistentStore.getState();
     const currentCardData = state.currentCardData;
     if (!currentCardData || !currentCardData[1]) {
         console.warn("No current card data to clear image from");

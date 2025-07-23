@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
-import { useManagerStore } from "@/app/stores/managerStores"
+import { useManagerNonPersistentStore, useManagerPersistentStore } from "@/app/stores/managerStores"
 import SetSelectionComp from "@/components/SetSelectionComp"
 import ImageCropper from "@/components/ImageCropper"
 import { fieldMissingModal } from "@/components/modals/fieldMissingModal"
@@ -25,7 +25,7 @@ export const fetchAllData = () => {
         originalFile,
         croppedFile,
         previousFile,
-    } = useManagerStore.getState();
+    } = useManagerPersistentStore.getState();
 
     console.log({
         updatingCard,
@@ -54,19 +54,22 @@ export default function Create() {
         currentSetImages,
         currentCardData,
         setCurrentCardData,
-        setImageCropUI,
         setSets, 
         setCroppedImageUrl,
         setOriginalImageUrl, 
-        loading,
-        setLoading,
-        imageCropUi,
         originalFile,
         croppedFile,
         originalImageUrl,
         croppedImageUrl,
         previousFile,
-    } = useManagerStore()
+    } = useManagerPersistentStore()
+    
+    const {
+        imageCropUI,
+        setImageCropUI,
+        loading,
+        setLoading,
+    } = useManagerNonPersistentStore()
 
     const [active, setActive] = useState<string>("create");
     const [previousFileName, setPreviousFileName] = useState<string | null>(null);
@@ -86,8 +89,8 @@ export default function Create() {
         fetchData();
     }, [currentSet.id, setSets]);
 
-    const updateCard = useManagerStore(state => state.updateCurrentCardData)
-    const clearCard = useManagerStore(state => state.clearCurrentCardData)
+    const updateCard = useManagerPersistentStore(state => state.updateCurrentCardData)
+    const clearCard = useManagerPersistentStore(state => state.clearCurrentCardData)
     const clearCurrentCardData = () => {
         clearCard()
         setCurrentSelectedImageUrl("")
@@ -143,7 +146,7 @@ export default function Create() {
 
     console.log({
         "currentCardData": currentCardData,
-        "ImageCropUI": imageCropUi,
+        "ImageCropUI": imageCropUI,
         "currentSelectedImageUrl": currentSelectedImageUrl,
         "originalImageUrl": originalImageUrl,
         "croppedImageUrl": croppedImageUrl,

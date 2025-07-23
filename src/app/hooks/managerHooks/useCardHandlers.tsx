@@ -1,7 +1,7 @@
 import { addOneCardToSet, deleteCardById, getSetById, updateCardCount, updateCardData } from "@/lib/dbFunctions"
 import { handleImageDelete, handleImageUpdate, handleImageUpload } from "./useImageHandlers"
 import { updateCurrentSet, updateSetImagesMap } from "./useSetHandlers"
-import { useManagerStore } from "@/app/stores/managerStores";
+import { useManagerPersistentStore } from "@/app/stores/managerStores";
 import { generateUniqueCardId } from "@/lib/card/card";
 import { fetchAllData } from "@/app/flashcards/manager/page";
 
@@ -37,7 +37,7 @@ export const convertUrlToFile = async (url: string, baseName: string) => {
 
 
 export const handleAddCard = async () => {
-    const state = useManagerStore.getState();
+    const state = useManagerPersistentStore.getState();
     const { category, front, back } = state.currentCardData;
     const currentSet = state.currentSet;
     const currentSetId = currentSet?.id;
@@ -101,7 +101,7 @@ export const handleAddCard = async () => {
 
 // deleteCard
 export const handleCardDelete = async (setId: number, cardId: number, fileName: string) => {
-    useManagerStore.getState().setLoading(true)
+    useManagerPersistentStore.getState().setLoading(true)
     console.log("setId:", setId, "cardId:",  cardId)
     await deleteCardById(setId, cardId)
 
@@ -141,8 +141,8 @@ export const handleUpdateCard = async ({
     await updateSetImagesMap(setId);
     await updateCurrentSet(setId);
 
-    useManagerStore.getState().setUpdatingCard(false);
-    useManagerStore.getState().setActive("manage");
-    useManagerStore.getState().clearCurrentCardData();
-    useManagerStore.getState().setPreviousFile(null);
+    useManagerPersistentStore.getState().setUpdatingCard(false);
+    useManagerPersistentStore.getState().setActive("manage");
+    useManagerPersistentStore.getState().clearCurrentCardData();
+    useManagerPersistentStore.getState().setPreviousFile(null);
 };
