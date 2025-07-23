@@ -22,12 +22,10 @@ export const updateSetImagesMap = async (id: number) => {
         }
 
         const cardsWithImages = set[0].cards.filter((card: { 
-            originalFileName: string; 
-            croppedFileName: string; 
+            fileName: string; 
         }) => {
-            const hasOriginal = card.originalFileName && card.originalFileName.trim() !== "";
-            const hasCropped = card.croppedFileName && card.croppedFileName.trim() !== "";
-            return hasOriginal || hasCropped;
+            const hasImage = card.fileName && card.fileName.trim() !== "";
+            return hasImage;
         });
 
         if (cardsWithImages.length === 0) {

@@ -1,50 +1,72 @@
-import { useManagerPersistentStore } from "@/app/stores/managerStores"
 import { getSetById } from "../dbFunctions"
 
 export const RetrieveSetImages = async (setId: number) => {
-    const set = await getSetById(setId)
-    const currentSetCardsWithImages = set[0]?.cards.filter(card => card.originalFileName && card.originalFileName.trim() !== "")
-    if (!currentSetCardsWithImages) return
-    const imagePromises = currentSetCardsWithImages.map(async (card) => {
-        const imageEntries: [string, string | null][] = [];
+    try {
+        const set = await getSetById(setId);
+        const currentSetCardsWithImages = set[0]?.cards.filter(card => 
+            card.fileName && card.fileName.trim() !== ""
+        );
+        
+        if (!currentSetCardsWithImages || currentSetCardsWithImages.length === 0) {
+            return {};
+        }
 
-        const originalImageUrl = await handleImageRetrieval(setId, card.cardId, card.originalFileName)
-        const originalImageExists = await checkImageExists(originalImageUrl)
-        if (originalImageExists) {
-            console.log("Found original image...")
-            const isExternal = originalImageUrl.startsWith("https://") || originalImageUrl.startsWith("http://")
-            const proxiedOriginal = isExternal ? `/api/proxy/image?url=${encodeURIComponent(originalImageUrl)}` : originalImageUrl   
+        const imagePromises = currentSetCardsWithImages.map(async (card) => {
+            const imageEntries: [string, string | null][] = [];
             
-            imageEntries.push([`${card.cardId}-original`, proxiedOriginal]);
-        }
+            try {
+                if (card.fileName) {
+                    const originalImageURL = await handleImageRetrieval(setId, card.cardId, "original", card.fileName);
+                    const originalImageExists = await checkImageExists(originalImageURL);
+                    
+                    if (originalImageExists) {
+                        console.log(`Found original image for card ${card.cardId}`);
+                        const isExternal = originalImageURL.startsWith("https://") || originalImageURL.startsWith("http://");
+                        const proxiedOriginal = isExternal 
+                            ? `/api/proxy/image?url=${encodeURIComponent(originalImageURL)}` 
+                            : originalImageURL;
+                        imageEntries.push([`${card.cardId}-original`, proxiedOriginal]);
+                    }
+                }
 
-        if (card.croppedFileName != "") {
-            const croppedImageUrl = await handleImageRetrieval(setId, card.cardId, card.croppedFileName)
-            const croppedImageExists = await checkImageExists(croppedImageUrl)
-            if (croppedImageExists) {
-                console.log("Found cropped image...")
-                const isExternal = croppedImageUrl.startsWith("https://") || croppedImageUrl.startsWith("http://")
-                const proxiedCropped = isExternal ? `/api/proxy/image?url=${encodeURIComponent(croppedImageUrl)}` : croppedImageUrl   
+                const croppedImageUrl = await handleImageRetrieval(setId, card.cardId, "cropped", card.fileName);
+                const croppedImageExists = await checkImageExists(croppedImageUrl);
                 
-                imageEntries.push([`${card.cardId}-cropped`, proxiedCropped]);
+                if (croppedImageExists) {
+                    console.log(`Found cropped image for card ${card.cardId}`);
+                    const isExternal = croppedImageUrl.startsWith("https://") || croppedImageUrl.startsWith("http://");
+                    const proxiedCropped = isExternal 
+                        ? `/api/proxy/image?url=${encodeURIComponent(croppedImageUrl)}` 
+                        : croppedImageUrl;
+                    imageEntries.push([`${card.cardId}-cropped`, proxiedCropped]);
+                }
+            } catch (error) {
+                console.error(`Error processing images for card ${card.cardId}:`, error);
             }
-        }
+            
+            return imageEntries;
+        });
 
-        return imageEntries
-    })
+        const nestedResults = await Promise.all(imagePromises);
+        const flatEntries = nestedResults.flat();
+        
+        const validEntries = flatEntries.filter(([, url]) => !!url);
+        validEntries.forEach(([, url]) => preloadImage(url!));
+        
+        const imageMap = Object.fromEntries(flatEntries);
+        console.log(`Retrieved ${Object.keys(imageMap).length} images for set ${setId}`);
+        
+        return imageMap;
+        
+    } catch (error) {
+        console.error(`Error retrieving images for set ${setId}:`, error);
+        return {};
+    }
+};
 
-    const nestedResults = await Promise.all(imagePromises);
-    const flatEntries = nestedResults.flat()
 
-    flatEntries
-        .filter(([, url]) => !!url)
-        .forEach(([, url]) => preloadImage(url!))
-
-    return Object.fromEntries(flatEntries);
-}
-
-export const handleImageRetrieval = async (setId: number, cardId: number, fileName: string) => {
-    const key = `${setId}/${cardId}/${fileName}`;
+export const handleImageRetrieval = async (setId: number, cardId: number, fileType: string, fileName: string) => {
+    const key = `${setId}/${cardId}/${fileType}/${fileName}`;
     console.log("S3 key:", key);
 
     try {

@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import Cropper from 'react-easy-crop'
 import * as Slider from "@radix-ui/react-slider";
-import { useManagerPersistentStore } from '@/app/stores/managerStores';
+import { useManagerNonPersistentStore, useManagerPersistentStore } from '@/app/stores/managerStores';
 import { getCroppedImg } from '@/lib/image';
 import { convertUrlToFile } from '@/app/hooks/managerHooks/useCardHandlers';
 
@@ -11,8 +11,6 @@ export default function ImageEditor() {
     const { 
         currentSelectedImageUrl,
         setCurrentSelectedImageUrl,
-        imageCropUi,
-        setImageCropUI,
         originalFile,
         originalImageUrl,
         setOriginalImageUrl,
@@ -20,6 +18,8 @@ export default function ImageEditor() {
         setCroppedFile,
         setOriginalFile,
     } = useManagerPersistentStore()
+
+    const {imageCropUI, setImageCropUI} = useManagerNonPersistentStore()
 
     const [crop, setCrop] = useState({ x: 0, y: 0 })
     const [zoom, setZoom] = useState(1)
@@ -37,7 +37,7 @@ export default function ImageEditor() {
             if (croppedImageUrl) {
                 const originalFileName = originalFile?.name;
                 const baseName = originalFileName;
-
+                
                 const croppedFile = await convertUrlToFile(croppedImageUrl, baseName);
 
                 setCroppedImageUrl(croppedImageUrl);
@@ -64,7 +64,7 @@ export default function ImageEditor() {
 
     return (
         <div>
-            {imageCropUi && (
+            {imageCropUI && (
                 <>
                     <div
                         className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30"

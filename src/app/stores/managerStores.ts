@@ -13,8 +13,7 @@ type persistentState = {
         category: string
         front: string
         back: string
-        originalFileName: string
-        croppedFileName: string
+        fileName: string
     }
     containsImages: boolean
     originalImageUrl: string
@@ -63,8 +62,7 @@ export const useManagerPersistentStore = create(
                 category: 'Category', 
                 front: 'Front', 
                 back: 'Back', 
-                originalFileName: '',
-                croppedFileName: '',
+                fileName: '',
             },
             containsImages: false,
             originalImageUrl: "",
@@ -98,8 +96,7 @@ export const useManagerPersistentStore = create(
                         category: 'Category',
                         front: 'Front',
                         back: 'Back',
-                        originalFileName: '',
-                        croppedFileName: '',
+                        fileName: '',
                         // due: 0,
                         // reps: 0,
                         // state: 0,
