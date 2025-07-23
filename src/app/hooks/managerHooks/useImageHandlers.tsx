@@ -2,17 +2,6 @@ import { useManagerPersistentStore } from "@/app/stores/managerStores";
 import { updateSetImagesMap } from "./useSetHandlers"
 import { convertUrlToFile } from "./useCardHandlers";
 
-
-// TODO:
-// 1. *When the user adds an image ie. fileChange: save that file to originalFile & originalFileUrl so we can store the original
-// 2. *If the user decides to crop the image we have to save the croppedImageUrl and convert it to a file then save croppedFile  
-// 3. When user presses addCard both cropped and original are uploaded to S3
-// 4. The fileName that is given for addCard is croppedFile.name
-// 5. On ImageRetrieval fetch both imgs
-// 6. Show croppedImg on all img sections
-// 7. When card is being edited and cropped button is pressed show originalImageUrl to allow re-cropping
-
-
 export const handleImageUpload = async (cardId: number) => {
     const state = useManagerPersistentStore.getState();
     const originalFile = state.originalFile;
@@ -27,11 +16,9 @@ export const handleImageUpload = async (cardId: number) => {
     const uploadFile = async (file: File, fileType: string) => {
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("fileType", fileType);
-        formData.append("originalFileName", originalFile.name);
 
         try {
-            const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}`, {
+            const response = await fetch(`/api/S3/upload?setId=${setId}&cardId=${cardId}&fileType=${fileType}`, {
                 method: "POST",
                 body: formData,
             });
@@ -74,11 +61,11 @@ export const handleImageUpload = async (cardId: number) => {
 
 
 // Delete
-export const handleImageDelete = async (cardId: number, fileName: string) => {
+export const handleImageDelete = async (cardId: number, fileName: string, fileType: string) => {
     const setId = useManagerPersistentStore.getState().currentSet.id
 
     console.log("Deleting given image...")
-    const key = `${setId}/${cardId}/${fileName}`;
+    const key = `${setId}/${cardId}/${fileType}/${fileName}`;
     
     try {
         const response = await fetch(`/api/S3/delete?key=${key}`, {
@@ -96,15 +83,12 @@ export const handleImageDelete = async (cardId: number, fileName: string) => {
 
 // Update
 export const handleImageUpdate = async (
-    previousOriginalFileName: string, 
-    previousCroppedFileName: string, 
+    previousFileName: string, 
     cardId: number
 ) => {
-    if (previousOriginalFileName)
-        await handleImageDelete(cardId, previousOriginalFileName)
-
-    if (previousCroppedFileName)
-        await handleImageDelete(cardId, previousCroppedFileName)
+    if (previousFileName)
+        await handleImageDelete(cardId, previousFileName, "original")
+        await handleImageDelete(cardId, previousFileName, "cropped")
 
     await handleImageUpload(cardId)
 }

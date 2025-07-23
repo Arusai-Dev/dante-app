@@ -155,7 +155,7 @@ export default function SetSelectionComp() {
         <>
         {/* Set Selection / Description */}
         {/* Select Set Drop Down / New Set Button */} 
-        <div className="w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px]">
+        <div className="w-[calc(100vw-20px)] max-w-[400px]   md:max-w-[1150px]">
             <div className="
                 justify-start mb:my-5 flex 
                 flex-col md:flex-row
