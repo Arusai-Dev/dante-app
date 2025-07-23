@@ -13,7 +13,7 @@ export default function SetSelectionComp() {
 
     // Zustand States
     const {sets, currentSet, setCurrentSet} = useManagerPersistentStore()
-    const {toggleNewSetUI} = useManagerNonPersistentStore()
+    const {newSetUI, toggleNewSetUI} = useManagerNonPersistentStore()
 
     const [importUI, setImportUI] = useState(false);
     const [selectionDropDown, setSelectionDropDown] = useState(false);
@@ -238,7 +238,7 @@ export default function SetSelectionComp() {
                             w-full md:w-[110px] lg:w-[130px] 
                             px-2 py-1 md:px-3
                         "
-                        onClick={toggleNewSetUI}
+                        onClick={() => toggleNewSetUI(!newSetUI)}
                     >
                         <div className="flex items-center justify-center">
                             <PlusCircle className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
@@ -293,7 +293,7 @@ export default function SetSelectionComp() {
                                     w-full
                                     px-2 py-1
                                 "
-                                onClick={() => toggleNewSetUI(false)}
+                                onClick={() => toggleNewSetUI(true)}
                             >
                                 <div className="flex items-center justify-center">
                                     <PlusCircle className="h-[16px] w-[16px]"/>
