@@ -1,13 +1,12 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-type managerStoreState = {
-    active: string
+type persistentState = {
     updatingCard: boolean
-    sets: any[]
-    currentSet: any
-    currentSelectedImageUrl: any
-    currentSetImages: any
+    sets: unknown[]
+    currentSet: unknown
+    currentSelectedImageUrl: unknown
+    currentSetImages: unknown
     currentCardData: {
         setId: number | null
         cardId: number | null
@@ -16,47 +15,43 @@ type managerStoreState = {
         back: string
         originalFileName: string
         croppedFileName: string
-        // due: number
-        // reps: number
-        // state: number
-        // lapses: number
-        // stability: number
-        // difficulty: number
-        // elapsed_day: number
-        // scheduled_days: number
-        // last_review: number | null
     }
-    imageCropUi: boolean
     containsImages: boolean
     originalImageUrl: string
     croppedImageUrl: string
-    originalFile: any
-    croppedFile: any
-    previousFile: any
-    loading: boolean
-    setActive: (mode: string) => void
+    originalFile: unknown
+    croppedFile: unknown
+    previousFile: unknown
     setUpdatingCard: (mode: boolean) => void
-    setSets: (data: any[]) => void
-    setCurrentSet: (data: any) => void
-    setCurrentSelectedImageUrl: (mode: any) => void
-    setCurrentSetImages: (data: any) => void
-    setCurrentCardData: (data: any) => void
-    setImageCropUI: (mode: boolean) => void 
+    setSets: (data: unknown[]) => void
+    setCurrentSet: (data: unknown) => void
+    setCurrentSelectedImageUrl: (mode: unknown) => void
+    setCurrentSetImages: (data: unknown) => void
+    setCurrentCardData: (data: unknown) => void
     setContainsImages: (mode: boolean) => void 
     setOriginalImageUrl: (mode: string) => void 
     setCroppedImageUrl: (mode: string) => void 
-    setOriginalFile: (data: any) => void
-    setCroppedFile: (data: any) => void
-    setPreviousFile: (data: any) => void
-    setLoading: (mode: boolean) => void
-    updateCurrentCardData: (key: string, value: any) => void
+    setOriginalFile: (data: unknown) => void
+    setCroppedFile: (data: unknown) => void
+    setPreviousFile: (data: unknown) => void
+    updateCurrentCardData: (key: string, value: unknown) => void
     clearCurrentCardData: () => void
 }
 
-export const useManagerStore = create(
-    persist<managerStoreState>(
+type nonPersistentState = {
+    active: string
+    setActive: (mode: string) => void
+    newSetUI: boolean
+    toggleNewSetUI: (mode: boolean) => void
+    imageCropUI: boolean
+    setImageCropUI: (mode: boolean) => void 
+    loading: boolean
+    setLoading: (mode: boolean) => void
+}
+
+export const useManagerPersistentStore = create(
+    persist<persistentState>(
         (set, get) => ({
-            active: 'create',
             updatingCard: false,
             sets: [],
             currentSet: [],
@@ -70,39 +65,25 @@ export const useManagerStore = create(
                 back: 'Back', 
                 originalFileName: '',
                 croppedFileName: '',
-                // due: 0,
-                // reps: 0,
-                // state: 0,
-                // lapses: 0,
-                // stability: 0,
-                // difficulty: 0,
-                // elapsed_day: 0,
-                // scheduled_days: 0,
-                // last_review: null,
             },
-            imageCropUi: false,
             containsImages: false,
             originalImageUrl: "",
             croppedImageUrl: "",
             originalFile: {},
             croppedFile: {},
             previousFile: {},
-            loading: false,
-            setActive: (mode) => set({ active: mode }),
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
             setSets: (data) => set({ sets: data }),
             setCurrentSet: (data) => set({ currentSet: data }),
             setCurrentSelectedImageUrl: (mode) => set({ currentSelectedImageUrl: mode }),
             setCurrentSetImages: (data) => set({ currentSetImages: data }),
             setCurrentCardData: (data) => set({ currentCardData: data }),
-            setImageCropUI: (mode) => set({ imageCropUi: mode}),
             setContainsImages: (mode) => set({ containsImages: mode}),
             setOriginalImageUrl: (mode) => set({ originalImageUrl: mode}),
             setCroppedImageUrl: (mode) => set({ croppedImageUrl: mode}),
             setOriginalFile: (data) => set({ originalFile: data }),
             setCroppedFile: (data) => set({ croppedFile: data }),
             setPreviousFile: (data) => set({ previousFile: data }),
-            setLoading: (mode) => set({ loading: mode }),
             updateCurrentCardData: (key, value) => set({
                 currentCardData: {
                     ...get().currentCardData,
@@ -144,3 +125,15 @@ export const useManagerStore = create(
         },
     )
 )
+
+
+export const useManagerNonPersistentStore = create<nonPersistentState>((set) => ({
+    active: 'create',  
+    setActive: (mode) => set({ active: mode }),
+    newSetUI: false,
+    toggleNewSetUI: (mode) => set({ newSetUI: mode}),
+    imageCropUI: false,
+    setImageCropUI: (mode) => set({ imageCropUI: mode}),
+    loading: false,
+    setLoading: (mode) => set({ loading: mode }),
+}))
