@@ -20,7 +20,6 @@ export const convertUrlToFile = async (url: string, baseName: string) => {
     return newFile;
 }
 
-
 export const handleAddCard = async () => {
     const state = useManagerPersistentStore.getState();
     const { category, front, back } = state.currentCardData;
