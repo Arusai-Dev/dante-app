@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Progress } from "@/components/ui/progress"
-import { CheckCircle, XCircle, RotateCcw, Eye, EyeOff, Play, Pause, Timer, Clock, LoaderCircle, Home } from "lucide-react"
+import { CheckCircle, XCircle, RotateCcw, Eye, EyeOff, Play, Pause, Timer, Clock, LoaderCircle, Home, Loader2 } from "lucide-react"
 import Link from "next/link";
 
 export default function QuizSet({ params }) {
@@ -68,21 +68,26 @@ export default function QuizSet({ params }) {
                       },
                       body: JSON.stringify({
                           prompt: 
-                          `this is a multiple-choice question, The question is as follows:
-                            <question> ${card.front} </question>
+                          `You are to respond only with a valid JSON object, and nothing else. Do not include any explanation outside the JSON. Do not use markdown formatting or code blocks.
 
-                            The correct answer is:
-                            <answer>
-                            ${card.back}
-                            </answer>
+                          Here is a multiple-choice question:
 
-                            your answer should be in the following format:
-                            { "options": ["option1", "option2", "option3", "option4"], "explanation": "your short, explanation for the question's answer" }                        
+                          <question> ${card.front} </question>
 
-                            guidelines for your response:
-                            1. The options array will contain 3 incorrect options and the correct option. All the options should be shuffled in a random order.
-                            2. The explanation string: provide a short, explanation for the question's answer
-                            3. Your response must be valid JSON`
+                          The correct answer is:
+                          <answer> ${card.back} </answer>
+
+                          Generate exactly one JSON object in the following format:
+                          {
+                            "options": ["option1", "option2", "option3", "option4"],
+                            "explanation": "Short explanation why the answer is correct"
+                          }
+
+                          Guidelines:
+                          1. "options" must include the correct answer and 3 plausible but incorrect answers, in random order.
+                          2. The "explanation" should briefly explain why the correct answer is right.
+                          3. Your response must be strictly a JSON object. Do not include any other text.
+                          `
                       })
                   });
 
@@ -243,15 +248,22 @@ export default function QuizSet({ params }) {
 
   if (isLoading) {
     return (
-        <div className="flex justify-center items-center w-screen pt-60">
-          <div className="block">
-            <h1 className="text-5xl">Please wait a moment.</h1>
-            <p className="text-2xl pt-7">Your custom, unique quiz will be ready soon</p>
-
-            <LoaderCircle className="animate-spin size-25 text-purple-400"></LoaderCircle>
-
-          </div>
+    <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
+      <div
+        className="text-center space-y-8"
+      >
+        <div className="flex justify-center">
+          <Loader2 className="w-8 h-8 text-white animate-spin" />
         </div>
+
+        <div className="space-y-3">
+          <h1 className="text-2xl font-medium text-white">Please wait a moment</h1>
+          <p className="text-neutral-400 text-base">Your custom quiz will be ready soon</p>
+        </div>
+
+        
+      </div>
+    </div>
 
     )
   }      
