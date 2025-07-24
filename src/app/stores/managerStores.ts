@@ -134,3 +134,4 @@ export const useManagerNonPersistentStore = create<nonPersistentState>((set) => 
     loading: false,
     setLoading: (mode) => set({ loading: mode }),
 }))
+
