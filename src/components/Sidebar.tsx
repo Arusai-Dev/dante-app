@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState, useRef, useEffect } from "react";
-import { ImageIcon, ChevronDown, Sparkles, Send, Bot, User } from "lucide-react";
+import { ImageIcon, ChevronDown, Sparkles, Send, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -131,7 +131,7 @@ export default function Sidebar({ onWidthChange }: SidebarProps) {
 		const deltaX = e.clientX - startX.current;
 		const newWidth = Math.max(
 			320,
-			Math.min(600, startWidth.current + deltaX)
+			Math.min(800, startWidth.current + deltaX)
 		);
 		setSidebarWidth(newWidth);
 	};
