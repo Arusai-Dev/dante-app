@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
 	Album,
 	PanelLeft,
@@ -36,9 +36,16 @@ export default function PracticeSet({ params }) {
 	const [studyComplete, setStudyComplete] = useState(false);
 	const [allCardImages, setAllCardImages] = useState({});
 	const [paramId, setParamId] = useState();
-	const [localCardState, setLocalCardState] = useState([]);
+	const [localCardScores, setLocalCardScores] = useState([]);
 	const [showSidebar, setShowSidebar] = useState(false);
 	const [sidebarWidth, setSidebarWidth] = useState(430);
+	
+	const intervalRef = useRef(null);
+	const localCardScoresRef = useRef([]);
+
+	useEffect(() => {
+		localCardScoresRef.current = localCardScores;
+	}, [localCardScores]);
 
 	useEffect(() => {
 		async function getParamId() {
@@ -50,21 +57,78 @@ export default function PracticeSet({ params }) {
 
 	useEffect(() => {
 		async function getInfo() {
-			const [set] = await getSetById(paramId);
-			setFlashcardSet([set]);
+			if (!paramId) return;
+			try {
+				const [set] = await getSetById(paramId);
+				setFlashcardSet([set]);
+			} catch (error) {
+				console.error("Error fetching flashcard set:", error);
+			}
 		}
 		getInfo();
 	}, [paramId]);
 
+	const set = flashcardSet[0];
+	const jsonCards = set?.cards;
+	const setId = set?.id;
+	const f = fsrs();
+
+	const submitReview = useCallback(async () => {
+		if (isSubmittingReview || localCardScores.length === 0) return;
+
+		setIsSubmittingReview(true);
+		const scoresToSubmit = [...localCardScores]; 
+
+		try {
+			
+			const response = await fetch(`/api/fsrs-update/${setId}`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					localCardScores: scoresToSubmit
+				})
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+				console.error("API Error:", response.status, errorData);
+				throw new Error(`Failed to update cards: ${response.status} - ${errorData.error || "Unknown error"}`);
+			}
+
+			const result = await response.json();
+
+			setLocalCardScores([]);
+
+		} catch (error) {
+			console.error("Error submitting review:", error);
+		} finally {
+			setIsSubmittingReview(false);
+		}
+	}, [isSubmittingReview, localCardScores, setId]);
+
+	useEffect(() => {
+		if (intervalRef.current) {
+			clearInterval(intervalRef.current);
+		}
+		
+		intervalRef.current = setInterval(() => {
+			if (localCardScoresRef.current.length > 0) {
+				submitReview();
+			}
+		}, 120000); // 2 minutes
+
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current);
+			}
+		};
+	}, [setId, submitReview]); 
+
 	const handleSidebar = () => {
 		setShowSidebar((prev) => !prev);
 	};
-
-	const set = flashcardSet[0];
-	const jsonCards = set?.cards;
-	const number_cards = set?.card_cnt;
-	const setId = set?.id;
-	const f = fsrs();
 
 	useEffect(() => {
 		if (!jsonCards) return;
@@ -72,21 +136,20 @@ export default function PracticeSet({ params }) {
 		const initializeCards = () => {
 			const initializedCards = jsonCards.map((card) => {
 				let fsrsCard: Card;
-				if (card.state === 0 || !card.due || !card.last_review) {
+				
+				if (card.state === undefined || card.state === 0 || !card.due || !card.last_review) {
 					fsrsCard = createEmptyCard();
 				} else {
 					fsrsCard = {
 						due: new Date(card.due),
-						stability: card.stability || 0,
-						difficulty: card.difficulty || 0,
-						elapsed_days: card.elapsed_days || 0,
-						scheduled_days: card.scheduled_days || 0,
-						reps: card.reps || 0,
-						lapses: card.lapses || 0,
-						state: card.state || State.New,
-						last_review: card.last_review
-							? new Date(card.last_review)
-							: undefined,
+						stability: parseFloat(card.stability) || 0,
+						difficulty: parseFloat(card.difficulty) || 0,
+						elapsed_days: parseInt(card.elapsed_days) || parseInt(card.elapsed_day) || 0,
+						scheduled_days: parseInt(card.scheduled_days) || 0,
+						reps: parseInt(card.reps) || 0,
+						lapses: parseInt(card.lapses) || 0,
+						state: parseInt(card.state) || State.New,
+						last_review: card.last_review ? new Date(card.last_review) : undefined,
 					};
 				}
 
@@ -104,7 +167,7 @@ export default function PracticeSet({ params }) {
 
 			const now = new Date();
 			const due = initializedCards.filter((card) => {
-				if (!card.due) return true;
+				if (!card.due) return true; 
 				return new Date(card.due) <= now;
 			});
 
@@ -118,80 +181,6 @@ export default function PracticeSet({ params }) {
 	const getCurrentCard = useCallback(() => {
 		return dueCards[currentCardIndex];
 	}, [dueCards, currentCardIndex]);
-
-	const submitReview = async (rating: Rating) => {
-		if (isSubmittingReview || dueCards.length === 0) return;
-
-		setIsSubmittingReview(true);
-
-		try {
-			const card = getCurrentCard();
-			const schedulingInfo = f.repeat(card, new Date());
-			const updatedCard = schedulingInfo[rating].card;
-
-			const response = await fetch(
-				`/api/fsrs-update/${setId}/${card.cardId}`,
-				{
-					method: "PATCH",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						due: updatedCard.due.toISOString(),
-						stability: updatedCard.stability,
-						difficulty: updatedCard.difficulty,
-						elapsed_days: updatedCard.elapsed_days,
-						scheduled_days: updatedCard.scheduled_days,
-						reps: updatedCard.reps,
-						lapses: updatedCard.lapses,
-						state: updatedCard.state,
-						last_review:
-							updatedCard.last_review?.toISOString() ||
-							new Date().toISOString(),
-					}),
-				}
-			);
-
-			if (!response.ok) {
-				const errorData = await response
-					.json()
-					.catch(() => ({ error: "Unknown error" }));
-				console.error("API Error:", response.status, errorData);
-				throw new Error(
-					`Failed to update card: ${response.status} - ${
-						errorData.error || "Unknown error"
-					}`
-				);
-			}
-
-			setCards((prevCards) =>
-				prevCards.map((c) =>
-					c.cardId === card.cardId ? { ...c, ...updatedCard } : c
-				)
-			);
-
-			setDueCards((prevDueCards) => {
-				const newDueCards = prevDueCards.filter(
-					(_, index) => index !== currentCardIndex
-				);
-				if (newDueCards.length === 0) {
-					setStudyComplete(true);
-				} else {
-					if (currentCardIndex >= newDueCards.length) {
-						setCurrentCardIndex(0);
-					}
-				}
-				return newDueCards;
-			});
-
-			setShowFront(true);
-			setQualityScore("Easy");
-		} catch (error) {
-			console.error("Error submitting review:", error);
-		} finally {
-			setIsSubmittingReview(false);
-		}
-	};
 
 	const nextCard = () => {
 		if (dueCards.length === 0) return;
@@ -220,14 +209,16 @@ export default function PracticeSet({ params }) {
 	const handleQualityScoreClick = (rating: Rating) => {
 		if (isSubmittingReview || dueCards.length === 0) return;
 
-		setIsSubmittingReview(true);
-
 		const card = getCurrentCard();
-		const schedulingInfo = f.repeat(card, new Date());
-		const updatedCard = schedulingInfo[rating].card;
+		if (!card) return;
 
-		localCardState.push(
-			JSON.stringify({
+		try {
+			const schedulingInfo = f.repeat(card, new Date());
+			const updatedCard = schedulingInfo[rating].card;
+
+
+			const newScore = {
+				id: card.cardId,
 				due: updatedCard.due.toISOString(),
 				stability: updatedCard.stability,
 				difficulty: updatedCard.difficulty,
@@ -236,38 +227,50 @@ export default function PracticeSet({ params }) {
 				reps: updatedCard.reps,
 				lapses: updatedCard.lapses,
 				state: updatedCard.state,
-				last_review:
-					updatedCard.last_review?.toISOString() ||
-					new Date().toISOString(),
-			})
-		);
+				last_review: updatedCard.last_review?.toISOString() || new Date().toISOString(),
+			};
 
-		setCards((prevCards) =>
-			prevCards.map((c) =>
-				c.cardId === card.cardId ? { ...c, ...updatedCard } : c
-			)
-		);
-		setDueCards((prevDueCards) => {
-			const newDueCards = prevDueCards.filter(
-				(_, index) => index !== currentCardIndex
+			setLocalCardScores(prev => [...prev, newScore]);
+
+			setCards((prevCards) =>
+				prevCards.map((c) =>
+					c.cardId === card.cardId ? { ...c, ...updatedCard } : c
+				)
 			);
-			if (newDueCards.length === 0) {
-				setStudyComplete(true);
-			} else {
-				if (currentCardIndex >= newDueCards.length) {
-					setCurrentCardIndex(0);
+			
+			setDueCards((prevDueCards) => {
+				const newDueCards = prevDueCards.filter(
+					(_, index) => index !== currentCardIndex
+				);
+				
+				if (newDueCards.length === 0) {
+					setStudyComplete(true);
+				} else {
+					if (currentCardIndex >= newDueCards.length) {
+						setCurrentCardIndex(0);
+					}
 				}
-			}
-			return newDueCards;
-		});
+				return newDueCards;
+			});
 
-		setShowFront(true);
-		setQualityScore("Easy");
-		setIsSubmittingReview(false);
+			setShowFront(true);
+			setQualityScore("Easy");
+
+		} catch (error) {
+			console.error("Error processing card rating:", error);
+		}
 	};
 
-	if (cards.length === 0) {
-		return <div>Loading cards...</div>;
+	useEffect(() => {
+		if (studyComplete && localCardScores.length > 0) {
+			submitReview();
+		}
+	}, [studyComplete, localCardScores, submitReview]);
+
+	if (!set || cards.length === 0) {
+		return <div className="h-screen w-full flex items-center justify-center">
+			<div className="text-xl">Loading cards...</div>
+		</div>;
 	}
 
 	if (studyComplete) {
@@ -281,8 +284,8 @@ export default function PracticeSet({ params }) {
 							Great job!
 						</h1>
 						<p className="text-white mb-6">
-							You&apos;ve completed all your practice cards for
-							today. Come back tomorrow for more practice!
+							You&apos;ve completed all your practice cards for today. 
+							Come back tomorrow for more practice!
 						</p>
 						<p className="text-white mb-6">
 							Want to practice more?{" "}
@@ -304,6 +307,13 @@ export default function PracticeSet({ params }) {
 		);
 	}
 
+	const currentCard = getCurrentCard();
+	if (!currentCard) {
+		return <div className="h-screen w-full flex items-center justify-center">
+			<div className="text-xl">No cards available</div>
+		</div>;
+	}
+
 	return (
 		<>
 			<Toaster />
@@ -317,11 +327,9 @@ export default function PracticeSet({ params }) {
 				<div className="flex items-center justify-between p-4 border-b border-neutral-700">
 					<div className="flex items-center space-x-3">
 						{showSidebar && (
-							<>
-								<div className="p-1.5 bg-neutral-800 rounded-md">
-									<MessageSquare className="w-4 h-4 text-neutral-400" />
-								</div>
-							</>
+							<div className="p-1.5 bg-neutral-800 rounded-md">
+								<MessageSquare className="w-4 h-4 text-neutral-400" />
+							</div>
 						)}
 					</div>
 					<Button
@@ -369,10 +377,10 @@ export default function PracticeSet({ params }) {
 					<div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded-[10px] hover-animation">
 						<h2 className="pl-3 py-2">
 							<Album className="inline-block mr-1" />{" "}
-							{getCurrentCard()?.category}
+							{currentCard.category}
 						</h2>
-						<div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl">
-							{getCurrentCard()?.front}
+						<div className="flex justify-center items-center h-[calc(100%-80px)] text-2xl p-4">
+							{currentCard.front}
 						</div>
 						<h2 className="absolute right-0 bottom-0 m-2">front</h2>
 					</div>
@@ -380,22 +388,10 @@ export default function PracticeSet({ params }) {
 					<div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded-[10px] hover-animation">
 						<h2 className="pl-3 py-2">
 							<Album className="inline-block mr-1" />{" "}
-							{getCurrentCard()?.category}
+							{currentCard.category}
 						</h2>
-						<div className="flex justify-center items-center h-[calc(100%-120px)] text-2xl">
-							{getCurrentCard()?.back}
-							{allCardImages[getCurrentCard().cardId] ? (
-								<></>
-							) : (
-								// <Image
-								//   src={allCardImages[getCurrentCard().cardId] || "/placeholder.svg"}
-								//   alt={getCurrentCard()?.fileName}
-								//   width={200}
-								//   height={200}
-								//   className="w-full max-w-xs h-40 object-cover rounded border-1 border-[#8c8c8c]"
-								// />
-								""
-							)}
+						<div className="flex justify-center items-center h-[calc(100%-120px)] text-2xl p-4">
+							{showFront ? <h1></h1> : currentCard.back}
 						</div>
 
 						<div
@@ -426,9 +422,7 @@ export default function PracticeSet({ params }) {
 							].map(({ rating, label, color }) => (
 								<button
 									key={rating}
-									onClick={() =>
-										handleQualityScoreClick(rating)
-									}
+									onClick={() => handleQualityScoreClick(rating)}
 									disabled={isSubmittingReview}
 									className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 ${
 										qualityScore === rating
@@ -445,7 +439,7 @@ export default function PracticeSet({ params }) {
 				</div>
 
 				<div className="bottom-10 right-5 absolute">
-					<h1>{dueCards.length}</h1>
+					<h1 className="text-lg">{dueCards.length}</h1>
 				</div>
 
 				<Link href="/flashcards/my-sets">
