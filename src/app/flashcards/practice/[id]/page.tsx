@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import {
 	Album,
 	PanelLeft,
-	MessageSquare,
 	ArrowRight,
 	ArrowLeft,
 	Home,
@@ -319,18 +318,13 @@ export default function PracticeSet({ params }) {
 			<Toaster />
 
 			<div
-				className={`fixed left-0 top-0 h-full bg-neutral-900/95 backdrop-blur-md shadow-2xl transition-all duration-300 ease-in-out z-50 flex flex-col border-r border-neutral-700 ${
+				className={`fixed left-0 top-0 h-full bg-neutral-900/95 backdrop-blur-md shadow-2xl z-50 flex flex-col border-r border-neutral-700 ${
 					showSidebar ? "translate-x-0" : "-translate-x-full"
 				}`}
 				style={{ width: showSidebar ? `${sidebarWidth}px` : "60px" }}
 			>
 				<div className="flex items-center justify-between p-4 border-b border-neutral-700">
 					<div className="flex items-center space-x-3">
-						{showSidebar && (
-							<div className="p-1.5 bg-neutral-800 rounded-md">
-								<MessageSquare className="w-4 h-4 text-neutral-400" />
-							</div>
-						)}
 					</div>
 					<Button
 						onClick={handleSidebar}
