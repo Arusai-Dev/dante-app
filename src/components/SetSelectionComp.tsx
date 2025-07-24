@@ -1,23 +1,20 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Check, PlusCircle, Eye, EyeOff, Import, FileTextIcon, Trash2, Menu } from "lucide-react";
-import { addMultipleCardsToSet, createNewSet, getSetByTitle, updateCardCount } from "@/lib/dbFunctions";
-import { useManagerStore } from "@/app/stores/managerStores";
-import { toast } from "sonner";
+import { ArrowDown, Check, PlusCircle, Import, FileTextIcon, Trash2, Menu } from "lucide-react";
+import { addMultipleCardsToSet, updateCardCount } from "@/lib/dbFunctions";
 import { generateUniqueCardId } from "@/lib/card/card";
 import LineNumberedTextarea from "./TextAreaLineNumbers";
 import { updateCurrentSet } from "@/app/hooks/managerHooks/useSetHandlers";
+import NewSetModal from "./modals/NewSetModal";
+import { useManagerNonPersistentStore, useManagerPersistentStore } from "@/app/stores/managerStores";
 
 export default function SetSelectionComp() {
 
-    // zustand
-    const { 
-        sets,
-        currentSet,
-        setCurrentSet,
-    } = useManagerStore()
-    const [newSetUI, setNewSetUI] = useState(false);
+    // Zustand States
+    const {sets, currentSet, setCurrentSet} = useManagerPersistentStore()
+    const {newSetUI, toggleNewSetUI} = useManagerNonPersistentStore()
+
     const [importUI, setImportUI] = useState(false);
     const [selectionDropDown, setSelectionDropDown] = useState(false);
     const [selectedDelimiterText, setSelectedDelimiterText] = useState("Pipe (|)");
@@ -75,51 +72,6 @@ export default function SetSelectionComp() {
             setMobileActionsDropDown(true)
             setSelectionDropDown(false)
         }
-    }
-
-    const toggleNewSetUI = () => {
-        setNewSetUI(!newSetUI);
-    }
-
-    const clearNewSetForm = () => {
-        setNewSetTitle("");
-        setNewSetDescription("");
-        setIsPrivate(false);
-    }
-
-    const [newSetTitle, setNewSetTitle] = useState("");
-    const [newSetDescription, setNewSetDescription] = useState("");
-    const [isPrivate, setIsPrivate] = useState(false);
-    const newSetUserId = "userid"; // testing purposes only later will get current user
-    const cards = [];
-    const date_created = new Date();
-    const number_cards = 0;
-    const tags = []
-    const category = ""
-    const study_count = 0
-    const rating = 0
-    const review_count = 0
-
-    const onNewSetSubmit = async () => {
-        await createNewSet(
-            newSetTitle, 
-            newSetDescription, 
-            isPrivate, 
-            date_created, 
-            number_cards, 
-            newSetUserId, 
-            cards,
-            tags,
-            category,
-            study_count,
-            rating,
-            review_count
-        );
-        console.log(date_created)
-        const result = await getSetByTitle(newSetUserId, newSetTitle)
-        setCurrentSet(result?.[0])
-        toggleNewSetUI();
-        clearNewSetForm();
     }
 
     const closeAnyUi = (e: MouseEvent) => {
@@ -203,7 +155,7 @@ export default function SetSelectionComp() {
         <>
         {/* Set Selection / Description */}
         {/* Select Set Drop Down / New Set Button */} 
-        <div className="w-[calc(100vw-20px)] max-w-[400px] md:max-w-[1150px]">
+        <div className="w-[calc(100vw-20px)] max-w-[400px]   md:max-w-[1150px]">
             <div className="
                 justify-start mb:my-5 flex 
                 flex-col md:flex-row
@@ -286,7 +238,7 @@ export default function SetSelectionComp() {
                             w-full md:w-[110px] lg:w-[130px] 
                             px-2 py-1 md:px-3
                         "
-                        onClick={toggleNewSetUI}
+                        onClick={() => toggleNewSetUI(!newSetUI)}
                     >
                         <div className="flex items-center justify-center">
                             <PlusCircle className="h-[16px] w-[16px] lg:h-[20px] lg:w-[20px]"/>
@@ -341,7 +293,7 @@ export default function SetSelectionComp() {
                                     w-full
                                     px-2 py-1
                                 "
-                                onClick={toggleNewSetUI}
+                                onClick={() => toggleNewSetUI(true)}
                             >
                                 <div className="flex items-center justify-center">
                                     <PlusCircle className="h-[16px] w-[16px]"/>
@@ -372,85 +324,8 @@ export default function SetSelectionComp() {
                 )}
             </div>
         </div>
-
-        {newSetUI && (
-            <>
-            <div className="fixed inset-0 bg-black/3 backdrop-blur-sm z-30" onClick={toggleNewSetUI}></div>
-
-            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40">
-                <div className="new-set-btn-pop-up z-50 flex flex-col justify-between gap-3 px-4 py-3 rounded-sm md:rounded-md w-screen md:w-[555px] h-fit md:h-fit bg-[#1e1e1e] transition-all duration-[0.2s]">
-                    <div className="flex flex-col gap-3">
-                        <div>
-                            <h1 className="font-bold text-[18px] md:text-[20px]">Create New Set</h1>
-                            <p className="text-[#8c8c8c] text-[14px] md:text-[16px]">Create a new set to organize your flashcards.</p>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <h2 className="text-sm lg:text-2xl">Set Title</h2>
-                            <input 
-                                className="px-2 py-1 border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                                onChange={(e) => setNewSetTitle(e.target.value)}
-                            ></input>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            <h2 className="text-sm lg:text-2xl">Set Description (optional)</h2>
-                            <textarea 
-                                className="set-desc-text-area px-2 py-1 w-full resize-y h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                                value={newSetDescription}
-                                onChange={(e) => {
-                                    setNewSetDescription(e.target.value)
-                                }}
-                            ></textarea>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 w-full items-start">
-                        <div className="flex items-center">
-                            <h1 className="font-semibold pr-2 text-sm lg:text-xl">Visibility:</h1>
-                            <button 
-                                className="flex justify-center cursor-pointer items-center w-[50] md:w-[50px] h-[35px] md:h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                onClick={() => {setIsPrivate(!isPrivate); toast(`Set is now ${isPrivate ? "private" : "public"}`)}}
-                            >
-                                {isPrivate ? 
-                                    <div className="flex items-center justify-center">
-                                        <Eye className="h-[16px] w-[16px] md:h-[20px] md:w-[20px]"/>
-                                    </div> 
-                                    : 
-                                    <div className="flex items-center justify-center">
-                                        <EyeOff className="h-[16px] w-[16px] md:h-[20px] md:w-[20px]"/>
-                                    </div>
-                                }
-                            </button>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button 
-                                className="flex justify-center cursor-pointer items-center w-[95px] md:w-[125px] h-[35px] md:h-[40px] py-1 bg-[#D9D9D9]/3 font-bold rounded-[5px] border-1 border-[#828282] hover-animation"
-                                onClick={() => {
-                                    toggleNewSetUI();
-                                    clearNewSetForm();
-                                }}
-                            >Cancel</button>
-
-                            <button 
-                                className="flex justify-center cursor-pointer items-center w-[95px] md:w-[125px] h-[35px] md:h-[40px] py-1 bg-[#D9D9D9] text-[#141414] font-bold rounded-[5px] border-1 border-[#828282] hover-animation-secondary"
-                                onClick={() => {
-
-                                    if (newSetTitle == "") {
-                                        toast('Please enter a Title')
-                                    } 
-                                    else { 
-                                        onNewSetSubmit()
-                                    }
-                                }}
-                            >Save</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </>
-        )}
+                
+        <NewSetModal />
 
         {importUI && (
             <>

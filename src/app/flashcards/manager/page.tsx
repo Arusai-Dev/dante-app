@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
-import { useManagerStore } from "@/app/stores/managerStores"
+import { useManagerNonPersistentStore, useManagerPersistentStore } from "@/app/stores/managerStores"
 import SetSelectionComp from "@/components/SetSelectionComp"
 import ImageCropper from "@/components/ImageCropper"
 import { fieldMissingModal } from "@/components/modals/fieldMissingModal"
 import { dismissLoading, loadingModal } from "@/components/modals/loading"
 import { handleImageUrlInput, handleFileChange, clearCurrentImage } from "@/app/hooks/managerHooks/useImageHandlers"
 import { updateSetImagesMap } from "@/app/hooks/managerHooks/useSetHandlers"
-import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/managerHooks/useCardHandlers"
+import { convertUrlToFile, handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/managerHooks/useCardHandlers"
 
 export const fetchAllData = () => {
     const {
@@ -25,7 +25,7 @@ export const fetchAllData = () => {
         originalFile,
         croppedFile,
         previousFile,
-    } = useManagerStore.getState();
+    } = useManagerPersistentStore.getState();
 
     console.log({
         updatingCard,
@@ -43,7 +43,6 @@ export const fetchAllData = () => {
     });
 };
 
-
 export default function Create() {
 
     const { 
@@ -55,19 +54,24 @@ export default function Create() {
         currentSetImages,
         currentCardData,
         setCurrentCardData,
-        setImageCropUI,
         setSets, 
         setCroppedImageUrl,
         setOriginalImageUrl, 
-        loading,
-        setLoading,
-        imageCropUi,
         originalFile,
+        setOriginalFile,
         croppedFile,
+        setCroppedFile,
         originalImageUrl,
         croppedImageUrl,
         previousFile,
-    } = useManagerStore()
+    } = useManagerPersistentStore()
+    
+    const {
+        imageCropUI,
+        setImageCropUI,
+        loading,
+        setLoading,
+    } = useManagerNonPersistentStore()
 
     const [active, setActive] = useState<string>("create");
     const [previousFileName, setPreviousFileName] = useState<string | null>(null);
@@ -80,15 +84,13 @@ export default function Create() {
             });
             const data = await res.json();
             setSets(data.Sets);
-
-            // await updateSetImagesMap(currentSet.id)
         }
 
         fetchData();
     }, [currentSet.id, setSets]);
 
-    const updateCard = useManagerStore(state => state.updateCurrentCardData)
-    const clearCard = useManagerStore(state => state.clearCurrentCardData)
+    const updateCard = useManagerPersistentStore(state => state.updateCurrentCardData)
+    const clearCard = useManagerPersistentStore(state => state.clearCurrentCardData)
     const clearCurrentCardData = () => {
         clearCard()
         setCurrentSelectedImageUrl("")
@@ -100,59 +102,62 @@ export default function Create() {
         setShowFront(!showFront);
     }
 
-
     const handleEditCardBtnPress = async (
         setId: number,
         cardId: number,
         category: string,
         front: string,
         back: string,
-        originalFileName: string,
-        croppedFileName: string,
-    ) => {  
+        fileName: string,
+    ) => {
         setCurrentCardData({
             setId: setId,
             cardId: cardId,
             category: category,
             front: front,
             back: back,
-            originalFileName: originalFileName,
-            croppedFileName: croppedFileName,
+            fileName: fileName,
         })
-
-        setPreviousFileName(originalFileName);
+        setPreviousFileName(fileName);
         setActive("create")
-        setCurrentSelectedImageUrl(
-            currentSetImages[`${cardId}-cropped`] ??
-            currentSetImages[`${cardId}-original`] ??
-            ""
-        )
-        setOriginalImageUrl(
-            currentSetImages[`${cardId}-original`] ??
-            ""
-        )
-        setCroppedImageUrl(
-            currentSetImages[`${cardId}-cropped`] ??
-            ""
-        )
         setUpdatingCard(true)
-    }  
 
-    // console.log(currentSetImages)
-    // console.log(currentCardData)
+        const croppedImageUrl = currentSetImages[`${cardId}-cropped`];
+        const originalImageUrl = currentSetImages[`${cardId}-original`];
+        
+        setCurrentSelectedImageUrl(croppedImageUrl ?? originalImageUrl ?? "");
+        setOriginalImageUrl(originalImageUrl ?? "");
+        setCroppedImageUrl(croppedImageUrl ?? "");
 
-    // console.log("Loading:", loading)
+        if (originalImageUrl) {
+            try {
+                const originalFile = await convertUrlToFile(originalImageUrl, fileName);
+                const originalBlobUrl = URL.createObjectURL(originalFile);
+                
+                setOriginalFile(originalFile);
+                setOriginalImageUrl(originalBlobUrl);
+                
+                if (!croppedImageUrl) {
+                    setCurrentSelectedImageUrl(originalBlobUrl);
+                }
+            } catch (error) {
+                console.error("Failed to convert original image URL to file:", error);
+            }
+        }
 
-    console.log({
-        "currentCardData": currentCardData,
-        "ImageCropUI": imageCropUi,
-        "currentSelectedImageUrl": currentSelectedImageUrl,
-        "originalImageUrl": originalImageUrl,
-        "croppedImageUrl": croppedImageUrl,
-        "originalFile": originalFile,
-        "croppedFile": croppedFile,
-        "previousFile": previousFile,
-    })
+        if (croppedImageUrl) {
+            try {
+                const croppedFile = await convertUrlToFile(croppedImageUrl, fileName);
+                const croppedBlobUrl = URL.createObjectURL(croppedFile);
+                
+                setCroppedFile(croppedFile);
+                setCroppedImageUrl(croppedBlobUrl); 
+                setCurrentSelectedImageUrl(croppedBlobUrl);
+            } catch (error) {
+                console.error("Failed to convert cropped image URL to file:", error);
+            }
+        }
+    }
 
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
@@ -247,8 +252,10 @@ export default function Create() {
                             </label>
                         </div>
 
+
                         <ImageCropper/>
-                        
+
+
                         {(currentSelectedImageUrl || (updatingCard && currentSetImages[currentCardData["originalFileName"]])) && (
                             <div className="flex justify-between mt-4">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -265,7 +272,6 @@ export default function Create() {
                                         width={35} height={35}
                                         onClick={() => {
                                             setOriginalImageUrl(currentSetImages[currentCardData["cardId"] + "-original"])
-
                                             setImageCropUI(true)
                                         }}   
                                     />
@@ -278,12 +284,13 @@ export default function Create() {
                             </div>
                         )}
 
+
                         <div className="flex gap-2 w-full max-w-[600px] mb-1 mt-4">
                             <button 
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
                                 onClick={() => {
                                     if (updatingCard) {
-                                        handleUpdateCard(currentCardData)
+                                        handleUpdateCard(currentCardData, originalFile.name)
                                     } else {
                                         if (currentCardData["front"] == "Front") {
                                             fieldMissingModal({title: "Enter a value for the front of the card."})
@@ -400,7 +407,7 @@ export default function Create() {
                                                     <Edit 
                                                         className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
                                                         onClick={() => {
-                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back, card.originalFileName, card.croppedFileName)
+                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back, card.fileName)
                                                         }}
                                                     />
                                                 </div>
@@ -437,11 +444,11 @@ export default function Create() {
                                                     // eslint-disable-next-line @next/next/no-img-element
                                                     <img
                                                         src={
-                                                            card.croppedFileName
+                                                            card.fileName
                                                                 ? currentSetImages[`${card.cardId}-cropped`]
                                                                 : currentSetImages[`${card.cardId}-original`]
                                                         }
-                                                        alt={card.originalFileName}
+                                                        alt={card.fileName}
                                                         className={`w-[100px] md:w-[245px] aspect-square object-cover border border-[#b1b1b1] rounded-[5px] ${loading ? "hidden" : ""}`}
                                                     />
                                                 ) : (

@@ -13,8 +13,6 @@ export async function POST(request) {
     try {
         const formData = await request.formData();
         const file = formData.get("file");
-        const fileType = formData.get("fileType"); 
-        const originalFileName = formData.get("originalFileName");
 
         if (!file) {
             return NextResponse.json({ error: "File is required." }, { status: 400 });
@@ -23,6 +21,7 @@ export async function POST(request) {
         const { searchParams } = new URL(request.url);
         const setId = searchParams.get("setId");
         const cardId = searchParams.get("cardId");
+        const fileType = searchParams.get("fileType");
 
         if (!setId || !cardId) {
             return NextResponse.json({ error: "Missing setId or cardId" }, { status: 400 });
@@ -30,21 +29,11 @@ export async function POST(request) {
 
         const fileBuffer = Buffer.from(await file.arrayBuffer());
 
-        let fileName;
-        if (fileType === "original") {
-            fileName = file.name;
-        } else if (fileType === "cropped") {
-            const userOriginalName = originalFileName || file.name;
-            const nameWithoutExtension = userOriginalName.split('.')[0];
-            const extension = userOriginalName.split('.').pop();
-            fileName = `cropped_${nameWithoutExtension}.${extension}`;
-        } else {
-            fileName = file.name;
-        }
+        const fileName = file.name
 
-        const key = `${setId}/${cardId}/${fileName}`;
+        const key = `${setId}/${cardId}/${fileType}/${fileName}`;
 
-        console.log("KEY WHEN UPLOADING:", key, "TYPE:", fileType);
+        console.log("KEY WHEN UPLOADING:", key);
 
         const params = {
             Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,

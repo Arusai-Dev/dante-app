@@ -1,4 +1,4 @@
-import { useManagerStore } from "@/app/stores/managerStores";
+import { useManagerPersistentStore } from "@/app/stores/managerStores";
 import { getSetById } from "@/lib/dbFunctions";
 import { preloadImage, RetrieveSetImages } from "@/lib/image";
 
@@ -8,7 +8,7 @@ import { preloadImage, RetrieveSetImages } from "@/lib/image";
 // Update Set Data
 export const updateCurrentSet = async (id: number) => {
     const updatedSet = await getSetById(id)
-    useManagerStore.getState().setCurrentSet(updatedSet[0])
+    useManagerPersistentStore.getState().setCurrentSet(updatedSet[0])
 }
 
 export const updateSetImagesMap = async (id: number) => {
@@ -17,26 +17,24 @@ export const updateSetImagesMap = async (id: number) => {
         
         if (!set || !set[0] || !set[0].cards) {
             console.log("No set or cards found");
-            // useManagerStore.getState().setContainsImages(false);
+            // useManagerPersistentStore.getState().setContainsImages(false);
             return;
         }
 
         const cardsWithImages = set[0].cards.filter((card: { 
-            originalFileName: string; 
-            croppedFileName: string; 
+            fileName: string; 
         }) => {
-            const hasOriginal = card.originalFileName && card.originalFileName.trim() !== "";
-            const hasCropped = card.croppedFileName && card.croppedFileName.trim() !== "";
-            return hasOriginal || hasCropped;
+            const hasImage = card.fileName && card.fileName.trim() !== "";
+            return hasImage;
         });
 
         if (cardsWithImages.length === 0) {
-            // useManagerStore.getState().setContainsImages(false);
+            // useManagerPersistentStore.getState().setContainsImages(false);
             console.log("No images to fetch");
             return;
         }
 
-        // useManagerStore.getState().setContainsImages(true);
+        // useManagerPersistentStore.getState().setContainsImages(true);
         console.log(`Found ${cardsWithImages.length} cards with images`);
 
         const map = await RetrieveSetImages(id);
@@ -56,12 +54,12 @@ export const updateSetImagesMap = async (id: number) => {
         
         await Promise.allSettled(preloadPromises);
         
-        useManagerStore.getState().setCurrentSetImages(map);
-        console.log("Updated set images:", useManagerStore.getState().currentSetImages);
+        useManagerPersistentStore.getState().setCurrentSetImages(map);
+        console.log("Updated set images:", useManagerPersistentStore.getState().currentSetImages);
 
     } catch (error) {
         console.error("Error updating set images map:", error);
-        useManagerStore.getState().setContainsImages(false);
+        useManagerPersistentStore.getState().setContainsImages(false);
     }
 };
 

@@ -5,7 +5,6 @@
 @plugin "tailwindcss-animate";
 
 
-@custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-inter: 'Inter', sans-serif;
