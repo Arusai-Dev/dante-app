@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     instructions: "",
     text: {
         "format": {
-        "type": "text"
+            "type": "json_object"
         }
     },
     reasoning: {},
