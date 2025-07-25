@@ -1,458 +1,598 @@
-'use client'
+/* eslint-disable react-hooks/exhaustive-deps */
+"use client";
 
 import { getSetById } from "@/lib/dbFunctions";
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Progress } from "@/components/ui/progress"
-import { CheckCircle, XCircle, RotateCcw, Eye, EyeOff, Play, Pause, Timer, Clock, LoaderCircle, Home, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Progress } from "@/components/ui/progress";
+import {
+	CheckCircle,
+	XCircle,
+	RotateCcw,
+	Eye,
+	EyeOff,
+	Play,
+	Pause,
+	Timer,
+	Clock,
+	LoaderCircle,
+	Home,
+	Loader2,
+} from "lucide-react";
 import Link from "next/link";
+import quizPrompt from "@/prompts/quizGeneration";
 
 export default function QuizSet({ params }) {
+	const [paramId, setParamId] = useState();
+	const [flashcardSet, setFlashcardSet] = useState([]);
+	const [currentQuestion, setCurrentQuestion] = useState(0);
+	const [selectedAnswer, setSelectedAnswer] = useState<
+		string | boolean | null
+	>(null);
+	const [showFeedback, setShowFeedback] = useState(false);
+	const [correctAnswers, setCorrectAnswers] = useState(0);
+	const [wrongAnswers, setWrongAnswers] = useState(0);
+	const [quizCompleted, setQuizCompleted] = useState(false);
+	const [showCounters, setShowCounters] = useState(true);
+	const [showHeader, setShowHeader] = useState(false);
+	const [timerActive, setTimerActive] = useState(false);
+	const [timerRunning, setTimerRunning] = useState(false);
+	const [timerTime, setTimerTime] = useState(0);
+	const [showTimerFull, setShowTimerFull] = useState(true);
+	const [finalTime, setFinalTime] = useState(0);
+	const [quizData, setQuizData] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
 
-    const [paramId, setParamId] = useState();
-    const [flashcardSet, setFlashcardSet] = useState([]);
-    const [currentQuestion, setCurrentQuestion] = useState(0)
-    const [selectedAnswer, setSelectedAnswer] = useState<string | boolean | null>(null)
-    const [showFeedback, setShowFeedback] = useState(false)
-    const [correctAnswers, setCorrectAnswers] = useState(0)
-    const [wrongAnswers, setWrongAnswers] = useState(0)
-    const [quizCompleted, setQuizCompleted] = useState(false)
-    const [showCounters, setShowCounters] = useState(true)
-    const [showHeader, setShowHeader] = useState(false)
-    const [timerActive, setTimerActive] = useState(false)
-    const [timerRunning, setTimerRunning] = useState(false)
-    const [timerTime, setTimerTime] = useState(0)
-    const [showTimerFull, setShowTimerFull] = useState(true)
-    const [finalTime, setFinalTime] = useState(0)
-    const [quizData, setQuizData] = useState([])
-    const [isLoading, setIsLoading] = useState(true);
+	useEffect(() => {
+		async function getParamId() {
+			const { id } = await params;
+			setParamId(id);
+		}
 
-    useEffect(() => {
-        async function getParamId() {
-            const { id } = await params;
-            setParamId(id);
-        }
+		getParamId();
+	}, [params]);
 
-        getParamId()
-    }, [params])
+	useEffect(() => {
+		async function getInfo() {
+			const [set] = await getSetById(paramId);
+
+			setFlashcardSet([set]);
+		}
+		getInfo();
+	}, [paramId]);
+
+	useEffect(() => {
+		async function generateQuizDetails() {
+			const allPromises =
+				flashcardSet?.flatMap((set) => {
+					if (!set || !set.cards) {
+						return [];
+					}
+
+					return set.cards.map(async (card, index) => {
+						const api = await fetch(
+							"http://localhost:3000/api/generate-quiz",
+							{
+								method: "POST",
+								headers: {
+									"Content-Type": "application/json",
+								},
+								body: JSON.stringify({
+									prompt: quizPrompt({front: card.front.toString(), back: card.back.toString()})
+								}),
+							}
+						);
+
+						const response = await api.json();
+						return {
+							id: index + 1,
+							type: "multiple-choice",
+							question: card.front,
+							options: response.model_response.options,
+							correctAnswer: card.back,
+							explanation: response.model_response.explanation,
+						};
+					});
+				}) || [];
+
+			const results = await Promise.all(allPromises);
+
+			setQuizData(results);
+			setIsLoading(false);
+		}
+
+		if (flashcardSet?.length > 0 && flashcardSet[0]?.cards) {
+			generateQuizDetails();
+		}
+	}, [flashcardSet]);
+
+	const question = quizData?.[currentQuestion];
+	const isCorrect = selectedAnswer === question?.correctAnswer;
+	const progress = ((currentQuestion + 1) / quizData?.length) * 100;
+
+	useEffect(() => {
+		let interval: NodeJS.Timeout | null = null;
+		if (timerRunning && timerActive) {
+			interval = setInterval(() => {
+				setTimerTime((time) => time + 1);
+			}, 1000);
+		}
+		return () => {
+			if (interval) clearInterval(interval);
+		};
+	}, [timerRunning, timerActive]);
 
 
-    useEffect(() => {
-        async function getInfo() {
-            const [set] = await getSetById(paramId)
-            
-            setFlashcardSet([set])
+	const formatTime = (seconds: number) => {
+		const mins = Math.floor(seconds / 60);
+		const secs = seconds % 60;
+		return `${mins.toString().padStart(2, "0")}:${secs
+			.toString()
+			.padStart(2, "0")}`;
+	};
 
-        }
-        getInfo()
-    }, [paramId])
+	const handleAnswerSelect = (answer: string | boolean) => {
+		setSelectedAnswer(answer);
+	};
 
+	const handleSubmit = () => {
+		if (selectedAnswer === null) return;
 
+		setShowFeedback(true);
+		if (isCorrect) {
+			setCorrectAnswers(correctAnswers + 1);
+		} else {
+			setWrongAnswers(wrongAnswers + 1);
+		}
+	};
+
+  
+	const handleNext = () => {
+    if (currentQuestion < quizData?.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+			setSelectedAnswer(null);
+			setShowFeedback(false);
+		} else {
+      if (timerActive) {
+        setFinalTime(timerTime);
+				setTimerRunning(false);
+			}
+			setQuizCompleted(true);
+		}
+	};
+  
   useEffect(() => {
-      
-      async function generateQuizDetails() {
-          
-          const allPromises = flashcardSet?.flatMap(set => {
-              if (!set || !set.cards) {
-                  return [];
-              }
-              
-              return set.cards.map(async (card, index) => {
-                  
-                  const api = await fetch('http://localhost:3000/api/generate-quiz', {
-                      method: "POST",
-                      headers: {
-                          'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify({
-                          prompt: 
-                          `You are to respond only with a valid JSON object, and nothing else. Do not include any explanation outside the JSON. Do not use markdown formatting or code blocks.
+    const handleKeyUp = (e) => {
+      switch (e.key) {
+        case "Enter":
+          if (showFeedback == true) {
+            handleNext()
+          } else {
+            handleSubmit()
+            e.preventDefault();
 
-                          Here is a multiple-choice question:
+          }
+          break;
 
-                          <question> ${card.front} </question>
+        case "1":
+          setSelectedAnswer(quizData[currentQuestion].options[e.key-1])  
+          break;
 
-                          The correct answer is:
-                          <answer> ${card.back} </answer>
+        case "2":
+          setSelectedAnswer(quizData[currentQuestion].options[e.key-1])  
+          break;
 
-                          Generate exactly one JSON object in the following format:
-                          {
-                            "options": ["option1", "option2", "option3", "option4"],
-                            "explanation": "Short explanation why the answer is correct"
-                          }
+        case "3":
+          setSelectedAnswer(quizData[currentQuestion].options[e.key-1])  
+          break;
 
-                          Guidelines:
-                          1. "options" must include the correct answer and 3 plausible but incorrect answers, in random order.
-                          2. The "explanation" should briefly explain why the correct answer is right.
-                          3. Your response must be strictly a JSON object. Do not include any other text.
-                          `
-                      })
-                  });
-
-                  const response = await api.json();
-
-                  return {
-                      id: index + 1,
-                      type: "multiple-choice",
-                      question: card.front,
-                      options: response.model_response.options,
-                      correctAnswer: card.back,
-                      explanation: response.model_response.explanation
-                  };
-              });
-          }) || [];
-
-          const results = await Promise.all(allPromises);
-          
-          setQuizData(results);
-          setIsLoading(false)
+        case "4":
+          setSelectedAnswer(quizData[currentQuestion].options[e.key-1])  
+          break;
+         
       }
+    };
 
-      if (flashcardSet?.length > 0 && flashcardSet[0]?.cards) {
-          generateQuizDetails();
-      }
-  }, [flashcardSet]);    
+    document.addEventListener("keyup", handleKeyUp);
 
+    return () => {
+      document.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [handleNext, handleSubmit]);
 
-    const question = quizData?.[currentQuestion]
-    const isCorrect = selectedAnswer === question?.correctAnswer
-    const progress = ((currentQuestion + 1) / quizData?.length) * 100
+	const handleRestart = () => {
+		setCurrentQuestion(0);
+		setSelectedAnswer(null);
+		setShowFeedback(false);
+		setCorrectAnswers(0);
+		setWrongAnswers(0);
+		setQuizCompleted(false);
+		setTimerTime(0);
+		setTimerRunning(false);
+		setTimerActive(false);
+		setFinalTime(0);
+		setShowHeader(true);
+	};
 
+	const toggleTimer = () => {
+		if (!timerActive) {
+			setTimerActive(true);
+			setTimerRunning(true);
+		} else {
+			setTimerRunning(!timerRunning);
+		}
+	};
 
-    useEffect(() => {
-        let interval: NodeJS.Timeout | null = null
-        if (timerRunning && timerActive) {
-        interval = setInterval(() => {
-            setTimerTime((time) => time + 1)
-        }, 1000)
-        }
-        return () => {
-        if (interval) clearInterval(interval)
-        }
-    }, [timerRunning, timerActive])
+	if (quizCompleted) {
+		return (
+			<div className="max-w-4xl mx-auto p-8">
+				<Card>
+					<CardHeader className="text-center">
+						<CardTitle className="text-3xl mb-2">
+							Quiz Completed!
+						</CardTitle>
+						<p className="text-lg text-gray-200">
+							{flashcardSet[0].title}
+						</p>
+					</CardHeader>
+					<CardContent className="text-center space-y-6 p-8">
+						<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+							<div className="space-y-2">
+								<div className="text-3xl font-bold text-green-600">
+									{correctAnswers}
+								</div>
+								<p className="text-sm text-muted-foreground">
+									Correct
+								</p>
+							</div>
+							<div className="space-y-2">
+								<div className="text-3xl font-bold text-red-600">
+									{wrongAnswers}
+								</div>
+								<p className="text-sm text-muted-foreground">
+									Wrong
+								</p>
+							</div>
+							<div className="space-y-2">
+								<div className="text-3xl font-bold text-primary">
+									{Math.round(
+										(correctAnswers / quizData.length) * 100
+									)}
+									%
+								</div>
+								<p className="text-sm text-muted-foreground">
+									Score
+								</p>
+							</div>
+						</div>
 
-    const formatTime = (seconds: number) => {
-        const mins = Math.floor(seconds / 60)
-        const secs = seconds % 60
-        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-    }
+						{finalTime > 0 && (
+							<div className="border-t pt-6">
+								<div className="flex items-center justify-center gap-2 text-lg">
+									<Clock className="w-5 h-5" />
+									<span>
+										Time taken: {formatTime(finalTime)}
+									</span>
+								</div>
+							</div>
+						)}
 
-    const handleAnswerSelect = (answer: string | boolean) => {
-        setSelectedAnswer(answer)
-    }
+						<Button
+							onClick={handleRestart}
+							className="gap-2 px-8 py-3 text-lg"
+						>
+							<RotateCcw className="w-5 h-5" />
+							Restart Quiz
+						</Button>
 
-    const handleSubmit = () => {
-        if (selectedAnswer === null) return
+						<Link href={"/flashcards/my-sets"}>
+							<Button
+								onClick={handleRestart}
+								className="gap-2 ml-5 px-8 py-3 text-lg"
+							>
+								<Home className="w-5 h-5" />
+								Home
+							</Button>
+						</Link>
+					</CardContent>
+				</Card>
+			</div>
+		);
+	}
 
-        setShowFeedback(true)
-        if (isCorrect) {
-        setCorrectAnswers(correctAnswers + 1)
-        } else {
-        setWrongAnswers(wrongAnswers + 1)
-        }
-    }
+	if (isLoading) {
+		return (
+			<div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
+				<div className="text-center space-y-8">
+					<div className="flex justify-center">
+						<Loader2 className="w-8 h-8 text-white animate-spin" />
+					</div>
 
+					<div className="space-y-3">
+						<h1 className="text-2xl font-medium text-white">
+							Please wait a moment
+						</h1>
+						<p className="text-neutral-400 text-base">
+							Your custom quiz will be ready soon
+						</p>
+					</div>
+				</div>
+			</div>
+		);
+	}
 
-    const handleNext = () => {
-        if (currentQuestion < quizData?.length - 1) {
-        setCurrentQuestion(currentQuestion + 1)
-        setSelectedAnswer(null)
-        setShowFeedback(false)
-        } else {
-        if (timerActive) {
-            setFinalTime(timerTime)
-            setTimerRunning(false)
-        }
-        setQuizCompleted(true)
-        }
-    }
+	return (
+		<div className="max-w-4xl mx-auto p-8 space-y-8">
+			{showHeader && (
+				<Card className="bg-neutral-900">
+					<CardHeader className="text-center relative text-white">
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => setShowHeader(false)}
+							className="absolute top-4 right-4 h-8 w-8 p-0 hover:bg-neutral-800"
+						>
+							<EyeOff className="w-4 h-4" />
+						</Button>
+						<CardTitle className="text-3xl">
+							{flashcardSet[0].title}
+						</CardTitle>
+						<p className="text-lg text-gray-200 mt-2">
+							{flashcardSet[0].description}
+						</p>
+						<div className="text-sm text-muted-foreground mt-1">
+							{quizData.length} questions •{" "}
+							{flashcardSet[0].category}
+						</div>
+					</CardHeader>
+				</Card>
+			)}
 
-    const handleRestart = () => {
-        setCurrentQuestion(0)
-        setSelectedAnswer(null)
-        setShowFeedback(false)
-        setCorrectAnswers(0)
-        setWrongAnswers(0)
-        setQuizCompleted(false)
-        setTimerTime(0)
-        setTimerRunning(false)
-        setTimerActive(false)
-        setFinalTime(0)
-        setShowHeader(true) 
-    }
+			{!showHeader && (
+				<div className="flex justify-center">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => setShowHeader(true)}
+						className="gap-2 text-gray-200 bg-neutral-900 hover:bg-neutral-700 hover:text-gray-200"
+					>
+						<Eye className="w-4 h-4" />
+						Show Quiz Info
+					</Button>
+				</div>
+			)}
 
-    const toggleTimer = () => {
-        if (!timerActive) {
-        setTimerActive(true)
-        setTimerRunning(true)
-        } else {
-        setTimerRunning(!timerRunning)
-        }
-    }
+			<div className="flex flex-wrap gap-4 justify-between items-center">
+				<div className="flex gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => setShowCounters(!showCounters)}
+						className="gap-2 text-black"
+					>
+						{showCounters ? (
+							<EyeOff className="w-4 h-4" />
+						) : (
+							<Eye className="w-4 h-4" />
+						)}
+						{showCounters ? "Hide" : "Show"} Counters
+					</Button>
 
-    if (quizCompleted) {
-        return (
-        <div className="max-w-4xl mx-auto p-8">
-            <Card>
-            <CardHeader className="text-center">
-                <CardTitle className="text-3xl mb-2">Quiz Completed!</CardTitle>
-                <p className="text-lg text-gray-200">{flashcardSet[0].title}</p>
-            </CardHeader>
-            <CardContent className="text-center space-y-6 p-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
-                    <div className="text-3xl font-bold text-green-600">{correctAnswers}</div>
-                    <p className="text-sm text-muted-foreground">Correct</p>
-                </div>
-                <div className="space-y-2">
-                    <div className="text-3xl font-bold text-red-600">{wrongAnswers}</div>
-                    <p className="text-sm text-muted-foreground">Wrong</p>
-                </div>
-                <div className="space-y-2">
-                    <div className="text-3xl font-bold text-primary">
-                    {Math.round((correctAnswers / quizData.length) * 100)}%
-                    </div>
-                    <p className="text-sm text-muted-foreground">Score</p>
-                </div>
-                </div>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={toggleTimer}
+						className="gap-2 bg-transparent"
+					>
+						{timerRunning ? (
+							<Pause className="w-4 h-4" />
+						) : (
+							<Play className="w-4 h-4" />
+						)}
+						{!timerActive
+							? "Start Timer"
+							: timerRunning
+							? "Pause"
+							: "Resume"}
+					</Button>
 
-                {finalTime > 0 && (
-                <div className="border-t pt-6">
-                    <div className="flex items-center justify-center gap-2 text-lg">
-                    <Clock className="w-5 h-5" />
-                    <span>Time taken: {formatTime(finalTime)}</span>
-                    </div>
-                </div>
-                )}
+					{timerActive && (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setShowTimerFull(!showTimerFull)}
+							className="gap-2 text-black"
+						>
+							{showTimerFull ? (
+								<Timer className="w-4 h-4" />
+							) : (
+								<Clock className="w-4 h-4" />
+							)}
+							{showTimerFull ? formatTime(timerTime) : ""}
+						</Button>
+					)}
+				</div>
+			</div>
 
-                <Button onClick={handleRestart} className="gap-2 px-8 py-3 text-lg">
-                  <RotateCcw className="w-5 h-5" />
-                  Restart Quiz
-                </Button>
-                
-                <Link href={"/flashcards/my-sets"}>
-                  <Button onClick={handleRestart} className="gap-2 ml-5 px-8 py-3 text-lg">
-                    <Home className="w-5 h-5" />
-                    Home
-                  </Button>
-                
-                </Link>
-            </CardContent>
-            </Card>
-        </div>
-        )
-    }
+			<div className="space-y-4">
+				<div className="flex justify-between items-center text-base">
+					<span className="text-gray-200">
+						Question {currentQuestion + 1} of {quizData.length}
+					</span>
 
+					{showCounters && (
+						<div className="flex gap-4 text-sm">
+							<span className="text-green-400 font-medium">
+								{correctAnswers}
+							</span>
+							<span className="text-red-400 font-medium">
+								{wrongAnswers}
+							</span>
+						</div>
+					)}
+				</div>
+				<Progress value={progress} className="w-full" />
+			</div>
 
-  if (isLoading) {
-    return (
-    <div className="min-h-screen bg-neutral-900 flex items-center justify-center p-4">
-      <div
-        className="text-center space-y-8"
-      >
-        <div className="flex justify-center">
-          <Loader2 className="w-8 h-8 text-white animate-spin" />
-        </div>
+			<Card className="bg-neutral-900">
+				<CardHeader className="pb-6">
+					<CardTitle className="text-2xl text-gray-200">
+						{question?.question}
+					</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-8 p-8">
+					{question?.type === "multiple-choice" &&
+						question.options && (
+							<RadioGroup
+								value={selectedAnswer as string}
+								onValueChange={(value) =>
+									handleAnswerSelect(value)
+								}
+								disabled={showFeedback}
+							>
+								<div className="space-y-3 text-white">
+									{question.options.map((option, index) => (
+										<div
+											key={index}
+											className={`flex items-center space-x-4 pl-4 rounded-lg border transition-colors text-lg ${
+												showFeedback
+													? option ===
+													  question.correctAnswer
+														? "border-3 bg-green-400 border-green-200"
+														: selectedAnswer ===
+														  option
+														? "border-3 bg-red-400 border-red-200"
+														: "bg-neutral-900"
+													: "hover:bg-gray-50 hover:text-black"
+											}`}
+										>
+											<RadioGroupItem
+												value={option}
+												id={`option-${index}`}
+												className=""
+											/>
 
-        <div className="space-y-3">
-          <h1 className="text-2xl font-medium text-white">Please wait a moment</h1>
-          <p className="text-neutral-400 text-base">Your custom quiz will be ready soon</p>
-        </div>
+											<label
+												htmlFor={`option-${index}`}
+												className="flex-1 cursor-pointer p-4"
+											>
+												{option}
+											</label>
+											{showFeedback &&
+												option ===
+													question.correctAnswer && (
+													<CheckCircle className="w-5 h-5 text-green-600" />
+												)}
+											{showFeedback &&
+												selectedAnswer === option &&
+												option !==
+													question.correctAnswer && (
+													<XCircle className="w-5 h-5 text-red-600" />
+												)}
+										</div>
+									))}
+								</div>
+							</RadioGroup>
+						)}
 
-        
-      </div>
-    </div>
+					{question?.type === "true-false" && (
+						<RadioGroup
+							value={selectedAnswer?.toString()}
+							onValueChange={(value) =>
+								handleAnswerSelect(value === "true")
+							}
+							disabled={showFeedback}
+						>
+							<div className="space-y-3 text-white">
+								{[true, false].map((option) => (
+									<div
+										key={option.toString()}
+										className={`flex items-center space-x-4 p-4 rounded-lg border transition-colors text-lg ${
+											showFeedback
+												? option ===
+												  question.correctAnswer
+													? "border-3 bg-green-400 border-green-200"
+													: selectedAnswer === option
+													? "border-3 bg-red-300 border-red-200"
+													: "bg-neural-900"
+												: "hover:bg-gray-50 hover:text-black"
+										}`}
+									>
+										<RadioGroupItem
+											value={option.toString()}
+											id={`tf-${option}`}
+										/>
+										<label
+											htmlFor={`tf-${option}`}
+											className="flex-1 cursor-pointer"
+										>
+											{option ? "True" : "False"}
+										</label>
+										{showFeedback &&
+											option ===
+												question.correctAnswer && (
+												<CheckCircle className="w-5 h-5 text-green-600" />
+											)}
+										{showFeedback &&
+											selectedAnswer === option &&
+											option !==
+												question.correctAnswer && (
+												<XCircle className="w-5 h-5 text-red-600" />
+											)}
+									</div>
+								))}
+							</div>
+						</RadioGroup>
+					)}
 
-    )
-  }      
+					{showFeedback && (
+						<div
+							className={`p-6 rounded-lg border-l-4 ${
+								isCorrect
+									? "bg-green-200 border-l-green-500 text-green-800"
+									: "bg-red-200 border-l-red-500 text-red-800"
+							}`}
+						>
+							<div className="flex items-center gap-3 mb-3">
+								{isCorrect ? (
+									<CheckCircle className="w-6 h-6 text-green-600" />
+								) : (
+									<XCircle className="w-6 h-6 text-red-600" />
+								)}
+								<span className="font-semibold text-lg">
+									{isCorrect ? "Correct!" : "Incorrect"}
+								</span>
+							</div>
+							<p className="text-base leading-relaxed">
+								{question.explanation}
+							</p>
+						</div>
+					)}
 
-  return (
-    <div className="max-w-4xl mx-auto p-8 space-y-8">
-      {showHeader && (
-        <Card className="bg-neutral-900">
-          <CardHeader className="text-center relative text-white">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowHeader(false)}
-              className="absolute top-4 right-4 h-8 w-8 p-0 hover:bg-neutral-800"
-            >
-              <EyeOff className="w-4 h-4" />
-            </Button>
-            <CardTitle className="text-3xl">{flashcardSet[0].title}</CardTitle>
-            <p className="text-lg text-gray-200 mt-2">
-              {flashcardSet[0].description}
-            </p>
-            <div className="text-sm text-muted-foreground mt-1">{quizData.length} questions • {flashcardSet[0].category}</div>
-          </CardHeader>
-        </Card>
-      )}
-
-      {!showHeader && (
-        <div className="flex justify-center">
-          <Button variant="outline" size="sm" onClick={() => setShowHeader(true)} className="gap-2 text-gray-200 bg-neutral-900 hover:bg-neutral-700 hover:text-gray-200">
-            <Eye className="w-4 h-4" />
-            Show Quiz Info
-          </Button>
-        </div>
-      )}
-
-      <div className="flex flex-wrap gap-4 justify-between items-center">
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowCounters(!showCounters)} className="gap-2 text-black">
-            {showCounters ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            {showCounters ? "Hide" : "Show"} Counters
-          </Button>
-
-          <Button variant="outline" size="sm" onClick={toggleTimer} className="gap-2 bg-transparent">
-            {timerRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            {!timerActive ? "Start Timer" : timerRunning ? "Pause" : "Resume"}
-          </Button>
-
-          {timerActive && (
-            <Button variant="outline" size="sm" onClick={() => setShowTimerFull(!showTimerFull)} className="gap-2 text-black">
-              {showTimerFull ? <Timer className="w-4 h-4" /> : <Clock className="w-4 h-4" />}
-              {showTimerFull ? formatTime(timerTime) : ""}
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        <div className="flex justify-between items-center text-base">
-          <span className="text-gray-200">
-            Question {currentQuestion + 1} of {quizData.length}
-          </span>
-
-          {showCounters && (
-            <div className="flex gap-4 text-sm">
-              <span className="text-green-400 font-medium">{correctAnswers}</span>
-              <span className="text-red-400 font-medium">{wrongAnswers}</span>
-            </div>
-          )}
-        </div>
-        <Progress value={progress} className="w-full" />
-      </div>
-
-      <Card className="bg-neutral-900">
-        <CardHeader className="pb-6">
-          <CardTitle className="text-2xl text-gray-200">{question?.question}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-8 p-8">
-
-
-          {question?.type === "multiple-choice" && question.options && (
-            <RadioGroup
-              value={selectedAnswer as string}
-              onValueChange={(value) => handleAnswerSelect(value)}
-              disabled={showFeedback}
-            >
-              <div className="space-y-3 text-white">
-                {question.options.map((option, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-center space-x-4 pl-4 rounded-lg border transition-colors text-lg ${
-                      showFeedback
-                        ? option === question.correctAnswer
-                          ? "border-3 bg-green-400 border-green-200"
-                          : selectedAnswer === option
-                            ? "border-3 bg-red-400 border-red-200"
-                            : "bg-neutral-900"
-                        : "hover:bg-gray-50 hover:text-black"
-                    }`}
-                  >
-                    <RadioGroupItem value={option} id={`option-${index}`} className=""/>
-
-                    <label htmlFor={`option-${index}`} className="flex-1 cursor-pointer p-4">
-                      {option}
-                    </label>
-                    {showFeedback && option === question.correctAnswer && (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                    )}
-                    {showFeedback && selectedAnswer === option && option !== question.correctAnswer && (
-                      <XCircle className="w-5 h-5 text-red-600" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </RadioGroup>
-          )}
-
-
-          {question?.type === "true-false" && (
-            <RadioGroup
-              value={selectedAnswer?.toString()}
-              onValueChange={(value) => handleAnswerSelect(value === "true")}
-              disabled={showFeedback}
-            >
-              <div className="space-y-3 text-white">
-                {[true, false].map((option) => (
-                  <div
-                    key={option.toString()}
-                    className={`flex items-center space-x-4 p-4 rounded-lg border transition-colors text-lg ${
-                      showFeedback
-                        ? option === question.correctAnswer
-                          ? "border-3 bg-green-400 border-green-200"
-                          : selectedAnswer === option
-                            ? "border-3 bg-red-300 border-red-200"
-                            : "bg-neural-900"
-                        : "hover:bg-gray-50 hover:text-black"
-                    }`}
-                  >
-                    <RadioGroupItem value={option.toString()} id={`tf-${option}`} />
-                    <label htmlFor={`tf-${option}`} className="flex-1 cursor-pointer">
-                      {option ? "True" : "False"}
-                    </label>
-                    {showFeedback && option === question.correctAnswer && (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                    )}
-                    {showFeedback && selectedAnswer === option && option !== question.correctAnswer && (
-                      <XCircle className="w-5 h-5 text-red-600" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </RadioGroup>
-          )}
-
-
-
-          {showFeedback && (
-            <div
-              className={`p-6 rounded-lg border-l-4 ${
-                isCorrect ? "bg-green-200 border-l-green-500 text-green-800" : "bg-red-200 border-l-red-500 text-red-800"
-              }`}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                {isCorrect ? (
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                ) : (
-                  <XCircle className="w-6 h-6 text-red-600" />
-                )}
-                <span className="font-semibold text-lg">{isCorrect ? "Correct!" : "Incorrect"}</span>
-              </div>
-              <p className="text-base leading-relaxed">{question.explanation}</p>
-            </div>
-          )}
-
-          <div className="flex justify-between">
-            {!showFeedback ? (
-              <Button onClick={handleSubmit} disabled={selectedAnswer === null} className="ml-auto px-8 py-3  border-1 hover:bg-neutral-800 ">
-                Submit Answer
-              </Button>
-            ) : (
-              <Button onClick={handleNext} className="ml-auto px-8 py-3 border-1 hover:bg-neutral-800">
-                {currentQuestion < quizData.length - 1 ? "Next Question" : "Finish Quiz"}
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-
-    </div>
-  )
-
+					<div className="flex justify-between">
+						{!showFeedback ? (
+							<Button
+								onClick={handleSubmit}
+								disabled={selectedAnswer === null}
+								className="ml-auto px-8 py-3  border-1 hover:bg-neutral-800 "
+							>
+								Submit Answer
+							</Button>
+						) : (
+							<Button
+								onClick={handleNext}
+								className="ml-auto px-8 py-3 border-1 hover:bg-neutral-800"
+							>
+								{currentQuestion < quizData.length - 1
+									? "Next Question"
+									: "Finish Quiz"}
+							</Button>
+						)}
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
 }
