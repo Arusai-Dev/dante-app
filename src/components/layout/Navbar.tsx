@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Settings, X } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
 import { SignedIn, SignedOut, SignUpButton, UserButton } from "@clerk/nextjs";
@@ -23,7 +23,7 @@ export default function Navbar() {
     if (hideNavbar) return null
     return (
         <nav className={clsx(
-            "fixed top-0 left-0 w-full z-50 transition-transform duration-300",
+            "fixed top-0 left-0 w-screen z-50 transition-transform duration-300",
             scrolled ? "bg-[#141414] shadow-md" : "bg-transparent"
         )}>
             <div className="flex items-center justify-between h-[50px] px-4 text-white border-b-1 border-b-[#828282]">
@@ -47,9 +47,21 @@ export default function Navbar() {
                 </button>
 
                 <div className="hidden md:flex">
-                    <SignedIn><UserButton/></SignedIn>
-
-                    <SignedOut><SignUpButton/></SignedOut>
+                    <SignedIn>
+                        <UserButton>
+                            <UserButton.MenuItems>
+                                <UserButton.Link
+                                label="Settings"
+                                labelIcon={<Settings size={16} />}
+                                href="/settings"
+                            />
+                            </UserButton.MenuItems>
+                        </UserButton>
+                    </SignedIn>
+                    
+                    <SignedOut>
+                        <SignUpButton/>
+                    </SignedOut>
                 </div>
             </div>
 

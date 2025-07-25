@@ -21,4 +21,8 @@ export const theme = {
     '2xl': '1536px',
   },
 };
-export const plugins = [];
+export const plugins = []
+
+export const corePlugins = {
+  preflight: true,
+};
