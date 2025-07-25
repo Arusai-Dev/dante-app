@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -8,6 +9,10 @@ import {
 	ArrowLeft,
 	Home,
 	CheckCircle,
+	Keyboard,
+	SquareChevronLeft,
+	SquareChevronRight,
+	Space,
 } from "lucide-react";
 import { Toaster } from "sonner";
 import { fsrs, type Card, Rating, State, createEmptyCard } from "ts-fsrs";
@@ -38,7 +43,8 @@ export default function PracticeSet({ params }) {
 	const [localCardScores, setLocalCardScores] = useState([]);
 	const [showSidebar, setShowSidebar] = useState(false);
 	const [sidebarWidth, setSidebarWidth] = useState(430);
-	
+	const [keyboardShortcutsMenu, setKeyboardShortcutsMenu] = useState(false)
+
 	const intervalRef = useRef(null);
 	const localCardScoresRef = useRef([]);
 
@@ -76,30 +82,34 @@ export default function PracticeSet({ params }) {
 		if (isSubmittingReview || localCardScores.length === 0) return;
 
 		setIsSubmittingReview(true);
-		const scoresToSubmit = [...localCardScores]; 
+		const scoresToSubmit = [...localCardScores];
 
 		try {
-			
 			const response = await fetch(`/api/fsrs-update/${setId}`, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					localCardScores: scoresToSubmit
-				})
+					localCardScores: scoresToSubmit,
+				}),
 			});
 
 			if (!response.ok) {
-				const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+				const errorData = await response
+					.json()
+					.catch(() => ({ error: "Unknown error" }));
 				console.error("API Error:", response.status, errorData);
-				throw new Error(`Failed to update cards: ${response.status} - ${errorData.error || "Unknown error"}`);
+				throw new Error(
+					`Failed to update cards: ${response.status} - ${
+						errorData.error || "Unknown error"
+					}`
+				);
 			}
 
 			const result = await response.json();
 
 			setLocalCardScores([]);
-
 		} catch (error) {
 			console.error("Error submitting review:", error);
 		} finally {
@@ -111,7 +121,7 @@ export default function PracticeSet({ params }) {
 		if (intervalRef.current) {
 			clearInterval(intervalRef.current);
 		}
-		
+
 		intervalRef.current = setInterval(() => {
 			if (localCardScoresRef.current.length > 0) {
 				submitReview();
@@ -123,7 +133,7 @@ export default function PracticeSet({ params }) {
 				clearInterval(intervalRef.current);
 			}
 		};
-	}, [setId, submitReview]); 
+	}, [setId, submitReview]);
 
 	const handleSidebar = () => {
 		setShowSidebar((prev) => !prev);
@@ -135,20 +145,30 @@ export default function PracticeSet({ params }) {
 		const initializeCards = () => {
 			const initializedCards = jsonCards.map((card) => {
 				let fsrsCard: Card;
-				
-				if (card.state === undefined || card.state === 0 || !card.due || !card.last_review) {
+
+				if (
+					card.state === undefined ||
+					card.state === 0 ||
+					!card.due ||
+					!card.last_review
+				) {
 					fsrsCard = createEmptyCard();
 				} else {
 					fsrsCard = {
 						due: new Date(card.due),
 						stability: parseFloat(card.stability) || 0,
 						difficulty: parseFloat(card.difficulty) || 0,
-						elapsed_days: parseInt(card.elapsed_days) || parseInt(card.elapsed_day) || 0,
+						elapsed_days:
+							parseInt(card.elapsed_days) ||
+							parseInt(card.elapsed_day) ||
+							0,
 						scheduled_days: parseInt(card.scheduled_days) || 0,
 						reps: parseInt(card.reps) || 0,
 						lapses: parseInt(card.lapses) || 0,
 						state: parseInt(card.state) || State.New,
-						last_review: card.last_review ? new Date(card.last_review) : undefined,
+						last_review: card.last_review
+							? new Date(card.last_review)
+							: undefined,
 					};
 				}
 
@@ -166,7 +186,7 @@ export default function PracticeSet({ params }) {
 
 			const now = new Date();
 			const due = initializedCards.filter((card) => {
-				if (!card.due) return true; 
+				if (!card.due) return true;
 				return new Date(card.due) <= now;
 			});
 
@@ -215,7 +235,6 @@ export default function PracticeSet({ params }) {
 			const schedulingInfo = f.repeat(card, new Date());
 			const updatedCard = schedulingInfo[rating].card;
 
-
 			const newScore = {
 				id: card.cardId,
 				due: updatedCard.due.toISOString(),
@@ -226,22 +245,24 @@ export default function PracticeSet({ params }) {
 				reps: updatedCard.reps,
 				lapses: updatedCard.lapses,
 				state: updatedCard.state,
-				last_review: updatedCard.last_review?.toISOString() || new Date().toISOString(),
+				last_review:
+					updatedCard.last_review?.toISOString() ||
+					new Date().toISOString(),
 			};
 
-			setLocalCardScores(prev => [...prev, newScore]);
+			setLocalCardScores((prev) => [...prev, newScore]);
 
 			setCards((prevCards) =>
 				prevCards.map((c) =>
 					c.cardId === card.cardId ? { ...c, ...updatedCard } : c
 				)
 			);
-			
+
 			setDueCards((prevDueCards) => {
 				const newDueCards = prevDueCards.filter(
 					(_, index) => index !== currentCardIndex
 				);
-				
+
 				if (newDueCards.length === 0) {
 					setStudyComplete(true);
 				} else {
@@ -254,7 +275,6 @@ export default function PracticeSet({ params }) {
 
 			setShowFront(true);
 			setQualityScore("Easy");
-
 		} catch (error) {
 			console.error("Error processing card rating:", error);
 		}
@@ -266,10 +286,65 @@ export default function PracticeSet({ params }) {
 		}
 	}, [studyComplete, localCardScores, submitReview]);
 
+	useEffect(() => {
+		const handleKeyUp = (e) => {
+			switch (e.key) {
+				case "ArrowRight":
+					e.preventDefault();
+					nextCard();
+					break;
+				
+				case "ArrowLeft":
+					e.preventDefault();
+					prevCard();
+					break;
+				case " ":
+					e.preventDefault();
+					flipCard();
+					break;
+				
+				case "a":
+					e.preventDefault();
+					handleQualityScoreClick(Rating.Again);
+					break;
+				case "h":
+					e.preventDefault();
+					handleQualityScoreClick(Rating.Hard);
+					break;
+
+				case "g":
+					e.preventDefault();
+					handleQualityScoreClick(Rating.Good);
+					break;
+
+				case "e":
+					e.preventDefault();
+					handleQualityScoreClick(Rating.Easy);
+					break;
+
+				case "Escape":
+					e.preventDefault();
+					setKeyboardShortcutsMenu(false);
+					break;
+
+				
+			}
+		};
+
+		document.addEventListener('keyup', handleKeyUp)
+
+		return () => {
+			document.removeEventListener('keyup', handleKeyUp)
+		}
+
+	}, [handleQualityScoreClick, nextCard, prevCard])
+
 	if (!set || cards.length === 0) {
-		return <div className="h-screen w-full flex items-center justify-center">
-			<div className="text-xl">Loading cards...</div>
-		</div>;
+		return (
+			<div className="h-screen w-full flex items-center justify-center">
+				<div className="text-xl">Loading cards...</div>
+			</div>
+		);
 	}
 
 	if (studyComplete) {
@@ -283,8 +358,8 @@ export default function PracticeSet({ params }) {
 							Great job!
 						</h1>
 						<p className="text-white mb-6">
-							You&apos;ve completed all your practice cards for today. 
-							Come back tomorrow for more practice!
+							You&apos;ve completed all your practice cards for
+							today. Come back tomorrow for more practice!
 						</p>
 						<p className="text-white mb-6">
 							Want to practice more?{" "}
@@ -299,6 +374,8 @@ export default function PracticeSet({ params }) {
 									Back to My Sets
 								</Button>
 							</Link>
+
+							
 						</div>
 					</div>
 				</div>
@@ -308,10 +385,14 @@ export default function PracticeSet({ params }) {
 
 	const currentCard = getCurrentCard();
 	if (!currentCard) {
-		return <div className="h-screen w-full flex items-center justify-center">
-			<div className="text-xl">No cards available</div>
-		</div>;
+		return (
+			<div className="h-screen w-full flex items-center justify-center">
+				<div className="text-xl">No cards available</div>
+			</div>
+		);
 	}
+
+
 
 	return (
 		<>
@@ -324,8 +405,8 @@ export default function PracticeSet({ params }) {
 				style={{ width: showSidebar ? `${sidebarWidth}px` : "60px" }}
 			>
 				<div className="flex items-center justify-between p-4 border-b border-neutral-700">
-					<div className="flex items-center space-x-3">
-					</div>
+					<div className="flex items-center space-x-3"></div>
+
 					<Button
 						onClick={handleSidebar}
 						variant="ghost"
@@ -334,18 +415,50 @@ export default function PracticeSet({ params }) {
 					>
 						<PanelLeft className="w-4 h-4" />
 					</Button>
-				</div>
 
+				</div>
+				
+				
 				{showSidebar && <Sidebar onWidthChange={handleWidthChange} />}
 			</div>
 
+
+
 			{!showSidebar && (
-				<Button
-					onClick={handleSidebar}
-					className="fixed top-4 left-4 z-40 p-3 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg transition-all duration-200 backdrop-blur-sm"
-				>
-					<PanelLeft className="w-5 h-5 text-neutral-300" />
-				</Button>
+				<>
+					<Button
+						onClick={handleSidebar}
+						className="fixed top-4 left-4 z-40 p-3 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg transition-all duration-200 backdrop-blur-sm"
+					>
+						<PanelLeft className="w-5 h-5 text-neutral-300" />
+					</Button>
+
+
+					<Button
+						onClick={() => setKeyboardShortcutsMenu(!keyboardShortcutsMenu)}
+						className="fixed top-4 left-18 z-40 p-3 bg-neutral-900/90 hover:bg-neutral-800 border border-neutral-700 rounded-lg shadow-lg transition-all duration-200 backdrop-blur-sm"
+					>
+						<Keyboard className="w-5 h-5 text-neutral-300" />
+					</Button>
+
+					{keyboardShortcutsMenu && (
+						<div className="fixed top-18 left-20 z-40 bg-neutral-800 p-4 rounded-2xl ">
+							<h1 className="text-md">Shortcuts Menu</h1>
+							
+							<p className="inline-block text-sm">Right & Left Arrows <SquareChevronLeft className="inline-block size-4"/> <SquareChevronRight className="inline-block size-4"/> - Previous/Next Card</p>
+
+							<br />
+							<p className="inline-block text-sm">Space Bar <Space className="inline-block size-4"/> - Flip Card</p>
+
+							<br />
+							<p className="inline-block text-sm">a, h, g, e - Rate Card (Again, Hard, Good, Easy)</p>
+
+						</div>
+
+					)
+
+					}
+				</>
 			)}
 
 			{showSidebar && (
@@ -416,7 +529,9 @@ export default function PracticeSet({ params }) {
 							].map(({ rating, label, color }) => (
 								<button
 									key={rating}
-									onClick={() => handleQualityScoreClick(rating)}
+									onClick={() =>
+										handleQualityScoreClick(rating)
+									}
 									disabled={isSubmittingReview}
 									className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 ${
 										qualityScore === rating
