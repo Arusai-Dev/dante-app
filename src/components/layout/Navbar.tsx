@@ -1,9 +1,9 @@
 "use client"
 import { useState, useEffect } from "react";
-import { Menu, Settings, X } from "lucide-react";
+import { Menu, Settings, User, X } from "lucide-react";
 import Link from "next/link";
 import clsx from "clsx";
-import { SignedIn, SignedOut, SignUpButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignUpButton, useClerk, UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
@@ -21,6 +21,7 @@ export default function Navbar() {
     const hideNavbar = pathname?.startsWith('/flashcards/practice/') || pathname?.startsWith('/flashcards/play/') || pathname?.startsWith('/flashcards/quiz/') 
 
     if (hideNavbar) return null
+
     return (
         <nav className={clsx(
             "fixed top-0 left-0 w-screen z-50 transition-transform duration-300",
@@ -48,16 +49,31 @@ export default function Navbar() {
 
                 <div className="hidden md:flex">
                     <SignedIn>
-                        <UserButton>
+                        <UserButton
+                            appearance={{
+                                elements: {
+                                    userButtonPopoverActionButtonIcon__manageAccount: "hidden",
+                                    userButtonPopoverActionButton__manageAccount: {
+                                    }                                    
+                                }
+                            }} 
+                        >
                             <UserButton.MenuItems>
                                 <UserButton.Link
-                                label="Settings"
-                                labelIcon={<Settings size={16} />}
-                                href="/settings"
-                            />
+                                    label="App Settings"
+                                    labelIcon={<Settings size={16} />}
+                                    href="/settings"
+                                />
                             </UserButton.MenuItems>
                         </UserButton>
                     </SignedIn>
+                    <style jsx global>{`
+                        .custom-manage-account-btn::before {
+                            content: '■';
+                            margin-right: -40px;
+                            margin-left: 10px;
+                        }   
+                    `}</style>
                     
                     <SignedOut>
                         <SignUpButton/>

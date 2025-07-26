@@ -1,7 +1,8 @@
 import { useSettingsPersistentStore } from "@/app/stores/useSettingsPersistentStore";
-import SimpleToast from "@/components/modals/featureNotAvailableModal";
+import { dismissTextModal } from "@/components/modals/dismissTextModal";
 import { useUser } from "@clerk/nextjs";
-import { Info, LockIcon, LockKeyholeIcon, Save, User } from "lucide-react";
+import { clerkClient } from "@clerk/nextjs/server";
+import { LockIcon, Save, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast, Toaster } from "sonner";
 
@@ -33,6 +34,47 @@ export default function Profile() {
             setUserEmail(user.emailAddresses[0]?.emailAddress || "");
         }
     }, [isLoaded, setUserEmail, setUserName, user]);
+
+
+    const saveProfile = async () => {
+        const userId = user?.id
+        
+        if (!userId) {
+            console.error("User ID not available")
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/clerk/update-profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    firstName: userName.split(' ')[0],
+                    lastName: userName.split(' ')[1] || '',
+                    userName: userName,
+                    bio: userBio,
+                    location: userLocation,
+                    website: userWebsite,
+                })
+            })
+
+            if (user && userEmail !== user?.primaryEmailAddress?.emailAddress) {
+                await user.createEmailAddress({ emailAddress: userEmail })
+            }
+
+
+            if (response.ok) {
+                console.log('Profile updated successfully')
+            } else {
+                console.log('Failed to upload profile')
+            }
+            toast("Profile updated successfully")       
+        } catch (err) {
+            console.log("Error updating profile:", err)
+        }
+    }
 
     return (
 
@@ -103,7 +145,8 @@ export default function Profile() {
                 <button 
                     className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center w-1/3 h-[33px] md:h-[40px] py-1 px-3 rounded-[5px] hover-animation-secondary"
                     onClick={() => {
-                        
+                        // saveProfile()
+                        dismissTextModal({ title: "Feature still in development"})
                     }}
                 >
                     <div className="flex items-center justify-center">
@@ -127,7 +170,7 @@ export default function Profile() {
                     <button 
                         className="cursor-pointer bg-[#151515] border border-[#404040] text-[#e3e3e3] w-1/3 h-[33px] md:h-[40px] py-1 px-3 rounded-[5px] hover-animation-secondary"
                         onClick={() => {
-                            toast
+                            dismissTextModal({ title: "Feature still in development"})
                         }}
                     >
                         <span className="text-sm md:text-[15px] font-semibold">Change Password</span>
@@ -136,6 +179,7 @@ export default function Profile() {
                     <button 
                         className="cursor-pointer bg-[#151515] border border-[#404040] text-[#e3e3e3] w-fit h-[33px] md:h-[40px] py-1 px-6 rounded-[5px] hover-animation-secondary"
                         onClick={() => {
+                            dismissTextModal({ title: "Feature still in development"})
                             
                         }}
                     >
@@ -149,6 +193,7 @@ export default function Profile() {
                     <button 
                         className="cursor-pointer bg-[#960000] border border-[#404040] text-[#e3e3e3] w-fit h-[33px] md:h-[40px] py-1 px-6 rounded-[5px] hover-animation"
                         onClick={() => {
+                            dismissTextModal({ title: "Feature still in development"})
                             
                         }}
                     >
