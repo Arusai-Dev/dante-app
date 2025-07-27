@@ -36,12 +36,6 @@ export default function RootLayout({
           },
         }
       }}
-      localization={{
-        userButton: {
-          action__manageAccount: "My Profile"
-        }
-      }}
-      
     >
       <html lang="en" className={interSans.className}>
         <Head>

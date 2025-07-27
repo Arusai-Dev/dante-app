@@ -204,5 +204,37 @@ body {
   .back {
     transform: rotateX(180deg);
   }
+
+  .border-minimal-dark {
+    border: 1px #8c8c8c;
+  }
 }
 
+
+
+.shine-glint {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transform: translateX(-100%) translateY(-100%) rotate(95deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+  mix-blend-mode: screen; 
+}
+
+button:hover .shine-glint {
+  opacity: 1;
+  animation: glint-move 0.9s ease-in-out forwards;
+}
+
+@keyframes glint-move {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(25deg);
+  }
+}
