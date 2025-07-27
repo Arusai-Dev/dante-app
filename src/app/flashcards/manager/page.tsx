@@ -14,12 +14,12 @@ import { convertUrlToFile, handleAddCard, handleCardDelete, handleUpdateCard } f
 export const fetchAllData = () => {
     const {
         updatingCard,
+        sets,
         currentSet,
         currentSelectedImageUrl,
         currentSetImages,
         currentCardData,
         containsImages,
-        imageCropUi,
         originalImageUrl,
         croppedImageUrl,
         originalFile,
@@ -29,11 +29,11 @@ export const fetchAllData = () => {
 
     console.log({
         updatingCard,
+        sets,
         currentSet,
         currentSelectedImageUrl,
         currentSetImages,
         currentCardData,
-        imageCropUi,
         containsImages,
         originalImageUrl,
         croppedImageUrl,
@@ -59,11 +59,7 @@ export default function Create() {
         setOriginalImageUrl, 
         originalFile,
         setOriginalFile,
-        croppedFile,
         setCroppedFile,
-        originalImageUrl,
-        croppedImageUrl,
-        previousFile,
     } = useManagerPersistentStore()
     
     const {
@@ -159,6 +155,7 @@ export default function Create() {
         }
     }
 
+    fetchAllData()
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
         

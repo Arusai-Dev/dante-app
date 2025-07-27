@@ -182,28 +182,34 @@ export default function SetSelectionComp() {
                     {/* Drop Drown Content */} 
                     {selectionDropDown && (
                         <div className="absolute mt-1 flex flex-col gap-1 overflow-y-auto z-50 w-[calc(100vw-20px)] max-w-[400px] md:w-[300px] max-h-[300px] py-1 bg-[#202020] rounded-[5px] border-1 border-[#828282] ">
-                            {sets.map((set, index:number) => (
-                                <div 
-                                    key={index} 
-                                    className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] md:pl-1 gap-x-1 mx-1 md:mr-2 hover-animation whitespace-nowrap "
-                                    
-                                    onClick={() => {
-                                        setCurrentSet(set)
-                                        const updateCtn = async () => {
-                                            await updateCardCount(currentSet.id, currentSet.card_cnt)
-                                        }
-                                        updateCtn()
-                                    }}
-                                >
-                                    <div className="flex items-center justify-center">
-                                        {currentSet.title == set.title && (
-                                            <Check className="h-[16px] md:h-[20px] md:w-[20px] mx-1"/>
-                                        )}
-                                    </div>
-                                    
-                                    <div className="w-fit md:max-w-[250px] text-[12px] md:text-[14px] overflow-x-hidden truncate" title={set.title}>{set.title}</div>
-                                </div>
-                            ))}
+                            {/* TODO: Uncomment for prod */}
+                            {/* {sets !== "No Sets" ? ( */}
+                                <>
+                                    {sets?.map((set, index:number) => (
+                                        <div 
+                                            key={index} 
+                                            className="bg-[#202020] cursor-pointer flex rounded-[5px] py-[3px] md:pl-1 gap-x-1 mx-1 md:mr-2 hover-animation whitespace-nowrap "
+                                            
+                                            onClick={() => {
+                                                setCurrentSet(set)
+                                                const updateCtn = async () => {
+                                                    await updateCardCount(currentSet.id, currentSet.card_cnt)
+                                                }
+                                                updateCtn()
+                                            }}
+                                        >
+                                            <div className="flex items-center justify-center">
+                                                {currentSet.title == set.title && (
+                                                    <Check className="h-[16px] md:h-[20px] md:w-[20px] mx-1"/>
+                                                )}
+                                            </div>
+                                            
+                                            <div className="w-fit md:max-w-[250px] text-[12px] md:text-[14px] overflow-x-hidden truncate" title={set.title}>{set.title}</div>
+                                        </div>
+                                    ))}
+                                </>
+                            {/* TODO: Uncomment for prod */}
+                            {/* ) : <span className="text-[14px] pl-2">No sets found</span>} */}
                         </div>
                     )}        
                 </div>

@@ -57,7 +57,7 @@ export default function Navbar() {
                     <SignedIn>
                         <div className="relative z-3 flex items-center">
                             <button
-                                className="relative overflow-hidden cursor-pointer  rounded-full bg-gradient-to-r hover:shadow-lg transition duration-300"
+                                className="relative overflow-hidden cursor-pointer rounded-full bg-gradient-to-r hover:shadow-lg transition duration-300"
                                 onClick={() => setMenuOpen(!menuOpen)}
                             >
                                 <span className="absolute inset-0 shine-glint rounded-full z-30 pointer-events-none" />
