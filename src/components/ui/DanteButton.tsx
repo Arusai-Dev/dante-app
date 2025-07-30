@@ -2,18 +2,18 @@ import React from "react";
 import type { ReactNode } from "react";
 import clsx from "clsx";
 
-type CustomButtonProps = {
+type DanteButtonPrompts = {
     label: string;
     icon?: ReactNode;
-    variant?: "light" | "dark";
+    variant?: string;
     onClick?: () => void;
     className?: string;
 };
 
-const CustomButton: React.FC<CustomButtonProps> = ({
+const DanteButton: React.FC<DanteButtonPrompts> = ({
     label,
     icon,
-    variant = "dark",
+    variant,
     onClick,
     className = "",
 }) => {
@@ -22,7 +22,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     const darkStyles =
         "bg-[#151515] border border-[#404040] text-[#e3e3e3] hover:bg-[#202020] hover:border-[#606060]";
     const lightStyles =
-        "bg-white border border-[#cccccc] text-black hover:bg-[#f3f3f3] hover:border-[#aaaaaa]";
+        "bg-white border border-[#cccccc] text-black hover:bg-[#BDBCBB] hover:border-[#aaaaaa]";
 
     return (
         <button
@@ -35,4 +35,4 @@ const CustomButton: React.FC<CustomButtonProps> = ({
     );
 };
 
-export default CustomButton;
+export default DanteButton;

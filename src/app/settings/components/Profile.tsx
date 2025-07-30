@@ -88,7 +88,7 @@ export default function Profile() {
                     </div>
                     <span className="text-[14px] text-gray-400">Update your personal information and profile details</span>
                 </div>
-    
+
                 <div className="flex md:gap-5">
                     <div className="flex flex-col w-full">
                         <label className="mb-1 font-semibold text-[15px]">Profile Name</label>
@@ -140,8 +140,7 @@ export default function Profile() {
                         ></input>
                     </div>
                 </div>
-    
-    
+
                 <button 
                     className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center w-1/3 h-[33px] md:h-[40px] py-1 px-3 rounded-[5px] hover-animation-secondary"
                     onClick={() => {

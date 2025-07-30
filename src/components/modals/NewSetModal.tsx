@@ -113,7 +113,6 @@ export default function NewSetModal() {
                         <form className="flex flex-col gap-1">
                             <label>Select a Category:</label>
                             <div className="relative ">
-                                {/* <Filter className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2  h-4"/> */}
                                 <select 
                                     className="text-white cursor-pointer rounded px-3 py-2 appearance-none focus:outline-1 border-[#8c8c8c] border w-full"
                                     value={category}

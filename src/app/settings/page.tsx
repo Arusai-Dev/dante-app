@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from "react";
-import Profile from "./components/Profile";
+import { useState } from "react"; 
+import Display from "./components/Display";
+// import Profile from "./components/Profile"; // TODO: custom page to replace userProfile for Clerk
 
 
 export default function Settings() {
-    const categories = ["Profile", "Display", "Alerts", "Privacy", "Data"]
-    const [selectedCategory, setSelectedCategory] = useState<string>("Profile")
+    // const categories = ["Profile", "Display", "Alerts", "Privacy", "Data"]
+    const categories = ["Display", "Alerts", "Privacy", "Data"]
+    const [selectedCategory, setSelectedCategory] = useState<string>("Display")
 
     return (
         <div className="pt-16 w-screen">
@@ -23,15 +25,17 @@ export default function Settings() {
                 </div>
             </div>
 
+
+
             <div className="sm:mx-0 lg:mx-40 mt-8 md:mt-10 flex flex-col md:gap-6 justify-center md:justify-start w-fit">
                 {/* Navigation */}
-                <div className="grid w-fit gap-3 grid-cols-2 md:grid-cols-5 h-auto p-2 bg-[#D9D9D9]/3 rounded-[5px]">
+                <div className="grid w-fit gap-3 grid-cols-2 md:grid-cols-4 h-auto p-2 bg-[#D9D9D9]/3 rounded-[5px]">
                     {categories.map((category, index) => (
                         <div
                             key={index}
                             className={`bg-[#D9D9D9]/3 px-10 font-semibold py-2 cursor-pointer hover-animation text-center rounded-[5px] text-white data-[state=active]:text-neutral-900 text-xs sm:text-sm ${selectedCategory == category ? `bg-white/30` : 'bg-[#D9D9D9]/3'}`}
                             onClick={() => setSelectedCategory(category)}   
-                        >
+                        >   
                             {category}
                         </div>
                     ))}
@@ -42,25 +46,21 @@ export default function Settings() {
                 {/* Sub Pages */}
                 <div className="w-fit">
 
-                    
-                    {(selectedCategory == "Profile") && (
+                    {/* TODO: custom page to replace userProfile for Clerk */}
+                    {/* {(selectedCategory == "Profile") && (
                         <Profile />
-                    )}
+                    )} */}
 
 
 
                     {(selectedCategory == "Display") && (
-                        <div>
-                            
-                        </div>
+                        <Display/>
                     )}
     
 
 
                     {(selectedCategory == "Alerts") && (
-                        <div>
-                            
-                        </div>
+                        <Alerts/>
                     )}
     
 
