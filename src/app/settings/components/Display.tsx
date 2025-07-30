@@ -1,5 +1,5 @@
 import DanteButton from "@/components/ui/DanteButton";
-import DanteSelect, { type DanteSelectProps } from "@/components/ui/DanteSelect";
+import DanteSelect from "@/components/ui/DanteSelect";
 import DanteToggle from "@/components/ui/DanteToggle";
 import { Monitor, Moon, Palette, Sun } from "lucide-react";
 import { useState } from "react";
@@ -53,15 +53,13 @@ export default function Display() {
                 </div>
             </div>
 
-            <div className="flex flex-col">
-                <DanteSelect
-                    variant={selectedTheme}
-                    value={selectedFontSize}
-                    options={fontSizeOptions}
-                    onChange={(value) => setSelectedFontSize(value)}
-                    label="Font Size"
-                />
-            </div>
+            <DanteSelect
+                variant={selectedTheme}
+                value={selectedFontSize}
+                options={fontSizeOptions}
+                onChange={(value) => setSelectedFontSize(value)}
+                label="Font Size"
+            />
 
             <DanteToggle
                 title="Compact Mode"

@@ -3,6 +3,7 @@
 import { useState } from "react"; 
 import Display from "./components/Display";
 import Alerts from "./components/Alerts";
+import Privacy from "./components/Privacy";
 // import Profile from "./components/Profile"; // TODO: custom page to replace userProfile for Clerk
 
 
@@ -67,9 +68,7 @@ export default function Settings() {
 
 
                     {(selectedCategory == "Privacy") && (
-                        <div>
-                            
-                        </div>
+                        <Privacy/>
                     )}
     
 
