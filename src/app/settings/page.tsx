@@ -2,6 +2,7 @@
 
 import { useState } from "react"; 
 import Display from "./components/Display";
+import Alerts from "./components/Alerts";
 // import Profile from "./components/Profile"; // TODO: custom page to replace userProfile for Clerk
 
 

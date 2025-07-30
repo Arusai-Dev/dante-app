@@ -30,6 +30,8 @@ export default function Display() {
                     <span className="text-[14px] text-gray-400">Customize how the app looks and feels</span>
                 </div>
 
+                <div className=" border border-[#404040]"></div>
+
                 <div className="flex flex-col">
                     <span className="text-[14px] font-semibold">Theme</span>
 
