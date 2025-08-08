@@ -13,7 +13,7 @@ type DanteButtonPrompts = {
 const DanteButton: React.FC<DanteButtonPrompts> = ({
     label,
     icon,
-    variant,
+    variant="dark",
     onClick,
     className = "",
 }) => {

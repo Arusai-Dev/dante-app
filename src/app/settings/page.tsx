@@ -4,6 +4,7 @@ import { useState } from "react";
 import Display from "./components/Display";
 import Alerts from "./components/Alerts";
 import Privacy from "./components/Privacy";
+import Data from "./components/Data";
 // import Profile from "./components/Profile"; // TODO: custom page to replace userProfile for Clerk
 
 
@@ -29,7 +30,7 @@ export default function Settings() {
 
 
 
-            <div className="sm:mx-0 lg:mx-40 mt-8 md:mt-10 flex flex-col md:gap-6 justify-center md:justify-start w-fit">
+            <div className="sm:mx-0 lg:mx-40 mt-8 md:mt-10 flex flex-col gap-3 md:gap-6 justify-center md:justify-start w-fit">
                 {/* Navigation */}
                 <div className="grid w-fit gap-3 grid-cols-2 md:grid-cols-4 h-auto p-2 bg-[#D9D9D9]/3 rounded-[5px]">
                     {categories.map((category, index) => (
@@ -74,9 +75,7 @@ export default function Settings() {
 
 
                     {(selectedCategory == "Data") && (
-                        <div>
-                            
-                        </div>
+                        <Data/>
                     )}
     
     
