@@ -2,6 +2,7 @@ import { type Metadata } from 'next'
 import {
   ClerkProvider
 } from '@clerk/nextjs'
+import { dark } from "@clerk/themes"
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
@@ -25,7 +26,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+        variables: { colorBackground: '#141414' },
+        elements: {
+          userButtonPopoverActionButtonIcon__manageAccount: {
+            display: "none"
+          },
+        }
+      }}
+    >
       <html lang="en" className={interSans.className}>
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1"/>

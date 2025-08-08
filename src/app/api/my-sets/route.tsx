@@ -2,6 +2,7 @@
 import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
+import { useUser } from "@clerk/nextjs";
 
 
 export async function GET() {
@@ -10,7 +11,8 @@ export async function GET() {
     // TODO 
     // using this for testing, for production use [user?.id] && uncomment next line
     // const user = await currentUser();
-    const userId = 'userid';
+    // const userId = user?.id;
+    const userId = 'userid'
     const set = await sql('SELECT * FROM flashcards WHERE "user" = $1', [userId]);
 
 

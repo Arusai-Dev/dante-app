@@ -6,7 +6,7 @@ type ToastProps = {
     id: string,
 }
 
-export function fieldMissingModal(toast: Omit<ToastProps, 'id'>) {
+export function dismissTextModal(toast: Omit<ToastProps, 'id'>) {
     return sonnerToast.custom((id: string) => (
         <Toast title={toast.title} id={id} />
     ));

@@ -1,11 +1,14 @@
 import { useManagerPersistentStore, useManagerNonPersistentStore } from "@/app/stores/managerStores";
 import { createNewSet, getSetByTitle } from "@/lib/dbFunctions";
+import { useUser } from "@clerk/nextjs";
 import { ArrowDown, Eye, EyeClosed, Filter, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 
 export default function NewSetModal() {
+
+    const { user } = useUser()
         
     const {setCurrentSet} = useManagerPersistentStore()
     const {newSetUI, toggleNewSetUI} = useManagerNonPersistentStore()
@@ -18,7 +21,8 @@ export default function NewSetModal() {
     const [tags, setTags] = useState([]);
     const [currentTag, setCurrentTag] = useState("");
     const [isPrivate, setIsPrivate] = useState(false);
-    const newSetUserId = "userid";
+    // const newSetUserId = user?.id; // TODO: Uncomment for prod
+    const newSetUserId = "userId";
     const cards = [];
     const date_created = new Date();
     const number_cards = 0;
@@ -109,7 +113,6 @@ export default function NewSetModal() {
                         <form className="flex flex-col gap-1">
                             <label>Select a Category:</label>
                             <div className="relative ">
-                                {/* <Filter className="absolute left-2 md:left-3 top-1/2 transform -translate-y-1/2  h-4"/> */}
                                 <select 
                                     className="text-white cursor-pointer rounded px-3 py-2 appearance-none focus:outline-1 border-[#8c8c8c] border w-full"
                                     value={category}

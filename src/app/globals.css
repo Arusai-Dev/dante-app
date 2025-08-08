@@ -1,16 +1,13 @@
-
 @import "tailwindcss";
 
-
-@plugin "tailwindcss-animate";
-
-
-
-@theme {
-  --font-inter: 'Inter', sans-serif;
-  --breakpoint-lg: 820px;
-  --breakpoint-md: 540px;
-  --breakpoint-sm: 321px;
+@layer utilities {
+  .px-\[20px\] { padding-left: 20px; padding-right: 20px; }
+  .px-\[24px\] { padding-left: 24px; padding-right: 24px; }
+  .px-\[28px\] { padding-left: 28px; padding-right: 28px; }
+  .px-\[30px\] { padding-left: 30px; padding-right: 30px; }
+  .px-\[32px\] { padding-left: 32px; padding-right: 32px; }
+  .px-\[36px\] { padding-left: 36px; padding-right: 36px; }
+  .px-\[40px\] { padding-left: 40px; padding-right: 40px; }
 }
 
 @keyframes gradientShift {
@@ -162,6 +159,14 @@ body {
     background-color: #323232
   }
 
+  .hover-animation-light {
+    transition: 0.2s;
+  }
+
+  .hover-animation-light:hover {
+    background-color: rgb(190, 190, 190);
+  }
+
   .hover-animation-text {
     transition: 0.2s;
   }
@@ -207,5 +212,37 @@ body {
   .back {
     transform: rotateX(180deg);
   }
+
+  .border-minimal-dark {
+    border: 1px #8c8c8c;
+  }
 }
 
+
+
+.shine-glint {
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transform: translateX(-100%) translateY(-100%) rotate(95deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+  mix-blend-mode: screen; 
+}
+
+button:hover .shine-glint {
+  opacity: 1;
+  animation: glint-move 0.9s ease-in-out forwards;
+}
+
+@keyframes glint-move {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(25deg);
+  }
+}

@@ -5,7 +5,7 @@ import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-reac
 import { useManagerNonPersistentStore, useManagerPersistentStore } from "@/app/stores/managerStores"
 import SetSelectionComp from "@/components/SetSelectionComp"
 import ImageCropper from "@/components/ImageCropper"
-import { fieldMissingModal } from "@/components/modals/fieldMissingModal"
+import { dismissTextModal } from "@/components/modals/dismissTextModal"
 import { dismissLoading, loadingModal } from "@/components/modals/loading"
 import { handleImageUrlInput, handleFileChange, clearCurrentImage } from "@/app/hooks/managerHooks/useImageHandlers"
 import { updateSetImagesMap } from "@/app/hooks/managerHooks/useSetHandlers"
@@ -14,11 +14,11 @@ import { convertUrlToFile, handleAddCard, handleCardDelete, handleUpdateCard } f
 export const fetchAllData = () => {
     const {
         updatingCard,
+        sets,
         currentSet,
         currentSelectedImageUrl,
         currentSetImages,
         currentCardData,
-        imageCropUi,
         containsImages,
         originalImageUrl,
         croppedImageUrl,
@@ -29,11 +29,11 @@ export const fetchAllData = () => {
 
     console.log({
         updatingCard,
+        sets,
         currentSet,
         currentSelectedImageUrl,
         currentSetImages,
         currentCardData,
-        imageCropUi,
         containsImages,
         originalImageUrl,
         croppedImageUrl,
@@ -59,11 +59,7 @@ export default function Create() {
         setOriginalImageUrl, 
         originalFile,
         setOriginalFile,
-        croppedFile,
         setCroppedFile,
-        originalImageUrl,
-        croppedImageUrl,
-        previousFile,
     } = useManagerPersistentStore()
     
     const {
@@ -159,6 +155,7 @@ export default function Create() {
         }
     }
 
+    fetchAllData()
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
         
@@ -293,9 +290,9 @@ export default function Create() {
                                         handleUpdateCard(currentCardData, originalFile.name)
                                     } else {
                                         if (currentCardData["front"] == "Front") {
-                                            fieldMissingModal({title: "Enter a value for the front of the card."})
+                                            dismissTextModal({title: "Enter a value for the front of the card."})
                                         } else if (currentCardData["back"] == "Back") {
-                                            fieldMissingModal({title:  "Enter a value for the back of the card."})
+                                            dismissTextModal({title:  "Enter a value for the back of the card."})
                                         } else {handleAddCard()} 
                                     }
                                 }}
