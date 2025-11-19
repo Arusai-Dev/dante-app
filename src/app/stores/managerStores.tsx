@@ -5,34 +5,18 @@ type persistentState = {
     updatingCard: boolean
     sets: unknown[]
     currentSet: unknown
-    currentSelectedImageUrl: unknown
-    currentSetImages: unknown
     currentCardData: {
         setId: number | null
         cardId: number | null
         category: string
         front: string
         back: string
-        fileName: string
+        // fileName: string
     }
-    containsImages: boolean
-    originalImageUrl: string
-    croppedImageUrl: string
-    originalFile: unknown
-    croppedFile: unknown
-    previousFile: unknown
     setUpdatingCard: (mode: boolean) => void
     setSets: (data: unknown[]) => void
     setCurrentSet: (data: unknown) => void
-    setCurrentSelectedImageUrl: (mode: unknown) => void
-    setCurrentSetImages: (data: unknown) => void
     setCurrentCardData: (data: unknown) => void
-    setContainsImages: (mode: boolean) => void 
-    setOriginalImageUrl: (mode: string) => void 
-    setCroppedImageUrl: (mode: string) => void 
-    setOriginalFile: (data: unknown) => void
-    setCroppedFile: (data: unknown) => void
-    setPreviousFile: (data: unknown) => void
     updateCurrentCardData: (key: string, value: unknown) => void
     clearCurrentCardData: () => void
 }
@@ -42,10 +26,6 @@ type nonPersistentState = {
     setActive: (mode: string) => void
     newSetUI: boolean
     toggleNewSetUI: (mode: boolean) => void
-    imageCropUI: boolean
-    setImageCropUI: (mode: boolean) => void 
-    loading: boolean
-    setLoading: (mode: boolean) => void
 }
 
 export const useManagerPersistentStore = create(
@@ -54,34 +34,19 @@ export const useManagerPersistentStore = create(
             updatingCard: false,
             sets: [],
             currentSet: [],
-            currentSelectedImageUrl: "",
-            currentSetImages: [],
             currentCardData: {
                 setId: null, 
                 cardId: null, 
                 category: 'Category', 
                 front: 'Front', 
                 back: 'Back', 
-                fileName: '',
+                // fileName: '',
             },
-            containsImages: false,
-            originalImageUrl: "",
-            croppedImageUrl: "",
-            originalFile: {},
-            croppedFile: {},
-            previousFile: {},
+
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
             setSets: (data) => set({ sets: data }),
             setCurrentSet: (data) => set({ currentSet: data }),
-            setCurrentSelectedImageUrl: (mode) => set({ currentSelectedImageUrl: mode }),
-            setCurrentSetImages: (data) => set({ currentSetImages: data }),
             setCurrentCardData: (data) => set({ currentCardData: data }),
-            setContainsImages: (mode) => set({ containsImages: mode}),
-            setOriginalImageUrl: (mode) => set({ originalImageUrl: mode}),
-            setCroppedImageUrl: (mode) => set({ croppedImageUrl: mode}),
-            setOriginalFile: (data) => set({ originalFile: data }),
-            setCroppedFile: (data) => set({ croppedFile: data }),
-            setPreviousFile: (data) => set({ previousFile: data }),
             updateCurrentCardData: (key, value) => set({
                 currentCardData: {
                     ...get().currentCardData,
@@ -96,7 +61,7 @@ export const useManagerPersistentStore = create(
                         category: 'Category',
                         front: 'Front',
                         back: 'Back',
-                        fileName: '',
+                        // fileName: '',
                         // due: 0,
                         // reps: 0,
                         // state: 0,
@@ -107,12 +72,6 @@ export const useManagerPersistentStore = create(
                         // scheduled_days: 0,
                         // last_review: null,
                     },
-                    originalFile: null,
-                    croppedFile: null,
-                    previousFile: null,
-                    croppedImageUrl: "",
-                    originalImageUrl: "",
-                    currentSelectedImageUrl: "",
                 })
             }
         }),
@@ -128,10 +87,6 @@ export const useManagerNonPersistentStore = create<nonPersistentState>((set) => 
     active: 'create',  
     setActive: (mode) => set({ active: mode }),
     newSetUI: false,
-    toggleNewSetUI: (mode) => set({ newSetUI: mode}),
-    imageCropUI: false,
-    setImageCropUI: (mode) => set({ imageCropUI: mode}),
-    loading: false,
-    setLoading: (mode) => set({ loading: mode }),
+    toggleNewSetUI: (mode) => set({ newSetUI: mode})
 }))
 

@@ -38,7 +38,6 @@ export default function PracticeSet({ params }) {
 	const [dueCards, setDueCards] = useState<FlashCard[]>([]);
 	const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 	const [studyComplete, setStudyComplete] = useState(false);
-	const [allCardImages, setAllCardImages] = useState({});
 	const [paramId, setParamId] = useState();
 	const [localCardScores, setLocalCardScores] = useState([]);
 	const [showSidebar, setShowSidebar] = useState(false);
