@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useManagerPersistentStore } from "@/app/stores/managerStores";
 import SetSelector from "./SetSelector";
 // import SetDescription from "./SetDescription";
-import BulkImportModal from "./BulkImportModal";
+import BulkImportModal from "../BulkImportModal";
 import SetDescription from "./SetDescription";
 import NewSetModal from "@/components/modals/NewSetModal";
 

@@ -1,24 +1,23 @@
+import { Card, Set } from '@/types'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 type persistentState = {
+    currentCard: Card | null
+    originalImageUrl: string | null
     updatingCard: boolean
-    sets: unknown[]
-    currentSet: unknown
-    currentCardData: {
-        setId: number | null
-        cardId: number | null
-        category: string
-        front: string
-        back: string
-        // fileName: string
-    }
+
+    setCurrentCard: (data: Card) => void
     setUpdatingCard: (mode: boolean) => void
-    setSets: (data: unknown[]) => void
-    setCurrentSet: (data: unknown) => void
-    setCurrentCardData: (data: unknown) => void
-    updateCurrentCardData: (key: string, value: unknown) => void
-    clearCurrentCardData: () => void
+    updateCurrentCard: (key: string, value: string) => void
+    clearCurrentCard: () => void
+    clearImageState: () => void
+    setOriginalImageUrl: (url: string | null) => void
+
+    sets: Set[]
+    currentSet: Set | null
+    setSets: (data: Set[]) => void
+    setCurrentSet: (data: Set) => void
 }
 
 type nonPersistentState = {
@@ -31,49 +30,43 @@ type nonPersistentState = {
 export const useManagerPersistentStore = create(
     persist<persistentState>(
         (set, get) => ({
-            updatingCard: false,
-            sets: [],
-            currentSet: [],
-            currentCardData: {
-                setId: null, 
-                cardId: null, 
-                category: 'Category', 
-                front: 'Front', 
-                back: 'Back', 
-                // fileName: '',
+            currentCard: {
+                setId: null,
+                cardId: null,
+                category: 'Category',
+                front: 'Front',
+                back: 'Back',
+                imageUrl: '',
             },
-
+            updatingCard: false,
+            originalImageUrl: null,
             setUpdatingCard: (mode) => set({ updatingCard: mode }),
-            setSets: (data) => set({ sets: data }),
-            setCurrentSet: (data) => set({ currentSet: data }),
-            setCurrentCardData: (data) => set({ currentCardData: data }),
-            updateCurrentCardData: (key, value) => set({
-                currentCardData: {
-                    ...get().currentCardData,
+            setCurrentCard: (data) => set({ currentCard: data }),
+            updateCurrentCard: (key, value) => set({
+                currentCard: {
+                    ...get().currentCard,
                     [key]: value
                 }
             }),
-            clearCurrentCardData: () => {
+            clearCurrentCard: () => {
                 set({
-                    currentCardData: {
+                    currentCard: {
                         setId: null,
                         cardId: null,
                         category: 'Category',
                         front: 'Front',
                         back: 'Back',
-                        // fileName: '',
-                        // due: 0,
-                        // reps: 0,
-                        // state: 0,
-                        // lapses: 0,
-                        // stability: 0,
-                        // difficulty: 0,
-                        // elapsed_day: 0,
-                        // scheduled_days: 0,
-                        // last_review: null,
+                        imageUrl: '',
                     },
                 })
-            }
+            },
+            clearImageState: () => set({ originalImageUrl: null }),
+            setOriginalImageUrl: (url) => set({ originalImageUrl: url }),
+
+            sets: [],
+            currentSet: null,
+            setSets: (data) => set({ sets: data }),
+            setCurrentSet: (data) => set({ currentSet: data }),
         }),
         {
             name: 'manager-storage', 

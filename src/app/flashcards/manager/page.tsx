@@ -1,37 +1,38 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { Trash2, Edit, PlusCircle, Save, ArrowUp, Trash2Icon } from "lucide-react"
+import { Trash2, Edit, PlusCircle, Save, ArrowUp } from "lucide-react"
 import { useManagerPersistentStore } from "@/app/stores/managerStores"
 import SetSelectionComp from "@/components/SetSelectionComp"
 import { dismissTextModal } from "@/components/modals/dismissTextModal"
 import { dismissLoading, loadingModal } from "@/components/modals/loading"
 import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/managerHooks/useCardHandlers"
+import ImageCropper from "@/components/ImageCropper"
 
 export const fetchAllData = () => {
     const {
         updatingCard,
         sets,
         currentSet,
-        currentCardData,
+        currentCard,
     } = useManagerPersistentStore.getState();
 
     console.log({
         updatingCard,
         sets,
         currentSet,
-        currentCardData,
+        currentCard,
     });
 };
 
 export default function Create() {
 
     const { 
+        currentCard,
+        setCurrentCard,
         updatingCard,
         setUpdatingCard,
         currentSet,
-        currentCardData,
-        setCurrentCardData,
         setSets, 
     } = useManagerPersistentStore()
     
@@ -50,9 +51,9 @@ export default function Create() {
         fetchData();
     }, [currentSet.id, setSets]);
 
-    const updateCard = useManagerPersistentStore(state => state.updateCurrentCardData)
-    const clearCard = useManagerPersistentStore(state => state.clearCurrentCardData)
-    const clearCurrentCardData = () => {
+    const updateCard = useManagerPersistentStore(state => state.updateCurrentCard)
+    const clearCard = useManagerPersistentStore(state => state.clearCurrentCard)
+    const clearcurrentCard = () => {
         clearCard()
     }
 
@@ -68,13 +69,15 @@ export default function Create() {
         category: string,
         front: string,
         back: string,
+        imageUrl: string
     ) => {
-        setCurrentCardData({
+        setCurrentCard({
             setId: setId,
             cardId: cardId,
             category: category,
             front: front,
             back: back,
+            imageUrl: imageUrl,
         })
         setActive("create")
         setUpdatingCard(true)
@@ -131,7 +134,7 @@ export default function Create() {
 
                         <h2 className="text-[12px] md:text-[15px] pb-1 md:pb-2">Category (optional)</h2>
                         <input className="text-[12px] md:text-[15px] mb-4 px-2 py-1 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
-                            value={currentCardData["category"] == "Category" ? '' : currentCardData["category"]}
+                            value={currentCard["category"] == "Category" ? '' : currentCard["category"]}
                             onChange={(e) => updateCard("category", e.target.value)}
                             placeholder="e.g., Vocab, Grammar, Math, Science, etc..."
                         ></input>
@@ -139,7 +142,7 @@ export default function Create() {
                         
                         <h2 className="text-[12px] md:text-[15px] pb-1 md:pb-2">Front Side</h2>
                         <textarea className="text-[12px] md:text-[15px] mb-4 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                            value={currentCardData["front"] == "Front" ? '' : currentCardData["front"]}
+                            value={currentCard["front"] == "Front" ? '' : currentCard["front"]}
                             onChange={(e) => updateCard("front", e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
@@ -147,21 +150,21 @@ export default function Create() {
                         
                         <h2 className="text-[12px] md:text-[15px] pb-1 md:pb-2">Back Side</h2>
                         <textarea className="text-[12px] md:text-[15px] mb-4 px-2 py-1 w-full resize-y h-[100px] md:h-[150px] border-[1px] border-[#8c8c8c] rounded-[5px] transition-colors duration-200 hover:bg-[#323232]"
-                            value={currentCardData["back"] == "Back" ? '' : currentCardData["back"]}
+                            value={currentCard["back"] == "Back" ? '' : currentCard["back"]}
                             onChange={(e) => updateCard("back", e.target.value)}
                             placeholder="Enter a question or term"
                         ></textarea>
 
                         
-                        {/* <h2 className="text-[12px] md:text-[15px] pb-1 font-semibold">Back Side Image (Optional)</h2>
+                        <h2 className="text-[12px] md:text-[15px] pb-1 font-semibold">Back Side Image (Optional)</h2>
                         <h2 className="text-[12px] md:text-[15px] pb-1 ">Image URL:</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             placeholder="https://example.com/image.jpg"
-                        ></input> */}
+                        ></input> 
 
-{/* 
+
                         <div className="flex items-center h-fit  gap-2">
-                            <h2 className="text-[12px] md:text-[15px]">or</h2>
+                            {/* <h2 className="text-[12px] md:text-[15px]">or</h2>
                             <label htmlFor="imageFile" className="inline-block px-3 py-1 bg-[#D9D9D9] text-sm font-semibold text-[#0F0F0F] rounded-[5px] cursor-pointer hover:bg-[#cbb88a] transition-colors duration-200">
                                 <input
                                     id="imageFile"
@@ -169,8 +172,10 @@ export default function Create() {
                                     accept="image/*"
                                     className="hidden"
                                 /> Upload Image
-                            </label>
-                        </div> */}
+                            </label> */}
+
+                            <ImageCropper/>
+                        </div>
 
 
                         <div className="flex gap-2 w-full max-w-[600px] mb-1 mt-4">
@@ -178,11 +183,11 @@ export default function Create() {
                                 className="flex gap-2 justify-center cursor-pointer bg-[#D9D9D9] text-[#0F0F0F] items-center grow-[356] h-[33px] md:h-[45px] py-1 px-3 font-bold text-[14px] md:text-xl rounded-[5px] hover-animation-secondary"
                                 onClick={() => {
                                     if (updatingCard) {
-                                        handleUpdateCard(currentCardData)
+                                        handleUpdateCard(currentCard)
                                     } else {
-                                        if (currentCardData["front"] == "Front") {
+                                        if (currentCard["front"] == "Front") {
                                             dismissTextModal({title: "Enter a value for the front of the card."})
-                                        } else if (currentCardData["back"] == "Back") {
+                                        } else if (currentCard["back"] == "Back") {
                                             dismissTextModal({title:  "Enter a value for the back of the card."})
                                         } else {handleAddCard()} 
                                     }
@@ -199,9 +204,9 @@ export default function Create() {
                                 onClick={() => {
                                     if (updatingCard) {
                                         setUpdatingCard(false);
-                                        clearCurrentCardData();
+                                        clearcurrentCard();
                                       } else {
-                                        clearCurrentCardData();
+                                        clearcurrentCard();
                                       }
                                 }}
                                 >
@@ -224,19 +229,19 @@ export default function Create() {
                             
                             {/* front */}
                             <div className="flip-face front absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/3 rounded md:rounded-[5px] hover-animation">
-                                <h2 className="pl-3 py-2">{currentCardData["category"] == "" ? "Category" : currentCardData["category"]}</h2>
-                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCardData["front"]}</div>
+                                <h2 className="pl-3 py-2">{currentCard["category"] == "" ? "Category" : currentCard["category"]}</h2>
+                                <div className="flex justify-center items-center h-[calc(100%-80px)]">{currentCard["front"]}</div>
                             </div>
 
                             {/* back */}
                             <div className="flip-face back absolute top-0 left-0 w-full h-full bg-[#D9D9D9]/6 rounded md:rounded-[5px] hover-animation">
-                                <h2 className="pl-3 py-2">{currentCardData["category"] == "" ? "Category" : currentCardData["category"]}</h2>
+                                <h2 className="pl-3 py-2">{currentCard["category"] == "" ? "Category" : currentCard["category"]}</h2>
                                 <div className="flex justify-center items-center h-[calc(100%-80px)] gap-[16px] text-sm lg:text-lg">
-                                    <div className="w-[50%] flex justify-center">{currentCardData["back"]}</div>
-                                        {/* {(currentSelectedImageUrl || (updatingCard && currentSetImages[currentCardData["fileName"]])) && (
+                                    <div className="w-[50%] flex justify-center">{currentCard["back"]}</div>
+                                        {/* {(currentSelectedImageUrl || (updatingCard && currentSetImages[currentCard["fileName"]])) && (
                                             // eslint-disable-next-line @next/next/no-img-element
                                             <img
-                                                src={currentSelectedImageUrl || (currentSetImages[currentCardData["originalImage"]])}
+                                                src={currentSelectedImageUrl || (currentSetImages[currentCard["originalImage"]])}
                                                 alt="Card preview"
                                                 width={200}
                                                 height={200}
@@ -295,7 +300,7 @@ export default function Create() {
                                                     <Edit 
                                                         className="h-[16px] md:h-[20px] md:w-[20px] hover:text-purple-400 transition-colors duration-200"
                                                         onClick={() => {
-                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back)
+                                                            handleEditCardBtnPress(currentSet.id, card.cardId, card.category, card.front, card.back, card.imageUrl)
                                                         }}
                                                     />
                                                 </div>

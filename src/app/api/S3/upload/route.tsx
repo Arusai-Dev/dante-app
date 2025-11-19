@@ -1,59 +1,66 @@
-import { NextResponse } from "next/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+// app/api/upload/route.ts
+import { NextRequest, NextResponse } from "next/server"
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3"
 
 const s3Client = new S3Client({
-    region: process.env.NEXT_PUBLIC_AWS_S3_REGION,
+    region: process.env.AWS_S3_REGION,
     credentials: {
-        accessKeyId: process.env.NEXT_PUBLIC_AWS_S3_ACCESS_KEY_ID,
-        secretAccessKey: process.env.NEXT_PUBLIC_AWS_S3_SECRET_ACCESS_KEY
+        accessKeyId: process.env.AWS_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_S3_SECRET_ACCESS_KEY
     }
 })
 
-export async function POST(request) {
+const MAX_FILE_SIZE = 10 * 1024 * 1024  // 10MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+export async function POST(request: NextRequest) {
     try {
-        const formData = await request.formData();
-        const file = formData.get("file");
+        const formData = await request.formData()
+        const file = formData.get("file") as File
+        const setId = formData.get("setId") as string
+        const cardId = formData.get("cardId") as string
 
-        if (!file) {
-            return NextResponse.json({ error: "File is required." }, { status: 400 });
+        if (!file || !setId || !cardId) {
+            return NextResponse.json(
+                { error: "Missing required fields" }, 
+                { status: 400 }
+            )
         }
 
-        const { searchParams } = new URL(request.url);
-        const setId = searchParams.get("setId");
-        const cardId = searchParams.get("cardId");
-        const fileType = searchParams.get("fileType");
-
-        if (!setId || !cardId) {
-            return NextResponse.json({ error: "Missing setId or cardId" }, { status: 400 });
+        if (file.size > MAX_FILE_SIZE) {
+            return NextResponse.json(
+                { error: "File too large (max 10MB)" }, 
+                { status: 400 }
+            )
         }
 
-        const fileBuffer = Buffer.from(await file.arrayBuffer());
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            return NextResponse.json(
+                { error: "Invalid file type" }, 
+                { status: 400 }
+            )
+        }
 
-        const fileName = file.name
+        const buffer = Buffer.from(await file.arrayBuffer())
+        const timestamp = Date.now()
+        const key = `${setId}/${cardId}/${timestamp}-${file.name}`
 
-        const key = `${setId}/${cardId}/${fileType}/${fileName}`;
-
-        console.log("KEY WHEN UPLOADING:", key);
-
-        const params = {
-            Bucket: process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME,
+        await s3Client.send(new PutObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
             Key: key,
-            Body: fileBuffer,
+            Body: buffer,
             ContentType: file.type
-        };
+        }))
 
-        const command = new PutObjectCommand(params);
-        await s3Client.send(command);
+        const url = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${key}`
 
-        return NextResponse.json({ 
-            success: true, 
-            key: key, 
-            fileType: fileType,
-            fileName: fileName
-        });
+        return NextResponse.json({ url, key })
 
-    } catch(error) {
-        console.error("Upload error:", error);
-        return NextResponse.json({ error: "Error uploading file" }, { status: 500 });
+    } catch (error) {
+        console.error("S3 upload failed:", error)
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : "Upload failed" }, 
+            { status: 500 }
+        )
     }
 }
