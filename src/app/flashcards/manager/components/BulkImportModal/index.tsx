@@ -1,10 +1,10 @@
 import { updateCurrentSet } from "@/app/hooks/managerHooks/useSetHandlers";
-import { card, setProp, useManagerNonPersistentStore, useManagerPersistentStore } from "@/app/stores/managerStores";
+import { setProp } from "@/app/stores/managerStores";
 import { generateUniqueCardId } from "@/lib/card/card";
 import { addMultipleCardsToSet } from "@/lib/dbFunctions";
 import { ArrowDown, Check, FileTextIcon, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import LineNumberedTextarea from "../../TextAreaLineNumbers";
+import { useState } from "react";
+import LineNumberedTextarea from "../../../../../components/TextAreaLineNumbers";
 
 
 
@@ -70,12 +70,14 @@ export default function BulkImportModal({
             .split("\n")
             .filter(line => line.trim())
             .map((line, index) => {
-                const [front, back, category] = line.trim().split(selectedDelimiter)
+                // const [front, back, category] = line.trim().split(selectedDelimiter)
+                const [front, ...backParts] = line.trim().split(selectedDelimiter);
                 return {
                     cardId: generateUniqueCardId(currentSet.cards.map(card => card.cardId)),
                     front: front?.trim() || '',
-                    back: back?.trim() || '',
-                    category: category == "" ? category?.trim() || '' : "N/A",
+                    back: backParts.join(selectedDelimiter) || '',
+                    // category: category?.trim() || '',
+                    // category: category == "" ? category?.trim() || '' : "N/A",
                     originalFileName: "",
                     croppedFileName: "",
                     due: due,

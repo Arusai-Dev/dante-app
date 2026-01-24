@@ -8,6 +8,7 @@ import { dismissTextModal } from "@/components/modals/dismissTextModal"
 import { dismissLoading, loadingModal } from "@/components/modals/loading"
 import { handleAddCard, handleCardDelete, handleUpdateCard } from "@/app/hooks/managerHooks/useCardHandlers"
 import ImageCropper from "@/components/ImageCropper"
+import { updateCardCount } from "@/lib/dbFunctions"
 
 export const fetchAllData = () => {
     const {
@@ -49,7 +50,8 @@ export default function Create() {
         }
 
         fetchData();
-    }, [currentSet.id, setSets]);
+        updateCardCount(currentSet.id, currentSet.cards.length);
+    }, [currentSet.cards.length, currentSet.id, setSets]);
 
     const updateCard = useManagerPersistentStore(state => state.updateCurrentCard)
     const clearCard = useManagerPersistentStore(state => state.clearCurrentCard)
@@ -84,7 +86,7 @@ export default function Create() {
 
     }
 
-    fetchAllData()
+    // console.log(fetchAllData())
     return (
         <section className="flex flex-col items-center pt-[45px] pb-[65px] font-(family-name:inter) force-scrollbar">
         
@@ -156,7 +158,7 @@ export default function Create() {
                         ></textarea>
 
                         
-                        <h2 className="text-[12px] md:text-[15px] pb-1 font-semibold">Back Side Image (Optional)</h2>
+                        {/* <h2 className="text-[12px] md:text-[15px] pb-1 font-semibold">Back Side Image (Optional)</h2>
                         <h2 className="text-[12px] md:text-[15px] pb-1 ">Image URL:</h2>
                         <input className="text-[12px] md:text-[16px] px-2 py-1 mb-3 w-full border-[1px] border-[#8c8c8c] rounded-[5px] hover-animation"
                             placeholder="https://example.com/image.jpg"
@@ -172,10 +174,10 @@ export default function Create() {
                                     accept="image/*"
                                     className="hidden"
                                 /> Upload Image
-                            </label> */}
+                            </label> 
 
                             <ImageCropper/>
-                        </div>
+                        </div> */}
 
 
                         <div className="flex gap-2 w-full max-w-[600px] mb-1 mt-4">
